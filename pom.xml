@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.cismet.cids</groupId>
+        <artifactId>cids-parent</artifactId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+
+    <groupId>de.cismet.cids.custom.switchon</groupId>
+    <artifactId>cids-custom-switchon-server</artifactId>
+    <version>2.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>cids Custom SWITCH-ON  Server</name>
+    <description>!!! description pending !!!</description>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License</name>
+            <distribution>repo</distribution>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.html</url>
+        </license>
+    </licenses>
+
+    <prerequisites>
+        <maven>3</maven>
+    </prerequisites>
+
+    <scm>
+        <connection>scm:git:https://github.com/switchonproject/cids-custom-switchon-server.git</connection>
+        <developerConnection>scm:git:git@github.com:switchonproject/cids-custom-switchon-server.git</developerConnection>
+        <url>https://github.com/switchonproject/cids-custom-switchon-server</url>
+    </scm>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/switchonproject/cids-custom-switchon-server/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>jenkins</system>
+        <url>https://ci.cismet.de/job/cids-custom-switchon-server/</url>
+    </ciManagement>
+
+    <repositories>
+        <repository>
+            <id>cismet-repo</id>
+            <url>https://repo.cismet.de/repo</url>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+                <updatePolicy>daily</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>warn</checksumPolicy>
+                <updatePolicy>interval:60</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    
+    <developers>
+        <developer>
+            <id>thell</id>
+            <name>Thorsten Hell</name>
+            <email>thorsten.hell@cismet.de</email>
+            <organization>cismet GmbH</organization>
+        </developer>
+        <developer>
+            <id>sschlobinski</id>
+            <name>Sascha Schlobinski</name>
+            <email>sascha.schlobinski@cismet.de</email>
+            <organization>cismet GmbH</organization>
+        </developer>
+        <developer>
+            <id>mscholl</id>
+            <name>Martin Scholl</name>
+            <email>martin.scholl@cismet.de</email>
+            <organization>cismet GmbH</organization>
+        </developer>
+        <developer>
+            <id>pdihe</id>
+            <name>Pascal Dihé</name>
+            <email>pascal.dihe@cismet.de</email>
+            <organization>cismet GmbH</organization>
+        </developer>
+    </developers>
+    
+    <distributionManagement>
+        <site>
+            <id>switchon-site</id>
+            <url>scp://demo@switchon.cismet.de/var/www_switchon/</url>
+        </site>
+        <repository>
+            <id>cismet-repo</id>
+            <name>cismet-libs-releases-local</name>
+            <url>https://repo.cismet.de/cismet-libs-releases-local</url>
+        </repository>
+        <snapshotRepository>
+            <id>cismet-repo</id>
+            <name>cismet-libs-snapshots-local</name>
+            <url>https://repo.cismet.de/cismet-libs-snapshots-local</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <properties>
+        <de.cismet.libDir>lib/localSwitchon</de.cismet.libDir>
+        <netbeans.version>RELEASE691</netbeans.version>
+        <jackson.version>2.2.2</jackson.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>de.cismet.cids</groupId>
+            <artifactId>cids-server</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- overwritten because the artifact has to be renamed du to
+            compatibility reasons to the cidsDistribution -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-installed</id>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <destFileName>cidsCustomServerStuff.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.3</version>
+                <dependencies>
+                    <dependency><!-- add support for ssh/scp -->
+                        <groupId>org.apache.maven.wagon</groupId>
+                        <artifactId>wagon-ssh</artifactId>
+                        <version>2.4</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>2.7</version>
+                <configuration>
+                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
+
+
+
+
+
+
+
