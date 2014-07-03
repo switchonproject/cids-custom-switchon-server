@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.3.3
 -- Dumped by pg_dump version 9.3.1
--- Started on 2014-07-02 14:32:21
+-- Started on 2014-07-03 10:56:11
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -757,6 +757,7 @@ INSERT INTO cs_attr VALUES (49, 17, 4, 'id', 'id', false, false, NULL, 'Primärs
 INSERT INTO cs_attr VALUES (28, 15, 9, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 4, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (37, 4, 8, 'name', 'name', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, 64, NULL, false);
 INSERT INTO cs_attr VALUES (15, 4, 8, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 2, 200, NULL, false);
+INSERT INTO cs_attr VALUES (22, 18, 14, 'fromDate', 'fromdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 11, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (70, 15, 29, 'contact', 'contact', true, false, 4, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 13, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (18, 15, 9, 'content', 'content', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 11, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (27, 17, 9, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
@@ -766,31 +767,39 @@ INSERT INTO cs_attr VALUES (25, 17, 9, 'content', 'content', false, false, NULL,
 INSERT INTO cs_attr VALUES (11, 15, 14, 'creationDate', 'creationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (75, 18, 22, 'metadata', 'metadata', true, false, 7, '', true, false, true, 'resource_reference', NULL, NULL, NULL, false, NULL, NULL, 18, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (73, 18, 36, 'tags', 'tags', true, false, 12, '', true, false, true, 'resource_reference', NULL, NULL, NULL, false, NULL, NULL, 5, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (30, 18, 14, 'lastmodificationdate', 'lastmodificationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 16, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (57, 18, 19, 'spatialCoverage', 'spatialcoverage', true, false, 1, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 6, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (29, 15, 8, 'name', 'name', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 3, 150, NULL, false);
 INSERT INTO cs_attr VALUES (72, 15, 31, 'tags', 'tags', true, false, 8, '', true, false, true, 'metadata_reference', NULL, NULL, NULL, false, NULL, NULL, 7, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (57, 18, 19, 'spatialcoverage', 'spatialcoverage', true, false, 1, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 6, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (22, 18, 14, 'fromdate', 'fromdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 11, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (32, 18, 14, 'publicationdate', 'publicationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 14, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (64, 18, 29, 'contact', 'contact', true, false, 4, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 17, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (74, 18, 30, 'representation', 'representation', true, false, 11, '', true, false, true, 'resource_reference', NULL, NULL, NULL, false, NULL, NULL, 19, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (58, 18, 28, 'accessConditions', 'accessconditions', true, false, 19, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 23, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (10, 4, 8, 'organisation', 'organisation', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 3, 100, NULL, false);
 INSERT INTO cs_attr VALUES (78, 16, 32, 'fromResources', 'fromresources', true, false, 5, '', true, false, true, 'relationship_reference', NULL, NULL, NULL, false, NULL, NULL, 8, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (77, 16, 23, 'tags', 'tags', true, false, 9, '', true, false, true, 'relationship_reference', NULL, NULL, NULL, false, NULL, NULL, 4, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (58, 18, 28, 'accessConditions', 'accessconditions', true, false, 19, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 24, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (32, 18, 14, 'publicationDate', 'publicationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 14, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (30, 18, 14, 'lastModificationDate', 'lastmodificationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 16, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (12, 19, 8, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 2, 500, NULL, false);
 INSERT INTO cs_attr VALUES (119, 18, 28, 'location', 'location', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 9, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (122, 18, 9, 'licenseStatement', 'licensestatement', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 25, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (125, 4, 8, 'email', 'email', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, 50, NULL, false);
 INSERT INTO cs_attr VALUES (124, 4, 18, 'url', 'url', true, false, 2, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 8, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (106, 16, 28, 'type', 'type', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (129, 18, 28, 'topicCategory', 'topiccategory', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 20, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (14, 18, 14, 'toDate', 'todate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (97, 4, 28, 'role', 'role', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 6, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (115, 18, 28, 'conformity', 'conformity', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 23, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (23, 18, 14, 'creationDate', 'creationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 13, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (100, 17, 28, 'contentType', 'contenttype', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (98, 19, 27, 'taggroup', 'taggroup', true, false, 20, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 3, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (102, 16, 34, 'toResource', 'toresource', true, false, 18, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (107, 16, 28, 'applicationProfile', 'applicationprofile', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 9, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (118, 18, 28, 'accessLimitations', 'accesslimitations', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 25, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (121, 17, 8, 'uuid', 'uuid', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, 50, NULL, false);
 INSERT INTO cs_attr VALUES (111, 17, 28, 'type', 'type', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 5, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (114, 18, 28, 'language', 'language', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 21, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (122, 18, 9, 'licenseStatement', 'licensestatement', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 26, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (130, 17, 2, 'spatialScale', 'spatialscale', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 15, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (131, 17, 8, 'temporalResolution', 'temporalresolution', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 16, 100, NULL, false);
+INSERT INTO cs_attr VALUES (132, 17, 8, 'spatialResolution', 'spatialresolution', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 14, 100, NULL, false);
 INSERT INTO cs_attr VALUES (123, 15, 8, 'uuid', 'uuid', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 2, 100, NULL, false);
 INSERT INTO cs_attr VALUES (104, 15, 28, 'type', 'type', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 5, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (99, 15, 28, 'contentType', 'contenttype', true, false, 19, NULL, true, true, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 8, NULL, NULL, false);
@@ -802,15 +811,8 @@ INSERT INTO cs_attr VALUES (127, 15, 18, 'contentLocation', 'contentlocation', t
 INSERT INTO cs_attr VALUES (105, 15, 28, 'standard', 'standard', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 15, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (103, 15, 28, 'language', 'language', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 14, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (128, 18, 28, 'type', 'type', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 4, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (14, 18, 14, 'todate', 'todate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (23, 18, 14, 'creationdate', 'creationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 13, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (112, 18, 28, 'scope', 'scope', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 21, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (113, 18, 28, 'geography', 'geography', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 10, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (114, 18, 28, 'language', 'language', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 20, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (115, 18, 28, 'conformity', 'conformity', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 22, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (116, 18, 8, 'spatialResolution', 'spatialresolution', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 8, 100, NULL, false);
 INSERT INTO cs_attr VALUES (117, 18, 28, 'srid', 'srid', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (118, 18, 28, 'accessLimitations', 'accesslimitations', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 24, NULL, NULL, false);
 
 
 --
@@ -1091,7 +1093,7 @@ INSERT INTO cs_icon VALUES (2, 'Erde', 'erde_16.gif');
 --
 
 INSERT INTO cs_locks VALUES (NULL, NULL, NULL, NULL, 1);
-INSERT INTO cs_locks VALUES (NULL, NULL, 'ABF_EXCLUSIVE_LOCK_1404303242686', 'pascal@KNECHT-RUPRECHT', 19);
+INSERT INTO cs_locks VALUES (NULL, NULL, 'ABF_EXCLUSIVE_LOCK_1404377646064', 'pascal@KNECHT-RUPRECHT', 21);
 
 
 --
@@ -1947,7 +1949,7 @@ ALTER TABLE ONLY cs_history
     ADD CONSTRAINT cs_history_usr_id_fkey FOREIGN KEY (usr_id) REFERENCES cs_usr(id);
 
 
--- Completed on 2014-07-02 14:32:24
+-- Completed on 2014-07-03 10:56:15
 
 --
 -- PostgreSQL database dump complete
