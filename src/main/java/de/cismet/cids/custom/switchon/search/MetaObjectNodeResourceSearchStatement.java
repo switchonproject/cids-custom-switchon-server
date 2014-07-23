@@ -47,21 +47,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
 
     //~ Static fields/initializers ---------------------------------------------
 
-    // - Static Constants and Objects -------------------------------------------
-
     private static final Logger LOG = Logger.getLogger(MetaObjectNodeResourceSearchStatement.class);
     protected static final String DOMAIN = "SWITCH-ON";
 
-    // - Constructors -----------------------------------------------------------
-
     //~ Instance fields --------------------------------------------------------
-
-    // - Variables --------------------------------------------------------------
 
     protected StringBuilder query;
     protected User user;
 
-    // - Queriables -//
+    // - Queriables - //
     protected Geometry geometryToSearchFor;
 
     protected List<String> keywordList;
@@ -70,7 +64,6 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected String title;
     protected Time fromDate;
     protected Time toDate;
-    // - Methods ----------------------------------------------------------------
 
     //~ Constructors -----------------------------------------------------------
 
@@ -153,8 +146,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         return query.toString();
     }
 
+    // - Append queryables and setter ------------------------------------------
+
     /**
-     * - Append queryables and setter -------------------------------------------
+     * DOCUMENT ME!
      */
     protected void appendGeometry() {
         if (geometryToSearchFor != null) {
@@ -195,10 +190,14 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if ((keywordList != null) && !keywordList.isEmpty()) {
             String[] keywords = null;
             keywords = keywordList.toArray(keywords);
-            query.append(" and ( kwt.name = ").append(keywords[0]).append(" and kwt_tg.name like 'keywords%'");
+            query.append(" and ( lower(kwt.name) = lower(")
+                    .append(keywords[0])
+                    .append(") and kwt_tg.name like 'keywords%'");
             if (keywords.length > 1) {
                 for (int i = 1; i < keywords.length; i++) {
-                    query.append(" OR kwt.name = ").append(keywords[i]).append(" and kwt_tg.name like 'keywords%'");
+                    query.append(" OR lower(kwt.name) = lower(")
+                            .append(keywords[i])
+                            .append(") and kwt_tg.name like 'keywords%'");
                 }
             }
             query.append(")");
@@ -210,7 +209,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendtopic() {
         if (topicCategory != null) {
-            query.append(" and tct.name = ").append(topicCategory);
+            query.append(" and lower(tct.name) = lower(").append(topicCategory).append(")");
         }
     }
 
@@ -219,7 +218,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendDescription() {
         if (description != null) {
-            query.append(" and r.description like %").append(description).append("%");
+            query.append(" and lower(r.description) like lower(%").append(description).append("%)");
         }
     }
 
@@ -228,7 +227,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendTitle() {
         if (title != null) {
-            query.append(" and r.title like %").append(title).append("%");
+            query.append(" and lower(r.title) like lower(%").append(title).append("%)");
         }
     }
 
