@@ -48,7 +48,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(MetaObjectNodeResourceSearchStatement.class);
-    protected static final String DOMAIN = "SWITCH-ON";
+    protected static final String DOMAIN = "SWITCHON";
 
     //~ Instance fields --------------------------------------------------------
 
