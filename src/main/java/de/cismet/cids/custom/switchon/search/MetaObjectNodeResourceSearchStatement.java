@@ -64,6 +64,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected String title;
     protected Time fromDate;
     protected Time toDate;
+    protected String location;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -134,6 +135,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if (topicCategory != null) {
             query.append(" join tag tct ON resource.topiccategory = tct.id");
         }
+        if (location != null) {
+            query.append(" join tag lct ON resource.location = lct.id");
+        }
         query.append(" WHERE TRUE ");
         // TODO append der einzelnen suchanfragen [appendTitle() / appendKeywords() / etc]
         appendGeometry();
@@ -142,6 +146,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         appendTempora();
         appendTitle();
         appendtopic();
+        appendLocation();
 
         return query.toString();
     }
@@ -233,6 +238,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
 
     /**
      * DOCUMENT ME!
+     */
+    private void appendLocation() {
+        if (location != null) {
+            query.append(" and lower(lct.name) = lower(").append(location).append(")");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
      *
      * @param  geometryToSearchFor  DOCUMENT ME!
      */
@@ -292,5 +306,14 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setToDate(final Time toDate) {
         this.toDate = toDate;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  location  DOCUMENT ME!
+     */
+    public void setLocation(final String location) {
+        this.location = location;
     }
 }
