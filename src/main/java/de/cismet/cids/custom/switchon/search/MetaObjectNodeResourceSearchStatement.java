@@ -5,44 +5,74 @@
 *              ... and it just works.
 *
 ****************************************************/
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package de.cismet.cids.custom.switchon.search;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
 import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
-import de.cismet.cids.server.search.AbstractCidsServerSearch;
-import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
-import de.cismet.cids.server.search.SearchException;
-import de.cismet.cismap.commons.jtsgeometryfactories.PostGisGeometryFactory;
+
+import org.apache.log4j.Logger;
+
 import java.rmi.RemoteException;
+
 import java.sql.Time;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import org.apache.log4j.Logger;
+
+import de.cismet.cids.server.search.AbstractCidsServerSearch;
+import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+import de.cismet.cids.server.search.SearchException;
+
+import de.cismet.cismap.commons.jtsgeometryfactories.PostGisGeometryFactory;
 
 /**
+ * DOCUMENT ME!
  *
- * @author FabHewer
+ * @author   FabHewer
+ * @version  $Revision$, $Date$
  */
-public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSearch implements MetaObjectNodeServerSearch {
+public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSearch
+        implements MetaObjectNodeServerSearch {
 
-    //- Static Constants and Objects -------------------------------------------
-    
+    //~ Static fields/initializers ---------------------------------------------
+
+    // - Static Constants and Objects -------------------------------------------
+
     private static final Logger LOG = Logger.getLogger(MetaObjectNodeResourceSearchStatement.class);
     protected static final String DOMAIN = "SWITCH-ON";
-    
-    //- Constructors -----------------------------------------------------------
+
+    // - Constructors -----------------------------------------------------------
+
+    //~ Instance fields --------------------------------------------------------
+
+    // - Variables --------------------------------------------------------------
+
+    protected StringBuilder query;
+    protected User user;
+
+    // - Queriables -//
+    protected Geometry geometryToSearchFor;
+
+    protected List<String> keywordList;
+    protected String topicCategory;
+    protected String description;
+    protected String title;
+    protected Time fromDate;
+    protected Time toDate;
+    // - Methods ----------------------------------------------------------------
+
+    //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new MetaObjectNodeDokumenteSearchStatement object.
@@ -52,23 +82,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     public MetaObjectNodeResourceSearchStatement(final User user) {
         this.user = user;
     }
-    
-    //- Variables --------------------------------------------------------------
-    
-    protected StringBuilder query;
-    protected User user; 
-    
-    
-        //- Queriables -//
-    protected Geometry geometryToSearchFor;
-    
-    protected List<String> keywordList;
-    protected String topicCategory;
-    protected String description;
-    protected String title;
-    protected Time fromDate;
-    protected Time toDate;
-    //- Methods ----------------------------------------------------------------
+
+    //~ Methods ----------------------------------------------------------------
 
     @Override
     public Collection<MetaObjectNode> performServerSearch() throws SearchException {
@@ -107,27 +122,27 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @return  DOCUMENT ME!
      */
-    
+
     protected String generateQuery() {
         query = new StringBuilder();
-        query.append("SELECT DISTINCT " +   "(SELECT id "
-                    +               "FROM    cs_class "
-                    +               "WHERE   name ilike 'resource' "
-                    +               "), r.id, r.name ");
+        query.append("SELECT DISTINCT " + "(SELECT id "
+                    + "FROM    cs_class "
+                    + "WHERE   name ilike 'resource' "
+                    + "), r.id, r.name ");
         query.append(" FROM resource r");
         if (geometryToSearchFor != null) {
             query.append(" join geom g ON r.geometrie = g.id ");
         }
-        if (keywordList != null && !keywordList.isEmpty()) {
+        if ((keywordList != null) && !keywordList.isEmpty()) {
             query.append(" join jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
-                 .append(" join tag kwt ON jtrt.tag_id = kwt.id")
-                 .append(" join taggroup kwt_tg ON t.taggroup = kwt_tg.id");
+                    .append(" join tag kwt ON jtrt.tag_id = kwt.id")
+                    .append(" join taggroup kwt_tg ON t.taggroup = kwt_tg.id");
         }
         if (topicCategory != null) {
             query.append(" join tag tct ON resource.topiccategory = tct.id");
         }
         query.append(" WHERE TRUE ");
-        //TODO append der einzelnen suchanfragen [appendTitle() / appendKeywords() / etc]
+        // TODO append der einzelnen suchanfragen [appendTitle() / appendKeywords() / etc]
         appendGeometry();
         appendDescription();
         appendKeywords();
@@ -137,9 +152,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
 
         return query.toString();
     }
-    
-    //- Append queryables and setter -------------------------------------------
-    
+
+    /**
+     * - Append queryables and setter -------------------------------------------
+     */
     protected void appendGeometry() {
         if (geometryToSearchFor != null) {
             final String geostring = PostGisGeometryFactory.getPostGisCompliantDbString(geometryToSearchFor);
@@ -157,7 +173,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             }
         }
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     */
     private void appendTempora() {
         if (fromDate != null) {
             query.append(" and fromDate = ").append(fromDate.toString());
@@ -168,72 +187,111 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             }
         }
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     */
     private void appendKeywords() {
-        if (keywordList != null && !keywordList.isEmpty()) {
+        if ((keywordList != null) && !keywordList.isEmpty()) {
             String[] keywords = null;
             keywords = keywordList.toArray(keywords);
-            query.append(" and ( kwt.name = ").append(keywords[0])
-                 .append(" and kwt_tg.name like 'keywords%'");
+            query.append(" and ( kwt.name = ").append(keywords[0]).append(" and kwt_tg.name like 'keywords%'");
             if (keywords.length > 1) {
-                for( int i = 1; i < keywords.length; i++) {
-                    query.append(" OR kwt.name = ").append(keywords[i])
-                 .append(" and kwt_tg.name like 'keywords%'");
+                for (int i = 1; i < keywords.length; i++) {
+                    query.append(" OR kwt.name = ").append(keywords[i]).append(" and kwt_tg.name like 'keywords%'");
                 }
             }
             query.append(")");
         }
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     */
     private void appendtopic() {
         if (topicCategory != null) {
             query.append(" and tct.name = ").append(topicCategory);
         }
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     */
     private void appendDescription() {
         if (description != null) {
-            query.append(" and r.description like %")
-                 .append(description).append("%");
-        }
-    }
-    
-    private void appendTitle() {
-        if (title != null) {
-            query.append(" and r.title like %")
-                 .append(title).append("%");
+            query.append(" and r.description like %").append(description).append("%");
         }
     }
 
-    public void setGeometryToSearchFor(Geometry geometryToSearchFor) {
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendTitle() {
+        if (title != null) {
+            query.append(" and r.title like %").append(title).append("%");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  geometryToSearchFor  DOCUMENT ME!
+     */
+    public void setGeometryToSearchFor(final Geometry geometryToSearchFor) {
         this.geometryToSearchFor = geometryToSearchFor;
     }
 
-    public void setKeywordList(List<String> keywordList) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  keywordList  DOCUMENT ME!
+     */
+    public void setKeywordList(final List<String> keywordList) {
         this.keywordList = keywordList;
     }
 
-    public void setTopicCategory(String topicCategory) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  topicCategory  DOCUMENT ME!
+     */
+    public void setTopicCategory(final String topicCategory) {
         this.topicCategory = topicCategory;
     }
 
-    public void setDescription(String description) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  description  DOCUMENT ME!
+     */
+    public void setDescription(final String description) {
         this.description = description;
     }
 
-    public void setTitle(String title) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  title  DOCUMENT ME!
+     */
+    public void setTitle(final String title) {
         this.title = title;
     }
 
-    public void setFromDate(Time fromDate) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  fromDate  DOCUMENT ME!
+     */
+    public void setFromDate(final Time fromDate) {
         this.fromDate = fromDate;
     }
 
-    public void setToDate(Time toDate) {
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  toDate  DOCUMENT ME!
+     */
+    public void setToDate(final Time toDate) {
         this.toDate = toDate;
     }
-
-    
-    
-    
 }
