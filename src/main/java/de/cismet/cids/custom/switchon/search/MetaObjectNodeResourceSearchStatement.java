@@ -131,8 +131,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         }
         if ((keywordList != null) && !keywordList.isEmpty()) {
             query.append(" join jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
-                    .append(" join tag kwt ON jtrt.tag_id = kwt.id")
-                    .append(" join taggroup kwt_tg ON t.taggroup = kwt_tg.id");
+                    .append(" join tag kwt ON jtrt.tagid = kwt.id")
+                    .append(" join taggroup kwt_tg ON kwt.taggroup = kwt_tg.id");
         }
         if (topicCategory != null) {
             query.append(" join tag tct ON r.topiccategory = tct.id");
@@ -168,7 +168,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                                 + "st_buffer(st_geometryfromtext('")
                         .append(geostring)
                         .append("'), 0.000001))");
-            } else {                                                                                         // without buffer for geostring
+            } else {                                                                                         // without buffer for
+                // geostring
                 query.append(" and st_intersects(" + "st_buffer(geo_field, 0.000001)," + "st_geometryfromtext('")
                         .append(geostring)
                         .append("'))");
@@ -185,13 +186,13 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                     .append(fromDate.toString())
                     .append("' and r.fromDate < '")
                     .append(fromDate.toString())
-                    .append("' + '1 day'");
+                    .append("'::Timestamp + '1 day'::interval");
             if (toDate != null) {
                 query.append(" and r.toDate >= '")
-                        .append(fromDate.toString())
+                        .append(toDate.toString())
                         .append("' and r.toDate < '")
-                        .append(fromDate.toString())
-                        .append("' + '1 day'");
+                        .append(toDate.toString())
+                        .append("'::Timestamp + '1 day'::interval");
             }
         }
     }
@@ -201,16 +202,16 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendKeywords() {
         if ((keywordList != null) && !keywordList.isEmpty()) {
-            String[] keywords = null;
+            String[] keywords = new String[keywordList.size()];
             keywords = keywordList.toArray(keywords);
-            query.append(" and ( lower(kwt.name) = lower(")
+            query.append(" and ( lower(kwt.name) = lower('")
                     .append(keywords[0])
-                    .append(") and kwt_tg.name like 'keywords%'");
+                    .append("') and kwt_tg.name like 'keywords%'");
             if (keywords.length > 1) {
                 for (int i = 1; i < keywords.length; i++) {
-                    query.append(" OR lower(kwt.name) = lower(")
+                    query.append(" OR lower(kwt.name) = lower('")
                             .append(keywords[i])
-                            .append(") and kwt_tg.name like 'keywords%'");
+                            .append("') and kwt_tg.name like 'keywords%'");
                 }
             }
             query.append(")");
