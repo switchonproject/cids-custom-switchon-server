@@ -24,7 +24,9 @@ import org.apache.log4j.Logger;
 
 import java.rmi.RemoteException;
 
+import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -125,7 +127,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                     + "), r.id, r.name ");
         query.append(" FROM resource r");
         if (geometryToSearchFor != null) {
-            query.append(" join geom g ON r.geometrie = g.id ");
+            query.append(" join geom g ON r.spatialcoverage = g.id ");
         }
         if ((keywordList != null) && !keywordList.isEmpty()) {
             query.append(" join jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
@@ -133,10 +135,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                     .append(" join taggroup kwt_tg ON t.taggroup = kwt_tg.id");
         }
         if (topicCategory != null) {
-            query.append(" join tag tct ON resource.topiccategory = tct.id");
+            query.append(" join tag tct ON r.topiccategory = tct.id");
         }
         if (location != null) {
-            query.append(" join tag lct ON resource.location = lct.id");
+            query.append(" join tag lct ON r.location = lct.id");
         }
         query.append(" WHERE TRUE ");
         // TODO append der einzelnen suchanfragen [appendTitle() / appendKeywords() / etc]
@@ -179,11 +181,17 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendTempora() {
         if (fromDate != null) {
-            query.append(" and fromDate = ").append(fromDate.toString());
+            query.append(" and r.fromDate >= '")
+                    .append(fromDate.toString())
+                    .append("' and r.fromDate < '")
+                    .append(fromDate.toString())
+                    .append("' + '1 day'");
             if (toDate != null) {
-                query.append(" and toDate = ").append(toDate.toString());
-            } else { // If the dataset is ongoing, then toDate is set to NULL.
-                query.append(" and toDate IS NULL");
+                query.append(" and r.toDate >= '")
+                        .append(fromDate.toString())
+                        .append("' and r.toDate < '")
+                        .append(fromDate.toString())
+                        .append("' + '1 day'");
             }
         }
     }
@@ -214,7 +222,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendtopic() {
         if (topicCategory != null) {
-            query.append(" and lower(tct.name) = lower(").append(topicCategory).append(")");
+            query.append(" and lower(tct.name) = lower('").append(topicCategory).append("')");
         }
     }
 
@@ -223,7 +231,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendDescription() {
         if (description != null) {
-            query.append(" and lower(r.description) like lower(%").append(description).append("%)");
+            query.append(" and lower(r.description) like lower('%").append(description).append("%')");
         }
     }
 
@@ -232,7 +240,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendTitle() {
         if (title != null) {
-            query.append(" and lower(r.title) like lower(%").append(title).append("%)");
+            query.append(" and lower(r.name) like lower('%").append(title).append("%')");
         }
     }
 
@@ -241,7 +249,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendLocation() {
         if (location != null) {
-            query.append(" and lower(lct.name) = lower(").append(location).append(")");
+            query.append(" and lower(lct.name) = lower('").append(location).append("')");
         }
     }
 
