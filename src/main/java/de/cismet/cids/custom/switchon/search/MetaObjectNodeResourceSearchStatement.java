@@ -64,8 +64,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected String topicCategory;
     protected String description;
     protected String title;
-    protected Time fromDate;
-    protected Time toDate;
+    protected Timestamp fromDate;
+    protected Timestamp toDate;
     protected String location;
 
     //~ Constructors -----------------------------------------------------------
@@ -303,7 +303,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @param  fromDate  DOCUMENT ME!
      */
-    public void setFromDate(final Time fromDate) {
+    public void setFromDate(final Timestamp fromDate) {
         this.fromDate = fromDate;
     }
 
@@ -312,7 +312,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @param  toDate  DOCUMENT ME!
      */
-    public void setToDate(final Time toDate) {
+    public void setToDate(final Timestamp toDate) {
         this.toDate = toDate;
     }
 
