@@ -143,10 +143,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         query.append(" WHERE TRUE ");
         // TODO append der einzelnen suchanfragen [appendTitle() / appendKeywords() / etc]
         appendGeometry();
-        appendDescription();
         appendKeywords();
         appendTempora();
-        appendTitle();
+        appendTitleDescription();
         appendtopic();
         appendLocation();
 
@@ -182,17 +181,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendTempora() {
         if (fromDate != null) {
-            query.append(" and r.fromDate >= '")
-                    .append(fromDate.toString())
-                    .append("' and r.fromDate < '")
-                    .append(fromDate.toString())
-                    .append("'::Timestamp + '1 day'::interval");
+            query.append(" and r.fromDate >= '").append(fromDate.toString()).append("'");
             if (toDate != null) {
-                query.append(" and r.toDate >= '")
-                        .append(toDate.toString())
-                        .append("' and r.toDate < '")
-                        .append(toDate.toString())
-                        .append("'::Timestamp + '1 day'::interval");
+                query.append(" and r.toDate < '").append(toDate.toString()).append("'::Timestamp + '1 day'::interval");
             }
         }
     }
@@ -204,14 +195,12 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if ((keywordList != null) && !keywordList.isEmpty()) {
             String[] keywords = new String[keywordList.size()];
             keywords = keywordList.toArray(keywords);
-            query.append(" and ( lower(kwt.name) = lower('")
-                    .append(keywords[0])
-                    .append("') and kwt_tg.name like 'keywords%'");
+            query.append(" and ( kwt.name ilike '").append(keywords[0]).append("' and kwt_tg.name like 'keywords%'");
             if (keywords.length > 1) {
                 for (int i = 1; i < keywords.length; i++) {
-                    query.append(" OR lower(kwt.name) = lower('")
+                    query.append(" OR kwt.name ilike '")
                             .append(keywords[i])
-                            .append("') and kwt_tg.name like 'keywords%'");
+                            .append("' and kwt_tg.name like 'keywords%'");
                 }
             }
             query.append(")");
@@ -223,25 +212,21 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendtopic() {
         if (topicCategory != null) {
-            query.append(" and lower(tct.name) = lower('").append(topicCategory).append("')");
+            query.append(" and tct.name ilike '").append(topicCategory).append("'");
         }
     }
 
     /**
      * DOCUMENT ME!
      */
-    private void appendDescription() {
-        if (description != null) {
-            query.append(" and lower(r.description) like lower('%").append(description).append("%')");
-        }
-    }
-
-    /**
-     * DOCUMENT ME!
-     */
-    private void appendTitle() {
-        if (title != null) {
-            query.append(" and lower(r.name) like lower('%").append(title).append("%')");
+    private void appendTitleDescription() {
+        if ((title != null) && (description == null)) {
+            query.append(" and r.name ilike '%").append(title).append("%'");
+        } else if ((title != null) && (description != null)) {
+            query.append(" and (r.name ilike '%").append(title).append("%'");
+            query.append(" or r.description ilike '%").append(description).append("%')");
+        } else if ((title == null) && (description != null)) {
+            query.append(" and r.description ilike '%").append(description).append("%'");
         }
     }
 
@@ -250,7 +235,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendLocation() {
         if (location != null) {
-            query.append(" and lower(lct.name) = lower('").append(location).append("')");
+            query.append(" and lct.name ilike '").append(location).append("'");
         }
     }
 
