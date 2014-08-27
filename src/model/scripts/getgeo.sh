@@ -6,15 +6,15 @@
 # USAGE: ./getgeo.sh
 #
 # DESCRIPTION: run the script so that the geodata will be downloaded and inserted into your
-# database
+# database in schema "geonames"
 #
 # OPTIONS: ---
-# REQUIREMENTS: PostgreSQL 9.1 w/ modules: cube, earthdistance
+# REQUIREMENTS: PostgreSQL 9.1 w/ modules: postgis
 # BUGS: ---
 # NOTES: ---
 # AUTHOR: Andreas (aka Harpagophyt )
 # COMPANY: <a href="http://forum.geonames.org/gforum/posts/list/926.page" target="_blank" rel="nofollow">http://forum.geonames.org/gforum/posts/list/926.page</a>
-# VERSION: 1.3
+# VERSION: 1.7
 # CREATED: 07/06/2008
 # REVISION: 1.1 2008-06-07 replace COPY continentCodes through INSERT statements.
 # 1.2 2008-11-25 Adjusted by Bastiaan Wakkie in order to not unnessisarily
@@ -25,6 +25,7 @@
 #                code to time zones.  Add column constraints after loading data, runs super fast on my machine.
 #                Normalized column naming, various other tweaks.
 # 1.6 2014-08-27 (Pascal Dihé) added PostGis geometry colums, added hierarchy
+# 1.7 2014-08-28 (Pascal Dihé) modified for cids Integration Base and SWITCH-ON Project
 #===============================================================================
 #!/bin/bash
 
@@ -36,15 +37,18 @@ DBHOST="127.0.0.1"
 DBPORT="5432"
 DBUSER="postgres"
 FILES="allCountries.zip alternateNames.zip userTags.zip admin1CodesASCII.txt admin2Codes.txt countryInfo.txt featureCodes_en.txt iso-languagecodes.txt timeZones.txt hierarchy.zip"
+DBNAME="switchon"
 
-psql -U $DBUSER -h $DBHOST -p $DBPORT postgres -c "CREATE DATABASE geonames WITH TEMPLATE=template0 ENCODING = 'UTF8';"
-psql -U $DBUSER -h $DBHOST -p $DBPORT geonames <<EOT
+psql -U $DBUSER -h $DBHOST -p $DBPORT $DBNAME <<EOT
 
-CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
+DROP SCHEMA IF EXISTS geonames;
+CREATE SCHEMA geonames;
+
+CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA geonames;
 -- CREATE EXTENSION IF NOT EXISTS postgis_topology WITH SCHEMA topology;
 
-DROP TABLE IF EXISTS geoname CASCADE;
-CREATE TABLE geoname (
+DROP TABLE IF EXISTS geonames.geoname CASCADE;
+CREATE TABLE geonames.geoname (
     id              INT PRIMARY KEY,
     name            VARCHAR,
     ascii_name      VARCHAR,
@@ -67,13 +71,13 @@ CREATE TABLE geoname (
 );
 
 -- PostGis stuff
-SELECT AddGeometryColumn( 'public','geoname','the_geom', 4326, 'GEOMETRY', 2 );
-ALTER TABLE geoname ADD CONSTRAINT enforce_srid_geom CHECK (st_srid(the_geom) = 4326);
-ALTER TABLE geoname ADD CONSTRAINT enforce_dims_geom CHECK (st_ndims(the_geom) = 2);
-ALTER TABLE geoname ADD CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL);
+SELECT AddGeometryColumn( 'geonames','geoname','the_geom', 4326, 'GEOMETRY', 2 );
+ALTER TABLE geonames.geoname ADD CONSTRAINT enforce_srid_geom CHECK (st_srid(the_geom) = 4326);
+ALTER TABLE geonames.geoname ADD CONSTRAINT enforce_dims_geom CHECK (st_ndims(the_geom) = 2);
+ALTER TABLE geonames.geoname ADD CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL);
 
-DROP TABLE IF EXISTS alternatename;
-CREATE TABLE alternatename (
+DROP TABLE IF EXISTS geonames.alternatename;
+CREATE TABLE geonames.alternatename (
     id                INT PRIMARY KEY,
     geoname_id        INT,
     iso_lang          VARCHAR,
@@ -84,8 +88,8 @@ CREATE TABLE alternatename (
     is_historic       BOOLEAN
 );
 
-DROP TABLE IF EXISTS countryinfo;
-CREATE TABLE "countryinfo" (
+DROP TABLE IF EXISTS geonames.countryinfo;
+CREATE TABLE geonames.countryinfo (
     iso_alpha2           CHAR(2) PRIMARY KEY,
     iso_alpha3           CHAR(3),
     iso_numeric          INTEGER,
@@ -109,8 +113,8 @@ CREATE TABLE "countryinfo" (
 
 
 
-DROP TABLE IF EXISTS iso_languagecodes;
-CREATE TABLE iso_languagecodes(
+DROP TABLE IF EXISTS geonames.iso_languagecodes;
+CREATE TABLE geonames.iso_languagecodes(
     iso_639_3     CHAR(4),
     iso_639_2     VARCHAR(50),
     iso_639_1     VARCHAR(50),
@@ -118,31 +122,31 @@ CREATE TABLE iso_languagecodes(
 );
 
 
-DROP TABLE IF EXISTS admin1CodesAscii;
-CREATE TABLE admin1CodesAscii (
+DROP TABLE IF EXISTS geonames.admin1CodesAscii;
+CREATE TABLE geonames.admin1CodesAscii (
     code       CHAR(20) PRIMARY KEY,
     name       TEXT,
     name_ascii  TEXT,
     geoname_id INT
 );
 
-DROP TABLE IF EXISTS admin2CodesAscii;
-CREATE TABLE admin2CodesAscii (
+DROP TABLE IF EXISTS geonames.admin2CodesAscii;
+CREATE TABLE geonames.admin2CodesAscii (
     code      CHAR(80) PRIMARY KEY,
     name      TEXT,
     name_ascii TEXT,
     geoname_id INT
 );
 
-DROP TABLE IF EXISTS featureCodes;
-CREATE TABLE featureCodes (
+DROP TABLE IF EXISTS geonames.featureCodes;
+CREATE TABLE geonames.featureCodes (
     code        CHAR(7) PRIMARY KEY,
     name        VARCHAR,
     description TEXT
 );
 
-DROP TABLE IF EXISTS timeZones;
-CREATE TABLE timeZones (
+DROP TABLE IF EXISTS geonames.timeZones;
+CREATE TABLE geonames.timeZones (
     id           VARCHAR PRIMARY KEY,
     country_code VARCHAR(2),
     GMT_offset NUMERIC(3,1),
@@ -150,15 +154,15 @@ CREATE TABLE timeZones (
     raw_offset NUMERIC(3,1)
 );
 
-DROP TABLE IF EXISTS continentCodes;
-CREATE TABLE continentCodes (
+DROP TABLE IF EXISTS geonames.continentCodes;
+CREATE TABLE geonames.continentCodes (
     code       CHAR(2) PRIMARY KEY,
     name       VARCHAR,
     geoname_id INT
 );
 
-DROP TABLE IF EXISTS postalcodes;
-CREATE TABLE postalcodes (
+DROP TABLE IF EXISTS geonames.postalcodes;
+CREATE TABLE geonames.postalcodes (
     country_code CHAR(2),
     postal_code  VARCHAR,
     place_name   VARCHAR,
@@ -173,18 +177,18 @@ CREATE TABLE postalcodes (
     accuracy     SMALLINT
 );
 
-DROP TABLE IF EXISTS hierarchy;
-CREATE TABLE hierarchy (
+DROP TABLE IF EXISTS geonames.hierarchy;
+CREATE TABLE geonames.hierarchy (
     parent_id INT, 
     child_id  INT,
     htype   VARCHAR
 );
 
 -- PostGis stuff
-SELECT AddGeometryColumn( 'public','postalcodes','the_geom', 4326, 'GEOMETRY', 2 );
-ALTER TABLE postalcodes ADD CONSTRAINT enforce_srid_geom CHECK (st_srid(the_geom) = 4326);
-ALTER TABLE postalcodes ADD CONSTRAINT enforce_dims_geom CHECK (st_ndims(the_geom) = 2);
-ALTER TABLE postalcodes ADD CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL);
+SELECT AddGeometryColumn( 'geonames','postalcodes','the_geom', 4326, 'GEOMETRY', 2 );
+ALTER TABLE geonames.postalcodes ADD CONSTRAINT enforce_srid_geom CHECK (st_srid(the_geom) = 4326);
+ALTER TABLE geonames.postalcodes ADD CONSTRAINT enforce_dims_geom CHECK (st_ndims(the_geom) = 2);
+ALTER TABLE geonames.postalcodes ADD CONSTRAINT enforce_geotype_geom CHECK (geometrytype(the_geom) = 'POINT'::text OR the_geom IS NULL);
 
 EOT
 
@@ -244,90 +248,90 @@ fi
 
 echo "+---- FILL DATABASE ------+"
 
-psql -e -U $DBUSER -h $DBHOST -p $DBPORT geonames <<EOT
-copy geoname (id,name,ascii_name,alternate_names,latitude,
+psql -e -U $DBUSER -h $DBHOST -p $DBPORT $DBNAME <<EOT
+copy geonames.geoname (id,name,ascii_name,alternate_names,latitude,
               longitude,fclass,fcode,country,cc2,admin1,admin2,
               admin3,admin4,population,elevation,gtopo30,
               timezone,modified_date)
     from '${WORKPATH}/${TMPPATH}/allCountries.txt' null as '';
 
-copy postalcodes (country_code,postal_code,place_name,
+copy geonames.postalcodes (country_code,postal_code,place_name,
                   admin1_name,admin1_code,admin2_name,admin2_code,
                   admin3_name,admin3_code,latitude,longitude,accuracy)
     from '${WORKPATH}/${PCPATH}/allCountries.txt' null as '';
 
-copy timeZones (country_code,id,GMT_offset,DST_offset,raw_offset)
+copy geonames.timeZones (country_code,id,GMT_offset,DST_offset,raw_offset)
     from '${WORKPATH}/${TMPPATH}/timeZones.txt.tmp' null as '';
 
-copy featureCodes (code,name,description)
+copy geonames.featureCodes (code,name,description)
     from '${WORKPATH}/${TMPPATH}/featureCodes_en.txt' null as '';
 
-copy admin1CodesAscii (code,name,name_ascii,geoname_id)
+copy geonames.admin1CodesAscii (code,name,name_ascii,geoname_id)
     from '${WORKPATH}/${TMPPATH}/admin1CodesASCII.txt' null as '';
 
-copy admin2CodesAscii (code,name,name_ascii,geoname_id)
+copy geonames.admin2CodesAscii (code,name,name_ascii,geoname_id)
     from '${WORKPATH}/${TMPPATH}/admin2Codes.txt' null as '';
 
-copy iso_languagecodes (iso_639_3,iso_639_2,iso_639_1,language_name)
+copy geonames.iso_languagecodes (iso_639_3,iso_639_2,iso_639_1,language_name)
     from '${WORKPATH}/${TMPPATH}/iso-languagecodes.txt.tmp' null as '';
 
-copy countryInfo (iso_alpha2,iso_alpha3,iso_numeric,fips_code,country,
+copy geonames.countryInfo (iso_alpha2,iso_alpha3,iso_numeric,fips_code,country,
                   capital,area,population,continent,tld,currency_code,
                   currency_name,phone,postal,postal_regex,languages,
                   geoname_id,neighbours,equivalent_fips_code)
     from '${WORKPATH}/${TMPPATH}/countryInfo.txt.tmp' null as '';
 
-copy alternatename (id,geoname_id,iso_lang,alternate_name,
+copy geonames.alternatename (id,geoname_id,iso_lang,alternate_name,
                     is_preferred_name,is_short_name,
                     is_colloquial,is_historic)
     from '${WORKPATH}/${TMPPATH}/alternateNames.txt' null as '';
     
-copy hierarchy (parent_id, child_id, htype)
+copy geonames.hierarchy (parent_id, child_id, htype)
     from '${WORKPATH}/${TMPPATH}/hierarchy.txt' null as ''; 
 
-INSERT INTO continentCodes VALUES ('AF', 'Africa', 6255146);
-INSERT INTO continentCodes VALUES ('AS', 'Asia', 6255147);
-INSERT INTO continentCodes VALUES ('EU', 'Europe', 6255148);
-INSERT INTO continentCodes VALUES ('NA', 'North America', 6255149);
-INSERT INTO continentCodes VALUES ('OC', 'Oceania', 6255150);
-INSERT INTO continentCodes VALUES ('SA', 'South America', 6255151);
-INSERT INTO continentCodes VALUES ('AN', 'Antarctica', 6255152);
-CREATE INDEX index_countryinfo_geonameid ON countryinfo (geoname_id);
-CREATE INDEX index_alternatename_geonameid ON alternatename (geoname_id);
-CREATE UNIQUE INDEX index_geoname_id ON geoname (id);
+INSERT INTO geonames.continentCodes VALUES ('AF', 'Africa', 6255146);
+INSERT INTO geonames.continentCodes VALUES ('AS', 'Asia', 6255147);
+INSERT INTO geonames.continentCodes VALUES ('EU', 'Europe', 6255148);
+INSERT INTO geonames.continentCodes VALUES ('NA', 'North America', 6255149);
+INSERT INTO geonames.continentCodes VALUES ('OC', 'Oceania', 6255150);
+INSERT INTO geonames.continentCodes VALUES ('SA', 'South America', 6255151);
+INSERT INTO geonames.continentCodes VALUES ('AN', 'Antarctica', 6255152);
+CREATE INDEX index_countryinfo_geonameid ON geonames.countryinfo (geoname_id);
+CREATE INDEX index_alternatename_geonameid ON geonames.alternatename (geoname_id);
+CREATE UNIQUE INDEX index_geoname_id ON geonames.geoname (id);
 
 -- PostGis Stuff -  populate the geometry columns
-UPDATE geoname SET the_geom = ST_GeomFromText('POINT(' || longitude || ' ' || latitude || ')',4326);
-UPDATE postalcodes SET the_geom = ST_GeomFromText('POINT(' || longitude || ' ' || latitude || ')',4326);
--- CREATE INDEX index_geoname_geom ON geoname USING GIST (the_geom);
+UPDATE geonames.geoname SET the_geom = ST_GeomFromText('POINT(' || longitude || ' ' || latitude || ')',4326);
+UPDATE geonames.postalcodes SET the_geom = ST_GeomFromText('POINT(' || longitude || ' ' || latitude || ')',4326);
+-- CREATE INDEX index_geoname_geom ON geonames.geoname USING GIST (the_geom);
 
 EOT
 
-psql -U $DBUSER -h $DBHOST -p $DBPORT geonames <<EOT
-ALTER TABLE ONLY countryinfo
+psql -U $DBUSER -h $DBHOST -p $DBPORT $DBNAME <<EOT
+ALTER TABLE ONLY geonames.countryinfo
     ADD CONSTRAINT fk_geonameid FOREIGN KEY (geoname_id)
-        REFERENCES geoname(id);
-ALTER TABLE ONLY alternatename
+        REFERENCES geonames.geoname(id);
+ALTER TABLE ONLY geonames.alternatename
     ADD CONSTRAINT fk_geonameid FOREIGN KEY (geoname_id)
-        REFERENCES geoname(id);
+        REFERENCES geonames.geoname(id);
 -- FK constraint disabled since 7522530 and 0 are not in geoname tabe!?
--- ALTER TABLE ONLY hierarchy
+-- ALTER TABLE ONLY geonames.hierarchy
 --     ADD CONSTRAINT fk_parentid FOREIGN KEY (parent_id)
---         REFERENCES geoname(id);
--- ALTER TABLE ONLY hierarchy
+--         REFERENCES geonames.geoname(id);
+-- ALTER TABLE ONLY geonames.hierarchy
 --     ADD CONSTRAINT fk_childid FOREIGN KEY (child_id)
---         REFERENCES geoname(id);
+--         REFERENCES geonames.geoname(id);
 
 
 -- create a country table as materialized view
-DROP MATERIALIZED VIEW IF EXISTS country;
+DROP MATERIALIZED VIEW IF EXISTS geonames.country;
 CREATE MATERIALIZED VIEW 
-    country AS select c.geoname_id as id, c.country, g.the_geom from countryinfo c, geoname g WHERE c.geoname_id = g.id ORDER BY c.country;
--- CREATE INDEX index_country_geom ON country USING GIST (the_geom);
+    geonames.country AS select c.geoname_id as id, c.country, g.the_geom from geonames.countryinfo c, geonames.geoname g WHERE c.geoname_id = g.id ORDER BY c.country;
+-- CREATE INDEX index_country_geom ON geonames.country USING GIST (the_geom);
 
 -- create european countries table as view
-CREATE OR REPLACE VIEW europe AS
-	SELECT * from country WHERE id IN (SELECT child_id FROM hierarchy WHERE parent_id = 6255148);
+CREATE OR REPLACE VIEW geonames.europe AS
+	SELECT * from geonames.country WHERE id IN (SELECT child_id FROM geonames.hierarchy WHERE parent_id = 6255148);
 
 EOT
 
