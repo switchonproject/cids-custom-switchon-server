@@ -177,7 +177,7 @@ INSERT INTO cs_attr (id, class_id, type_id, name, field_name, foreign_key, subst
 -- Data for Name: cs_class; Type: TABLE DATA; Schema: public; Owner: switchon
 --
 
-INSERT INTO cs_class (id, name, descr, class_icon_id, object_icon_id, table_name, primary_key_field, indexed, tostring, editor, renderer, array_link, policy, attribute_policy) VALUES (4, 'conact', '', 2, 2, 'CONACT', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
+INSERT INTO cs_class (id, name, descr, class_icon_id, object_icon_id, table_name, primary_key_field, indexed, tostring, editor, renderer, array_link, policy, attribute_policy) VALUES (4, 'contact', '', 2, 2, 'CONTACT', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
 INSERT INTO cs_class (id, name, descr, class_icon_id, object_icon_id, table_name, primary_key_field, indexed, tostring, editor, renderer, array_link, policy, attribute_policy) VALUES (5, 'taggroup', '', 2, 2, 'TAGGROUP', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
 INSERT INTO cs_class (id, name, descr, class_icon_id, object_icon_id, table_name, primary_key_field, indexed, tostring, editor, renderer, array_link, policy, attribute_policy) VALUES (6, 'tag', '', 2, 2, 'TAG', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
 INSERT INTO cs_class (id, name, descr, class_icon_id, object_icon_id, table_name, primary_key_field, indexed, tostring, editor, renderer, array_link, policy, attribute_policy) VALUES (7, 'representation', '', 2, 2, 'REPRESENTATION', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
@@ -406,7 +406,7 @@ INSERT INTO cs_locks (class_id, object_id, user_string, additional_info, id) VAL
 -- Data for Name: cs_type; Type: TABLE DATA; Schema: public; Owner: switchon
 --
 
-INSERT INTO cs_type (id, name, class_id, complex_type, descr, editor, renderer) VALUES (20, 'conact', 4, true, NULL, NULL, NULL);
+INSERT INTO cs_type (id, name, class_id, complex_type, descr, editor, renderer) VALUES (20, 'contact', 4, true, NULL, NULL, NULL);
 INSERT INTO cs_type (id, name, class_id, complex_type, descr, editor, renderer) VALUES (21, 'taggroup', 5, true, NULL, NULL, NULL);
 INSERT INTO cs_type (id, name, class_id, complex_type, descr, editor, renderer) VALUES (22, 'tag', 6, true, NULL, NULL, NULL);
 INSERT INTO cs_type (id, name, class_id, complex_type, descr, editor, renderer) VALUES (23, 'representation', 7, true, NULL, NULL, NULL);
