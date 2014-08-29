@@ -1,15 +1,16 @@
-ï»¿INSERT INTO taggroup (name, description)
+INSERT INTO taggroup (name, description)
 VALUES
 ('access conditions','License regulating the conditions for access and use of the data (open group with some predefined tags).'),
 ('access limitations','Limitations on public access in accordance to Article 13 of Directive 2007/2/EC (fixed group with tags from a standard codelist).'),
 ('application profile','Application that can be used to open or process the resource representation (open group with some predefined tags).'),
 ('catchments','Catchment of a Level B dataset (open group with some predefined tags).'),
 ('collection','Assigns the resource to a collection of resources for cataloguing purposes, e.g. SWITCH-ON Experiment Results, etc. (open group with some predefined tags).'),
+('conformity','This is a citation of the implementing rules adopted under Article 7(1) of Directive 2007/2/EC or other specification to which a particular resource conforms. (fixed group)'),
 ('content type','MIME Type of the representation (open group which several predefined tags).'),
 ('function','Function that can be perfomred following the contentLocation link to the resource representation (fixed group, standard codelist).'),
 ('geography','Geographical classification of the resource, currently Level A and Level B are defined (open group with some predefined tags).'),
 ('hydrological concept','Hydrological concept of a Level A Dataset (open group with some predefined tags).'),
-('keywords - INSPIRE themes 1.0','Keywords from  Gemet â€“ INSPIREthemes, version 1.0, publication, 2008-06-01 Hydrography (fixed group).'),
+('keywords - INSPIRE themes 1.0','Keywords from  Gemet – INSPIREthemes, version 1.0, publication, 2008-06-01 Hydrography (fixed group).'),
 ('keywords - open','User defined to describe the subject (open group with several predefined tags).'),
 ('language','The language(s) used within the resource or in which the metadata elements are expressed.  The value domain of this tag is limited to the languages defined in ISO 639-2.'),
 ('location','Geographic Location of the resource (covered by the data). E.g. Continent, Country, Region, City, etc. Open Group. (open group with some predefined tags).'),
@@ -18,11 +19,11 @@ VALUES
 ('protocol','Protocol of the service that can be accessed at the contentLocation of the resource representation (open group with several predefined tags from standard codelists).'),
 ('realtionship type','SIP internal type of the releationship between resources (fixed group).'),
 ('representation type','SIP internal type of the representation of the resource (fixed group).'),
+('resource type','SIP internal type of the resource (fixed group).'),
 ('role','Function performed by the responsible party (fixed group, standard codelist).'),
+('scope','Scope of the resource. A codelist used in hierarchyLevel, DQ_Scope.level, and updateScope (fixed group with tags from a standard codelist)'),
 ('srid','The Spatial Reference System Identifier (SRID) of the spatial coverage of the resource EPSG format (open group with some predefined tags).'),
-('topic category','High-level classification of resources in accordance with ISO 19115 for grouping and topic-based search (fixed group).'),
-('conformity','This is a citation of the implementing rules adopted under Article 7(1) of Directive 2007/2/EC or other specification to which a particular resource conforms. (fixed group)'),
-('resource type','SIP internal type of the resource (fixed group).');
+('topic category','High-level classification of resources in accordance with ISO 19115 for grouping and topic-based search (fixed group).');
 
 DO $$
 DECLARE tgid integer;
@@ -71,7 +72,6 @@ VALUES
 ('Wylye','Wylye',tgid);
 
 tgid = (SELECT id from taggroup where name = 'collection');
-INSERT INTO tag (name, description, taggroup)
 
 tgid = (SELECT id from taggroup where name = 'content type');
 INSERT INTO tag (name, description, taggroup)
@@ -124,7 +124,9 @@ VALUES
 ('order','link value is URL of web application requiring user interaction to order/request access to the resource',tgid),
 ('search','link value is URL of web application requiring user interaction to search/browse/subset the resource.',tgid),
 ('offlineAccess','link points to the local filesystem',tgid),
-('application','link points to an application (e.g. downloadable exe or Java Webstart rich internet application) which can be used to get the resource',tgid);
+('application','link points to an application (e.g. downloadable exe or Java Webstart rich internet application) which can be used to get the resource',tgid),
+('inline','The actual resource data is provided together with the resource meta-data (in the content attribute of the Representation class)',tgid);
+
 
 tgid = (SELECT id from taggroup where name = 'geography');
 INSERT INTO tag (name, description, taggroup)
@@ -239,7 +241,10 @@ VALUES
 ('DbCL','Database Contents License (DbCL) v1.0 http://opendatacommons.org/licenses/dbcl/1.0/',tgid),
 ('PDDL','ODC Public Domain Dedication and Licence (PDDL) http://opendatacommons.org/licenses/pddl/1.0/',tgid),
 ('ODC-By','Open Data Commons Attribution License (ODC-By) v1.0 http://opendatacommons.org/licenses/by/1.0/',tgid),
-('proprietary','Proprietary License.',tgid);
+('proprietary','Proprietary License.',tgid),
+('No conditions apply','No conditions apply',tgid),
+('Conditions unknown','Conditions unknown',tgid);
+
 
 tgid = (SELECT id from taggroup where name = 'location');
 INSERT INTO tag (name, description, taggroup)
@@ -261,7 +266,9 @@ VALUES
 ('basic meta-data','Type of the Meta-Data Record. "basic meta-data" refers to meta-data collected by switch-on according to the SIM meta-data schema. In fact, this meta-meta-data record refers to enclosing resource meta-data record.',tgid),
 ('origin meta-data','Type of the Meta-Data Record. "origin meta-data" refers to meta-data available at the origin (e.g. website) of the resource. It could refer to a webpage which provides information on the resource or, if available, a meta-data catalogue entry. There may be multiple entries of this meta-data record.',tgid),
 ('quality meta-data','Type of the Meta-Data Record. "quality meta-data" refers to meta-data on data quality either available at the origin (e.g. website) of the resource or provided by SWITCH-ON. Since no default schema for meta-data on data quality has been defined yet, the content of this meta-data record will be limited to a short statement by the person collecting the meta-data.',tgid),
-('lineage meta-data','Type of the Meta-Data Record. "lineage meta-data" refers to meta-data about the lineage of the resource, e.g. a protocol of an experiment.',tgid);
+('lineage meta-data','Type of the Meta-Data Record. "lineage meta-data" refers to meta-data about the lineage of the resource, e.g. a protocol of an experiment.',tgid),
+('relationship meta-data','Refers to meta-data about the relationship of the resource to other resources in the SIP, e.g. a protocol of an experiment.',tgid);
+
 
 tgid = (SELECT id from taggroup where name = 'protocol');
 INSERT INTO tag (name, description, taggroup)
@@ -284,7 +291,13 @@ VALUES
 ('WWW:LINK','Web Address (URL)',tgid),
 ('WWW:WSDL','Web Service Description Language XML document describing service operation',tgid),
 ('OpenSearch1.1','OpenSearch template',tgid),
-('OpenSearch1.1:Description','OpenSearch description document',tgid);
+('OpenSearch1.1:Description','OpenSearch description document',tgid),
+('ZIP:$contentType','ZIF File containing  the actual data',tgid),
+('ZIP:application/x-netcdf','Compressed netCDF-CF/Network Common Data Form dataset',tgid),
+('WWW:RIA','Rich Internet Application (JavaScript/HTML5 application)',tgid),
+('WWW:FORM','Web form',tgid),
+('WWW:TILESERVER','...',tgid);
+
 
 tgid = (SELECT id from taggroup where name = 'realtionship type');
 INSERT INTO tag (name, description, taggroup)
@@ -293,7 +306,8 @@ VALUES
 ('aggregated','The target resource has been aggregated from the origin resource(s).',tgid),
 ('experiment','The target resource is a result of an experiment that used the origin resource(s) as input data.',tgid),
 ('derived','The target resource has been derived from the origin resource(s).',tgid),
-('transformed','The target resource has been transformed from the origin resource(s).',tgid);
+('transformed','The target resource has been transformed from the origin resource(s).',tgid),
+('unknown','The type of the reltionship is unknown or no source resources are available in the SIP',tgid);
 
 tgid = (SELECT id from taggroup where name = 'representation type');
 INSERT INTO tag (name, description, taggroup)
@@ -305,7 +319,7 @@ VALUES
 tgid = (SELECT id from taggroup where name = 'role');
 INSERT INTO tag (name, description, taggroup)
 VALUES
-('resourceProvider','Party that supplies the resource. Person or organisation responsible for the availability of the data resource. Different form data distributor, who actively distributes the data resource at userâ€™s request.',tgid),
+('resourceProvider','Party that supplies the resource. Person or organisation responsible for the availability of the data resource. Different form data distributor, who actively distributes the data resource at user’s request.',tgid),
 ('custodian','Party that accepts accountability for the data and ensures appropriate care and maintenance of the resource. Person or organisation responsible for care and maintenance of the data resource.',tgid),
 ('owner','Party that owns the resource. Person or organization with the title to intellectual property rights.',tgid),
 ('user','Party that uses the resource. Person or organization that is, or can be, the key user of the resource.',tgid),
@@ -332,7 +346,7 @@ VALUES
 ('economy','economic activities, conditions and employment. Examples: production, labour, revenue, commerce, industry, tourism and ecotourism, forestry, fisheries, commercial or subsistence hunting, exploration and exploitation of resources such as minerals, oil and gas',tgid),
 ('elevation','height above or below sea level Examples: altitude, bathymetry, digital elevation models, slope, derived products',tgid),
 ('environment','environmental resources, protection and conservation Examples: environmental pollution, waste storage and treatment, environmental impact assessment, monitoring environmental risk, nature reserves, landscape',tgid),
-('geoscientificInformation','information pertaining to earth sciences Examples: geophysical features and processes, geology, minerals, sciences dealing with the composition, structure and origin of the earthâ€™s rocks, risks of earthquakes, volcanic activity, landslides, gravity information, soils, permafrost, hydrogeology, erosion',tgid),
+('geoscientificInformation','information pertaining to earth sciences Examples: geophysical features and processes, geology, minerals, sciences dealing with the composition, structure and origin of the earth’s rocks, risks of earthquakes, volcanic activity, landslides, gravity information, soils, permafrost, hydrogeology, erosion',tgid),
 ('health','health, health services, human ecology, and safety Examples: disease and illness, factors affecting health, hygiene, substance abuse, mental and physical health, health services',tgid),
 ('imageryBaseMapsEarthCover','base maps Examples: land cover, topographic maps, imagery, unclassified images, annotations',tgid),
 ('intelligenceMilitary','military bases, structures, activities Examples: barracks, training grounds, military transportation, information collection',tgid),
@@ -365,5 +379,25 @@ VALUES
 ('repurposed data','This is any data which has been adjusted or recalculated to be used in hydrological modelling or in a hydrological experiment.',tgid),
 ('experiment result data','New datasets originating  from hydrological experiments.',tgid),
 ('repurposed experiment result data','This is basically the same as repurposed data, however, they are explicitly mentioned here to highlight that the fact that a result might need repurposing to be reused in a new experiment.',tgid);
+
+tgid = (SELECT id from taggroup where name = 'scope');
+INSERT INTO tag (name, description, taggroup)
+VALUES
+('attribute','information applies to the attribute class',tgid),
+('attributeType','information applies to the characteristic of a feature',tgid),
+('collectionHardware','information applies to the collection hardware class',tgid),
+('collectionSession','information applies to the collection session',tgid),
+('dataset','information applies to the dataset',tgid),
+('series','information applies to the series',tgid),
+('nonGeographicDataset','information applies to non-geographic data',tgid),
+('dimensionGroup','information applies to a dimension group',tgid),
+('feature','information applies to a feature',tgid),
+('featureType','information applies to a feature type',tgid),
+('propertyType','information applies to a property type',tgid),
+('fieldSession','information applies to a field session',tgid),
+('software','information applies to a computer program or routine',tgid),
+('service','information applies to a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behaviour, such as a use case',tgid),
+('model','information applies to a copy or imitation of an existing or hypothetical object',tgid),
+('tile','information applies to a tile, a spatial subset of geographic data',tgid);
 END;
 $$

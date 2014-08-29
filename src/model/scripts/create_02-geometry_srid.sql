@@ -4,6 +4,7 @@
 DROP VIEW public.geosuche;
 
 SELECT updategeometrysrid('geom', 'geo_field', 4326);
+alter table geom add constraint enforce_srid_geo_field CHECK (st_srid(geo_field) = (4326));
 
 CREATE OR REPLACE VIEW public.geosuche AS 
  SELECT DISTINCT x.class_id,
