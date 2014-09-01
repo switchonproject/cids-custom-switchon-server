@@ -70,7 +70,7 @@ BEGIN
 	--end default value catcher
 	For dataset in (SELECT * FROM 
 --Here, the table, which shall be imported, can be changed----------------------------------------------------------------------------------/
-	import_tables.SMHI_batch_a_time_recovery
+	import_tables.importer
 --Here, the table, which shall be imported, can be changed----------------------------------------------------------------------------------\
 	) LOOP
 		--11raise info 'Beginning of Time';
@@ -256,10 +256,10 @@ BEGIN
 			--End of Metadata
 			--Preperation for Representation
 			taggroupID = (SELECT id FROM taggroup WHERE name = 'function');
-			IF (dataset.loginrequired ilike '%yes%') then
+			IF (dataset.loginrequired ilike '%yes%' OR dataset.directdownload ilike '%question%') then
 				tagname = 'order';
 			else
-				IF (dataset.directdownload ilike '%yes%' OR dataset.directdownload ilike '%form%' OR dataset.directdownload ilike '%question%') then
+				IF (dataset.directdownload ilike '%yes%') then
 					tagname = 'download';
 				ELSE
 					tagname = 'information';

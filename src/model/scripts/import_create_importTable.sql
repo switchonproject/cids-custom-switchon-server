@@ -1,6 +1,6 @@
-﻿--DROP TABLE import_tables.dataimport
+﻿--DROP TABLE import_tables.importer
 
-CREATE TABLE import_tables.dataimport
+CREATE TABLE import_tables.importer
 (
 LoginRequired character varying,
 directDownload character varying,
@@ -33,5 +33,5 @@ metadataPointOfContact character varying,
 metadataLanguage character varying,
 spatialScale character varying,
 batch character varying,
-CONSTRAINT identify PRIMARY KEY (uniqueResourceIdentify)
+CONSTRAINT identifyx PRIMARY KEY (uniqueResourceIdentify)
 )
