@@ -50,6 +50,20 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private static final Logger LOG = Logger.getLogger(MetaObjectNodeResourceSearchStatement.class);
     protected static final String DOMAIN = "SWITCHON";
 
+    //~ Enums ------------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public enum GeometryFunction {
+
+        //~ Enum constants -----------------------------------------------------
+
+        CONTAINS, INTERSECT
+    }
+
     //~ Instance fields --------------------------------------------------------
 
     protected StringBuilder query;
@@ -65,6 +79,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected Timestamp fromDate;
     protected Timestamp toDate;
     protected String location;
+    private GeometryFunction geometryFunction;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -307,5 +322,23 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setLocation(final String location) {
         this.location = location;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public GeometryFunction getGeometryFunction() {
+        return geometryFunction;
+    }
+
+    /**
+     * The geometryFunction influences the behavior of the search by a geometry.
+     *
+     * @param  geometryFunction  DOCUMENT ME!
+     */
+    public void setGeometryFunction(final GeometryFunction geometryFunction) {
+        this.geometryFunction = geometryFunction;
     }
 }
