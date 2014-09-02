@@ -1,28 +1,9 @@
-﻿-- View: public."pyCSW_View"
+-- View: public."pyCSW_View"
 
 --DROP VIEW public.pycsw_view;
 --DROP Table public.pycsw_view;
 
-
---To concatenate the tags by their specific taggroup, you have to query for the taggroup names or the ID.
---therefore a list with all availiable taggroups should be availiable somewhere
--- Here are the Taggroups which are/was relevant in the enrichment database
---Classification: 1
---Language	: 2
---Resource Type	: 3
---Keywords	: 4
---other Constraints: 5
---Topic category: 6
---misc		: 7
-
---To accumulate the tags of one taggroup in a single column, this function is needed and thus has to be implemented
---CREATE AGGREGATE array_accum (anyelement)
---(
---    sfunc = array_append,
---    stype = anyarray,
---    initcond = '{}'
---);
-CREATE View public.pycsw_view
+CREATE OR REPLACE View public.pycsw_view
  AS
 WITH
   tag_to_group_resource AS (
@@ -83,11 +64,27 @@ WITH
 	LEFT JOIN jt_resource_representation as jt_rep ON
 	  jt_rep.resource_reference = resource.id
 	LEFT JOIN representation as rep ON
-	  rep.id = jt_rep.repid
+	  rep.id = jt_rep.representationid
 	LEFT JOIN tag as type ON
 	  rep.contenttype::integer = type.id
   ),
-
+  
+  tempTabScopeResource AS (
+	SELECT 
+	  resource.id,
+	  tag.name as scope
+	FROM
+	  public.resource,
+	  public.jt_resource_tag,
+	  public.taggroup,
+	  public.tag
+	WHERE 
+	  tag.taggroup = taggroup.id AND
+	  taggroup.name = 'scope' AND
+	  resource.tags = jt_resource_tag.resource_reference AND
+	  jt_resource_tag.tagid = tag.id
+  ),
+  
   tempTabLanguageResource AS (
 	SELECT 
 	  resource.id,
@@ -185,7 +182,7 @@ WITH
 ),
 	  
   fullTableWOAnyText AS ( -- Here, the view is forged (well... except of AnyText). Every every View for other CSW services or changes in the current one are to do here. The last step after forging the view here
-			  -- is to add the AnyText column by concatenating all availiable colums, to ensure an fulltext search is possible by just query over onee column instead of querying over the complete table.
+			  -- is to add the AnyText column by concatenating all available columns, to ensure an full text search is possible by just query over one column instead of querying over the complete table.
 			  -- PLUS: all CSW implementations, I found and tested during the process needed that specific column.
 SELECT DISTINCT
   resource.uuid::text AS identifier, 
@@ -219,7 +216,7 @@ SELECT DISTINCT
   NULL as relation,
   NULL as contributor,
   NULL as mdsource,
-  NULL as type,
+  scope.scope as type,
   NULL as schema,
   NULL as format,
   NULL as publisher,
@@ -232,6 +229,8 @@ FROM
   public.resource
   LEFT JOIN tempTabLanguageResource as resLang ON
 	resource.id = resLang."id"
+  LEFT JOIN tempTabScopeResource as scope ON
+	resource.id = scope.id
   LEFT JOIN tempTabKeywords ON
 	resource.id = tempTabKeywords."id"
   LEFT JOIN public.contact as ResContact ON
@@ -241,7 +240,7 @@ FROM
   LEFT JOIN public.jt_metadata_resource ON
 	resource.metadata = jt_metadata_resource.resource_reference
   LEFT JOIN public.metadata ON
-	jt_metadata_resource.metaID = metadata.id
+	jt_metadata_resource.metadataid = metadata.id
   LEFT JOIN public.contact as MetaContact ON
 	metadata.contact = MetaContact.id
   LEFT JOIN tempTabLanguageMetadata as metaLang ON
@@ -255,7 +254,7 @@ FROM
   LEFT JOIN jt_fromResource_relationship ON
 	jt_fromResource_relationship.relationship_reference = relationship.id
   LEFT JOIN resource as sourceResource ON
-	jt_fromResource_relationship.resID = sourceResource.id
+	jt_fromResource_relationship.resourceID = sourceResource.id
   LEFT JOIN tempTabAccessStuff as access ON
 	resource.id = access.id
   LEFT JOIN tag as resConRole ON
