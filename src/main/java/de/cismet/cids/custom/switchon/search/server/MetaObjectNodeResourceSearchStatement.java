@@ -53,7 +53,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     //~ Enums ------------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * The postgis functions which can be used to search by geometries.
+     *
+     * <p><b>Note:</b> When a new function is added the order of the parameters might be important, depending on the
+     * commutativity of the function.</p>
      *
      * @version  $Revision$, $Date$
      */
@@ -61,7 +64,29 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
 
         //~ Enum constants -----------------------------------------------------
 
-        CONTAINS, INTERSECT
+        CONTAINS("st_contains"), INTERSECT("st_intersects");
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String postGisFunction;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new GeometryFunction object.
+         *
+         * @param  postGisFunction  DOCUMENT ME!
+         */
+        private GeometryFunction(final String postGisFunction) {
+            this.postGisFunction = postGisFunction;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public String toString() {
+            return postGisFunction;
+        }
     }
 
     //~ Instance fields --------------------------------------------------------
