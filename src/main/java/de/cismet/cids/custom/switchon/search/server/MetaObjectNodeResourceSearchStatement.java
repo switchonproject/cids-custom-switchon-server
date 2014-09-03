@@ -50,6 +50,45 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private static final Logger LOG = Logger.getLogger(MetaObjectNodeResourceSearchStatement.class);
     protected static final String DOMAIN = "SWITCHON";
 
+    //~ Enums ------------------------------------------------------------------
+
+    /**
+     * The postgis functions which can be used to search by geometries.
+     *
+     * <p><b>Note:</b> When a new function is added the order of the parameters might be important, depending on the
+     * commutativity of the function.</p>
+     *
+     * @version  $Revision$, $Date$
+     */
+    public enum GeometryFunction {
+
+        //~ Enum constants -----------------------------------------------------
+
+        CONTAINS("st_contains"), INTERSECT("st_intersects");
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String postGisFunction;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new GeometryFunction object.
+         *
+         * @param  postGisFunction  DOCUMENT ME!
+         */
+        private GeometryFunction(final String postGisFunction) {
+            this.postGisFunction = postGisFunction;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        @Override
+        public String toString() {
+            return postGisFunction;
+        }
+    }
+
     //~ Instance fields --------------------------------------------------------
 
     protected StringBuilder query;
@@ -65,6 +104,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected Timestamp fromDate;
     protected Timestamp toDate;
     protected String location;
+    private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -139,7 +179,6 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             query.append(" join tag lct ON r.location = lct.id");
         }
         query.append(" WHERE TRUE ");
-        // TODO append der einzelnen suchanfragen [appendTitle() / appendKeywords() / etc]
         appendGeometry();
         appendKeywords();
         appendTempora();
@@ -160,16 +199,29 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             final String geostring = PostGisGeometryFactory.getPostGisCompliantDbString(geometryToSearchFor);
             query.append("and g.geo_field && st_geometryfromtext('").append(geostring).append("')");
 
-            if ((geometryToSearchFor instanceof Polygon) || (geometryToSearchFor instanceof MultiPolygon)) { // with buffer for geostring
-                query.append(" and st_intersects(" + "st_buffer(geo_field, 0.000001),"
-                                + "st_buffer(st_geometryfromtext('")
+            if ((geometryToSearchFor instanceof Polygon) || (geometryToSearchFor instanceof MultiPolygon)) {
+                // with buffer for geostring
+                query.append(" and ")
+                        .append(geometryFunction)
+                        .append("(")
+                        .append("st_buffer(st_geometryfromtext('")
                         .append(geostring)
-                        .append("'), 0.000001))");
-            } else {                                                                                         // without buffer for
-                // geostring
-                query.append(" and st_intersects(" + "st_buffer(geo_field, 0.000001)," + "st_geometryfromtext('")
+                        .append("'), 0.000001)")
+                        .append(", ")
+                        .append("")
+                        .append("st_buffer(geo_field, 0.000001)")
+                        .append(")");
+            } else {
+                // without buffer for geostring
+                query.append(" and ")
+                        .append(geometryFunction)
+                        .append("(")
+                        .append("st_geometryfromtext('")
                         .append(geostring)
-                        .append("'))");
+                        .append("')")
+                        .append(", ")
+                        .append("st_buffer(geo_field, 0.000001)")
+                        .append(")");
             }
         }
     }
@@ -307,5 +359,23 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setLocation(final String location) {
         this.location = location;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public GeometryFunction getGeometryFunction() {
+        return geometryFunction;
+    }
+
+    /**
+     * The geometryFunction influences the behavior of the search by a geometry.
+     *
+     * @param  geometryFunction  DOCUMENT ME!
+     */
+    public void setGeometryFunction(final GeometryFunction geometryFunction) {
+        this.geometryFunction = geometryFunction;
     }
 }
