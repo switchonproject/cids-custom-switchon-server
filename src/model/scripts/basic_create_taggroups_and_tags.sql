@@ -46,6 +46,7 @@ INSERT INTO tag (name, description, taggroup)
 VALUES
 ('Google Earth','Google Earth Application',tgid),
 ('WMS Client','WMS Client Application',tgid),
+('Web Browser','Web Browser',tgid),
 ('WFS Client','WFS Client Application',tgid);
 
 tgid = (SELECT id from taggroup where name = 'catchments');
@@ -112,7 +113,8 @@ VALUES
 ('text/html','Hypertext Markup Language',tgid),
 ('text/plain','raw, ascii text',tgid),
 ('text/rtf','Rich Text Format',tgid),
-('text/tab-separated-values','Tab Separated Values',tgid);
+('text/tab-separated-values','Tab Separated Values',tgid),
+('application/x-java-jnlp-file','Java Network Launching Protocol',tgid);
 
 tgid = (SELECT id from taggroup where name = 'function');
 INSERT INTO tag (name, description, taggroup)
