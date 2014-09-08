@@ -181,7 +181,7 @@ BEGIN
 			geomID = currval('geom_seq');
 
 			PERFORM (nextval('resource_seq'));
-			INSERT INTO resource (id, uuid, name, description, spatialcoverage, fromDate, toDate, licenseStatement, srid, location, accessconditions, language, conformity, tags, metadata, representations, contact, type, topiccategory, collection, accesslimitations)
+			INSERT INTO resource (id, uuid, name, description, spatialcoverage, fromDate, toDate, licenseStatement, srid, location, accessconditions, language, conformity, tags, metadata, representation, contact, type, topiccategory, collection, accesslimitations)
 			VALUES (currval('resource_seq'), dataset.uniqueresourceidentify, dataset.resourcetitle, dataset.resourceabstraction , geomID, 
 			dataset.fromtime::date, dataset.totime::date, dataset.constraintsrelatedtoaau, sridID, locationID, accessconditionsID, reslangID, conformityID, 
 			currval('resource_seq'), currval('resource_seq'), currval('resource_seq'), rescontactID, resourceTypeID, topicID, collectionID, lopaID);
