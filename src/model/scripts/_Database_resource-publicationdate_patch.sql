@@ -1,5 +1,5 @@
 drop view pycsw.pycsw_view;
-UPDATE cs_attr SET type_id = 12 where field_name = 'publicationdate';
+UPDATE cs_attr SET type_id = (SELECT id from cs_type where name ilike 'timestamp') where field_name = 'publicationdate';
 DELETE FROM cs_attr WHERE id = 112;
 ALTER TABLE resource ALTER publicationdate SET DATA TYPE timestamp without time zone;
 
