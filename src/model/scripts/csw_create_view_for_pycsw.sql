@@ -12,26 +12,34 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
            FROM jt_resource_tag,
             tag
           WHERE jt_resource_tag.tagid = tag.id
-        ), tag_to_group_metadata AS (
+        ), 
+
+        tag_to_group_metadata AS (
          SELECT jt_metadata_tag.metadata_reference AS metaid,
             tag.name,
             tag.taggroup
            FROM jt_metadata_tag,
             tag
           WHERE jt_metadata_tag.tagid = tag.id
-        ), accumulatedtags_resource AS (
+        ), 
+
+        accumulatedtags_resource AS (
          SELECT tag_to_group_resource.resid,
             tag_to_group_resource.taggroup,
             array_to_string(array_accum(tag_to_group_resource.name), ', '::text) AS value
            FROM tag_to_group_resource
           GROUP BY tag_to_group_resource.taggroup, tag_to_group_resource.resid
-        ), accumulatedtags_metadata AS (
+        ), 
+
+        accumulatedtags_metadata AS (
          SELECT tag_to_group_metadata.metaid,
             tag_to_group_metadata.taggroup,
             array_to_string(array_accum(tag_to_group_metadata.name), ', '::text) AS value
            FROM tag_to_group_metadata
           GROUP BY tag_to_group_metadata.taggroup, tag_to_group_metadata.metaid
-        ), accumulatedlinks AS (
+        ), 
+
+        accumulatedlinks AS (
          SELECT resource.id,
             resource.name,
             concat(rep.description, ',', type.name, ',', rep.contentlocation) AS link
@@ -39,7 +47,9 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
              LEFT JOIN jt_resource_representation jt_rep ON jt_rep.resource_reference = resource.id
              LEFT JOIN representation rep ON rep.id = jt_rep.representationid
              LEFT JOIN tag type ON rep.protocol = type.id
-        ), temptabscoperesource AS (
+        ), 
+
+        temptabscoperesource AS (
          SELECT resource.id,
             tag.name AS scope
            FROM resource,
@@ -47,21 +57,27 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
             taggroup,
             tag
           WHERE tag.taggroup = taggroup.id AND taggroup.name::text = 'scope'::text AND resource.tags = jt_resource_tag.resource_reference AND jt_resource_tag.tagid = tag.id
-        ), temptablanguageresource AS (
+        ), 
+
+        temptablanguageresource AS (
          SELECT resource.id,
             tag.name AS language
            FROM resource,
             taggroup,
             tag
           WHERE tag.taggroup = taggroup.id AND taggroup.name::text = 'language'::text AND resource.language = tag.id
-        ), temptablanguagemetadata AS (
+        ), 
+
+        temptablanguagemetadata AS (
          SELECT metadata.id,
             tag.name AS language
            FROM metadata,
             taggroup,
             tag
           WHERE tag.taggroup = taggroup.id AND taggroup.name::text = 'language'::text AND metadata.language = tag.id
-        ), temptabkeywords AS (
+        ), 
+
+        temptabkeywords AS (
          SELECT resource.id,
             array_to_string(array_accum(accumulatedtags_resource.value), ', '::text) AS keywords
            FROM accumulatedtags_resource,
@@ -69,26 +85,34 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
             taggroup
           WHERE accumulatedtags_resource.taggroup = taggroup.id AND taggroup.name::text ~~ 'keywords%'::text AND resource.id = accumulatedtags_resource.resid
           GROUP BY resource.id
-        ), temptabtopic AS (
+        ), 
+
+        temptabtopic AS (
          SELECT resource.id,
             accumulatedtags_resource.value AS topiccategory
            FROM accumulatedtags_resource,
             resource,
             taggroup
           WHERE accumulatedtags_resource.taggroup = taggroup.id AND taggroup.name::text = 'topic category'::text AND resource.id = accumulatedtags_resource.resid
-        ), temptabotherconst AS (
+        ), 
+
+        temptabotherconst AS (
          SELECT resource.id,
             accumulatedtags_resource.value AS otherconstraints
            FROM accumulatedtags_resource,
             resource,
             taggroup
           WHERE accumulatedtags_resource.taggroup = taggroup.id AND taggroup.name::text = 'constraints'::text AND resource.id = accumulatedtags_resource.resid
-        ), temptablinks AS (
+        ), 
+
+        temptablinks AS (
          SELECT accumulatedlinks.id,
             concat('none', ',', array_to_string(array_accum(accumulatedlinks.link), ', '::text)) AS links
            FROM accumulatedlinks
           GROUP BY accumulatedlinks.id
-        ), temptabaccessstuff AS (
+        ), 
+
+        temptabaccessstuff AS (
          SELECT resource.id,
             conditions.description AS conditions,
             limitations.description AS limitations,
@@ -97,7 +121,9 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
             tag conditions,
             tag limitations
           WHERE resource.accessconditions = conditions.id AND resource.accesslimitations = limitations.id
-        ), fulltablewoanytext AS (
+        ), 
+
+        fulltablewoanytext AS (
          SELECT DISTINCT resource.uuid::text AS identifier,
             NULL::text AS parentidentifier,
             resource.name AS title,
@@ -152,8 +178,10 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
              LEFT JOIN resource sourceresource ON jt_fromresource_relationship.resourceid = sourceresource.id
              LEFT JOIN temptabaccessstuff access ON resource.id = access.id
              LEFT JOIN tag resconrole ON rescontact.role = resconrole.id
+           WHERE metadata.type = (SELECT id from tag where name ilike 'basic meta%')
         )
- SELECT DISTINCT fulltablewoanytext.identifier,
+ SELECT DISTINCT 
+    fulltablewoanytext.identifier,
     fulltablewoanytext.parentidentifier,
     fulltablewoanytext.title,
     fulltablewoanytext.abstract,
