@@ -105,7 +105,7 @@
 
     <properties>
         <de.cismet.libDir>lib/localSwitchon</de.cismet.libDir>
-        <netbeans.version>RELEASE691</netbeans.version>
+        <netbeans.version>RELEASE701</netbeans.version>
         <jackson.version>2.2.2</jackson.version>
     </properties>
 
@@ -138,7 +138,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE701</version>
+            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-httpclient</groupId>
