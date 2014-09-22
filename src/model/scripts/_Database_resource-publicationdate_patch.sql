@@ -1,5 +1,5 @@
 drop view pycsw.pycsw_view;
-UPDATE cs_attr SET type_id = 12 where field_name = 'publicationdate';
+UPDATE cs_attr SET type_id = (SELECT id from cs_type where name ilike 'timestamp') where field_name = 'publicationdate';
 DELETE FROM cs_attr WHERE id = 112;
 ALTER TABLE resource ALTER publicationdate SET DATA TYPE timestamp without time zone;
 
@@ -151,6 +151,7 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
              LEFT JOIN resource sourceresource ON jt_fromresource_relationship.resourceid = sourceresource.id
              LEFT JOIN temptabaccessstuff access ON resource.id = access.id
              LEFT JOIN tag resconrole ON rescontact.role = resconrole.id
+           WHERE metadata.type = (SELECT id from tag where name ilike 'basic meta%')
         )
  SELECT DISTINCT fulltablewoanytext.identifier,
     fulltablewoanytext.parentidentifier,
