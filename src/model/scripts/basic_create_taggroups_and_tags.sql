@@ -17,7 +17,7 @@ VALUES
 ('meta-data standard','Official standard on which the meta-data record is based (open group with some predefined tags).'),
 ('meta-data type','SIP internal type of the Meta-Data Record (fixed group). '),
 ('protocol','Protocol of the service that can be accessed at the contentLocation of the resource representation (open group with several predefined tags from standard codelists).'),
-('realtionship type','SIP internal type of the releationship between resources (fixed group).'),
+('relationship type','SIP internal type of the releationship between resources (fixed group).'),
 ('representation type','SIP internal type of the representation of the resource (fixed group).'),
 ('resource type','SIP internal type of the resource (fixed group).'),
 ('role','Function performed by the responsible party (fixed group, standard codelist).'),
@@ -88,7 +88,7 @@ VALUES
 ('application/json','Java Script Object Notation',tgid),
 ('application/netcdf','netCDF-CF/Network Common Data Form',tgid),
 ('application/ntf','National Imagery Transmission Format',tgid),
-('application/octec-stream','General Binary Data',tgid),
+('application/octet-stream','General Binary Data',tgid),
 ('application/sdf','Spatial Data File',tgid),
 ('application/shp','ESRI Shapefile',tgid),
 ('application/vnd.geo+json','GeoJSON/JavaScript Object Notation',tgid),
@@ -269,7 +269,8 @@ VALUES
 ('origin meta-data','Type of the Meta-Data Record. "origin meta-data" refers to meta-data available at the origin (e.g. website) of the resource. It could refer to a webpage which provides information on the resource or, if available, a meta-data catalogue entry. There may be multiple entries of this meta-data record.',tgid),
 ('quality meta-data','Type of the Meta-Data Record. "quality meta-data" refers to meta-data on data quality either available at the origin (e.g. website) of the resource or provided by SWITCH-ON. Since no default schema for meta-data on data quality has been defined yet, the content of this meta-data record will be limited to a short statement by the person collecting the meta-data.',tgid),
 ('lineage meta-data','Type of the Meta-Data Record. "lineage meta-data" refers to meta-data about the lineage of the resource, e.g. a protocol of an experiment.',tgid),
-('relationship meta-data','Refers to meta-data about the relationship of the resource to other resources in the SIP, e.g. a protocol of an experiment.',tgid);
+('relationship meta-data','Refers to meta-data about the relationship of the resource to other resources in the SIP, e.g. a protocol of an experiment.',tgid),
+('none',NULL,tgid);
 
 
 tgid = (SELECT id from taggroup where name = 'protocol');
