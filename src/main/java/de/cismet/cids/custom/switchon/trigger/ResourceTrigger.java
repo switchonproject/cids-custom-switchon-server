@@ -170,7 +170,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
         }
         geoServerRESTPublisher.publishGeoTIFF(workspace, workspace + "-geotiff", layername, geoTiff);
 
-        return "";
+        return GEOSERVER_REST_URL + "/wms?service=wms&version=1.1.1&request=GetCapabilities&namespace=" + workspace;
     }
 
     /**
