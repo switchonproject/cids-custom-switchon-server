@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.cids.custom.switchon.trigger;
 
+import Sirius.server.middleware.types.LightweightMetaObject;
+import Sirius.server.middleware.types.MetaClass;
 import Sirius.server.middleware.types.MetaObject;
 import Sirius.server.newuser.User;
 
@@ -70,6 +72,8 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     //~ Instance fields --------------------------------------------------------
+
+    private User user;
 
     private GeoServerRESTReader geoServerRESTReader;
     private final GeoServerRESTPublisher geoServerRESTPublisher;
@@ -180,14 +184,30 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
      * @param   url             DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
      */
-    private CidsBean createRepresentation(final CidsBean representation, final String url) {
-        LOG.fatal("ResourceTrigger.createRepresentation: Not supported yet.", new Exception()); // NOI18N
-        return null;
+    private CidsBean createLayerRepresentation(final CidsBean representation, final String url) throws Exception {
+        final CidsBean newRepresentation = CidsBean.createNewCidsBeanFromTableName("SWITCHON", "representation");
+
+        final String name = representation.getProperty("name") + " Layer";
+        newRepresentation.setProperty("name", name);
+
+        final CidsBean protocolTag = fetchTagByName("OGC:WMS");
+        newRepresentation.setProperty("protocol", protocolTag);
+
+        newRepresentation.setProperty("contentlocation", url);
+
+        newRepresentation.setProperty("uploadstatus", fetchTagByName("uploading"));
+
+        newRepresentation.setProperty("type", fetchTagByName("original data"));
+
+        return newRepresentation;
     }
 
     @Override
     public void beforeInsert(final CidsBean cidsBean, final User user) {
+        this.user = user;
         makeAdditionalRepresentationAndUploadToGeoServer(cidsBean);
     }
 
@@ -197,6 +217,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
     @Override
     public void beforeUpdate(final CidsBean cidsBean, final User user) {
+        this.user = user;
         makeAdditionalRepresentationAndUploadToGeoServer(cidsBean);
     }
 
@@ -304,5 +325,32 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
             string = URLEncoder.encode(string);
         }
         return string.replace("+", replaceWhiteSpace);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   name  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    private CidsBean fetchTagByName(final String name) throws Exception {
+        final MetaClass tagClass;
+        try {
+            tagClass = getDbServer().getClassByTableName(user, "tag");
+        } catch (Throwable ex) {
+            throw new Exception(ex);
+        }
+        String query = "SELECT id, name ";
+        query += " FROM tag ";
+        query += " WHERE name ilike '" + name + "' limit 1";
+        final LightweightMetaObject[] lmo = getDbServer().getLightweightMetaObjectsByQuery(tagClass.getId(),
+                user,
+                query,
+                new String[] { "NAME" });
+
+        return lmo[0].getBean();
     }
 }
