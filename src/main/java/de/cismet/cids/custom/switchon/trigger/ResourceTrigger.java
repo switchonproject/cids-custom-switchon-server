@@ -16,6 +16,8 @@ import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
+import org.deegree.io.geotiff.GeoTiffReader;
+
 import org.openide.util.lookup.ServiceProvider;
 
 import java.io.File;
@@ -149,9 +151,24 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
         final String contentLocation = (String)representation.getProperty("contentlocation");
         final String prefix = FilenameUtils.getBaseName(contentLocation);
         final String suffix = FilenameUtils.getExtension(contentLocation);
-        final File temp = File.createTempFile(prefix, suffix);
-        FileUtils.copyURLToFile(new URL(contentLocation), temp);
-        geoServerRESTPublisher.publishGeoTIFF(workspace, workspace + "-geotiff", temp);
+        final File geoTiff = File.createTempFile(prefix, suffix);
+        FileUtils.copyURLToFile(new URL(contentLocation), geoTiff);
+
+        // check if file is a GeoTiff, throws an exception otherwise
+        final GeoTiffReader tiffReader = new GeoTiffReader(geoTiff);
+        // check if the used coordinate system is of the type (1) ModelTypeProjected (Projection Coordinate System) or
+        // (2) ModelTypeGeographic (Geographic latitude-longitude System)
+        final int modeltype = tiffReader.getGTModelTypeGeoKey();
+        if ((modeltype != 1) && (modeltype != 2)) {
+            throw new Exception(
+                "GeoTiff invalid, the used coordinate system must be of the type projection or geographic.");
+        }
+
+        String layername = (String)representation.getProperty("name");
+        if ((layername == null) || layername.trim().equals("")) {
+            layername = prefix;
+        }
+        geoServerRESTPublisher.publishGeoTIFF(workspace, workspace + "-geotiff", layername, geoTiff);
 
         return "";
     }
@@ -253,7 +270,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
      */
     private String checkIfWorkspaceExists(final CidsBean resource) {
         final String resourceName = urlEncode((String)resource.getProperty("name"), "_");
-        if (!geoServerRESTReader.getWorkspaceNames().contains("resourceName")) {
+        if (!geoServerRESTReader.getWorkspaceNames().contains(resourceName)) {
             geoServerRESTPublisher.createWorkspace(resourceName);
         }
         return resourceName;
