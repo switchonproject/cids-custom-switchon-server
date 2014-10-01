@@ -31,12 +31,15 @@ import java.net.URLEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import de.cismet.cids.dynamics.CidsBean;
 
 import de.cismet.cids.trigger.AbstractDBAwareCidsTrigger;
 import de.cismet.cids.trigger.CidsTrigger;
 import de.cismet.cids.trigger.CidsTriggerKey;
+
+import de.cismet.commons.concurrency.CismetExecutors;
 
 import de.cismet.tools.PasswordEncrypter;
 import de.cismet.tools.PropertyReader;
@@ -73,6 +76,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
     //~ Instance fields --------------------------------------------------------
 
+    public ExecutorService singleThreadExecutor = CismetExecutors.newSingleThreadExecutor();
     private User user;
 
     private GeoServerRESTReader geoServerRESTReader;
@@ -118,9 +122,12 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                 for (final CidsBean publishStyleTag : publishStyles) {
                     if (publishStyleTag.getProperty("name").equals("geotiff")) {
                         try {
-                            final String url = uploadToGeoServer(workspace, representation);
-                            final CidsBean newRepresentation = createRepresentation(representation, url);
-                            newRepresentations.add(newRepresentation);
+                            final String url = GEOSERVER_REST_URL
+                                        + "/wms?service=wms&version=1.1.1&request=GetCapabilities&namespace="
+                                        + workspace;
+                            final CidsBean layerRepresentation = createLayerRepresentation(representation, url);
+                            newRepresentations.add(layerRepresentation);
+                            uploadToGeoServerWorker(workspace, representation, layerRepresentation);
                         } catch (MalformedURLException ex) {
                             LOG.error(ex, ex);
                         } catch (Exception ex) {
@@ -136,16 +143,48 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     /**
      * DOCUMENT ME!
      *
+     * @param  workspace            DOCUMENT ME!
+     * @param  representation       DOCUMENT ME!
+     * @param  layerRepresentation  DOCUMENT ME!
+     */
+    private void uploadToGeoServerWorker(final String workspace,
+            final CidsBean representation,
+            final CidsBean layerRepresentation) {
+        singleThreadExecutor.submit(new Runnable() {
+
+                @Override
+                public void run() {
+                    try {
+                        uploadToGeoServer(workspace, representation);
+                        layerRepresentation.setProperty("uploadstatus", fetchTagByName("finished"));
+                    } catch (Exception ex) {
+                        try {
+                            layerRepresentation.setProperty("uploadstatus", fetchTagByName("failed"));
+                        } catch (Exception ex1) {
+                            LOG.error(ex1, ex1);
+                        }
+                    } finally {
+                        try {
+                            layerRepresentation.persist();
+                        } catch (Exception ex) {
+                            LOG.error(ex, ex);
+                        }
+                    }
+                }
+            });
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
      * @param   workspace       DOCUMENT ME!
      * @param   representation  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
      *
      * @throws  MalformedURLException  DOCUMENT ME!
      * @throws  Exception              DOCUMENT ME!
      */
-    private String uploadToGeoServer(final String workspace, final CidsBean representation)
-            throws MalformedURLException, Exception {
+    private void uploadToGeoServer(final String workspace, final CidsBean representation) throws MalformedURLException,
+        Exception {
         if (!geoServerRESTReader.existGeoserver()) {
             final String message = "The URL '" + GEOSERVER_REST_URL + "' doesn't point to a GeoServer."; // NOI18N
             LOG.error(message);
@@ -173,8 +212,6 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
             layername = prefix;
         }
         geoServerRESTPublisher.publishGeoTIFF(workspace, workspace + "-geotiff", layername, geoTiff);
-
-        return GEOSERVER_REST_URL + "/wms?service=wms&version=1.1.1&request=GetCapabilities&namespace=" + workspace;
     }
 
     /**
