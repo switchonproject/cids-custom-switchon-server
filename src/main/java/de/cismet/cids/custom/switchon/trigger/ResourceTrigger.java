@@ -29,8 +29,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
 import de.cismet.cids.dynamics.CidsBean;
@@ -74,6 +78,10 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                     false));
     }
 
+    public static final String UPDATE_UPLOADSTATUS = "UPDATE representation"
+                + " SET uploadstatus = ? "
+                + " WHERE uuid = ? ";
+
     //~ Instance fields --------------------------------------------------------
 
     public ExecutorService singleThreadExecutor = CismetExecutors.newSingleThreadExecutor();
@@ -81,6 +89,9 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
     private GeoServerRESTReader geoServerRESTReader;
     private final GeoServerRESTPublisher geoServerRESTPublisher;
+
+    private ArrayList<UploadToGeoServerInformation> uploadToGeoServerInformation =
+        new ArrayList<UploadToGeoServerInformation>();
 
     //~ Constructors -----------------------------------------------------------
 
@@ -127,7 +138,10 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                                         + workspace;
                             final CidsBean layerRepresentation = createLayerRepresentation(representation, url);
                             newRepresentations.add(layerRepresentation);
-                            uploadToGeoServerWorker(workspace, representation, layerRepresentation);
+                            uploadToGeoServerInformation.add(new UploadToGeoServerInformation(
+                                    workspace,
+                                    representation,
+                                    layerRepresentation));
                         } catch (MalformedURLException ex) {
                             LOG.error(ex, ex);
                         } catch (Exception ex) {
@@ -154,20 +168,45 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
                 @Override
                 public void run() {
+                    CidsBean uploadStatusTag = null;
                     try {
                         uploadToGeoServer(workspace, representation);
-                        layerRepresentation.setProperty("uploadstatus", fetchTagByName("finished"));
+                        uploadStatusTag = fetchTagByName("finished");
                     } catch (Exception ex) {
                         try {
-                            layerRepresentation.setProperty("uploadstatus", fetchTagByName("failed"));
+                            uploadStatusTag = fetchTagByName("failed");
                         } catch (Exception ex1) {
                             LOG.error(ex1, ex1);
                         }
                     } finally {
                         try {
-                            layerRepresentation.persist();
+                            updateLayerRepresentation((String)layerRepresentation.getProperty("uuid"), uploadStatusTag);
                         } catch (Exception ex) {
                             LOG.error(ex, ex);
+                        }
+                    }
+                }
+
+                private void updateLayerRepresentation(final String uuid, final CidsBean uploadStatusTag) {
+                    PreparedStatement s = null;
+                    try {
+                        s = getDbServer().getActiveDBConnection().getConnection().prepareStatement(UPDATE_UPLOADSTATUS);
+
+                        s.setInt(1, uploadStatusTag.getPrimaryKeyValue());
+
+                        s.setString(2, uuid);
+
+                        s.executeUpdate();
+                    } catch (SQLException ex) {
+                        if (s != null) {
+                            LOG.error(
+                                "Error while updating the Representation "
+                                        + uuid
+                                        + ". Query: "
+                                        + s.toString(),
+                                ex);
+                        } else {
+                            LOG.error("Error while updating the Representation " + uuid, ex);
                         }
                     }
                 }
@@ -239,27 +278,37 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
         newRepresentation.setProperty("type", fetchTagByName("original data"));
 
+        newRepresentation.setProperty("uuid", UUID.randomUUID().toString());
+
         return newRepresentation;
     }
 
     @Override
     public void beforeInsert(final CidsBean cidsBean, final User user) {
         this.user = user;
+        uploadToGeoServerInformation.clear();
         makeAdditionalRepresentationAndUploadToGeoServer(cidsBean);
     }
 
     @Override
     public void afterInsert(final CidsBean cidsBean, final User user) {
+        for (final UploadToGeoServerInformation info : uploadToGeoServerInformation) {
+            uploadToGeoServerWorker(info.workspace, info.sourceRepresentation, info.layerRepresentation);
+        }
     }
 
     @Override
     public void beforeUpdate(final CidsBean cidsBean, final User user) {
         this.user = user;
+        uploadToGeoServerInformation.clear();
         makeAdditionalRepresentationAndUploadToGeoServer(cidsBean);
     }
 
     @Override
     public void afterUpdate(final CidsBean cidsBean, final User user) {
+        for (final UploadToGeoServerInformation info : uploadToGeoServerInformation) {
+            uploadToGeoServerWorker(info.workspace, info.sourceRepresentation, info.layerRepresentation);
+        }
     }
 
     @Override
@@ -389,5 +438,38 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                 new String[] { "NAME" });
 
         return lmo[0].getBean();
+    }
+
+    //~ Inner Classes ----------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    private class UploadToGeoServerInformation {
+
+        //~ Instance fields ----------------------------------------------------
+
+        String workspace;
+        CidsBean sourceRepresentation;
+        CidsBean layerRepresentation;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new UploadToGeoServerInformation object.
+         *
+         * @param  workspace             DOCUMENT ME!
+         * @param  sourceRepresentation  DOCUMENT ME!
+         * @param  layerRepresentation   DOCUMENT ME!
+         */
+        public UploadToGeoServerInformation(final String workspace,
+                final CidsBean sourceRepresentation,
+                final CidsBean layerRepresentation) {
+            this.workspace = workspace;
+            this.sourceRepresentation = sourceRepresentation;
+            this.layerRepresentation = layerRepresentation;
+        }
     }
 }
