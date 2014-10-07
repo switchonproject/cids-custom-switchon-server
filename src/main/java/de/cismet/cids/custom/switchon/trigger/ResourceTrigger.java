@@ -14,7 +14,6 @@ import Sirius.server.newuser.User;
 
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
-import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -34,9 +33,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -253,7 +255,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                 break;
             }
             case "shapefile": {
-                uploadShapeFile(workspace, fileToUpload, layername);
+                uploadShapeFile(workspace, fileToUpload);
                 break;
             }
         }
@@ -289,14 +291,33 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
      *
      * @param   workspace  DOCUMENT ME!
      * @param   shapeZip   DOCUMENT ME!
-     * @param   layername  DOCUMENT ME!
      *
      * @throws  Exception  DOCUMENT ME!
      */
     private void uploadShapeFile(final String workspace,
-            final File shapeZip,
-            final String layername) throws Exception {
-        geoServerRESTPublisher.publishShp(workspace, workspace + "-geotiff", layername, shapeZip);
+            final File shapeZip) throws Exception {
+        String layername = null;
+        // open a zip file for reading
+        final ZipFile zipFile = new ZipFile(shapeZip);
+
+        // get an enumeration of the ZIP file entries
+        final Enumeration<? extends ZipEntry> e = zipFile.entries();
+
+        while (e.hasMoreElements()) {
+            final ZipEntry entry = e.nextElement();
+
+            // get the name of the entry
+            final String entryName = entry.getName();
+            if (FilenameUtils.getExtension(entryName).equals("shp")) {
+                layername = FilenameUtils.getBaseName(entryName);
+                break;
+            }
+        }
+        if (layername != null) {
+            geoServerRESTPublisher.publishShp(workspace, workspace + "-shape", layername, shapeZip);
+        } else {
+            throw new Exception("No entry in zip file with extension 'shp' found.");
+        }
     }
 
     /**
