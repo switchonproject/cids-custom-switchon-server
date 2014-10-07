@@ -17,6 +17,7 @@ import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 
 import org.deegree.io.geotiff.GeoTiffReader;
 
@@ -33,6 +34,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.UUID;
@@ -84,6 +86,11 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     public static final String UPDATE_UPLOADSTATUS = "UPDATE representation"
                 + " SET uploadstatus = ?, uploadmessage = ? "
                 + " WHERE uuid = ? ";
+
+    public static final String DELETE_PUBLISH_STATUS_TAGS = "DELETE\n"
+                + "FROM jt_representation_tag\n"
+                + "WHERE representation_reference = ?\n"
+                + "  AND tagid IN ($tagids$)";
 
     //~ Instance fields --------------------------------------------------------
 
@@ -154,6 +161,8 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                         }
                     }
                 }
+
+                removeAllPublishStyleTagsFromTheRepresentation(representation, publishStyles);
             }
         }
         representations.addAll(newRepresentations);
@@ -228,6 +237,66 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                     }
                 }
             });
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  representation  DOCUMENT ME!
+     * @param  publishStyles   DOCUMENT ME!
+     */
+    private void removeAllPublishStyleTagsFromTheRepresentation(final CidsBean representation,
+            final List<CidsBean> publishStyles) {
+        if ((publishStyles != null) && !publishStyles.isEmpty()) {
+            final int representationId = representation.getPrimaryKeyValue();
+            final String tagIds = StringUtils.join(getIdsOfTags(publishStyles), ',');
+
+            singleThreadExecutor.submit(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        PreparedStatement s = null;
+                        try {
+                            final String query = DELETE_PUBLISH_STATUS_TAGS.replace("$tagids$", tagIds);
+
+                            s = getDbServer().getActiveDBConnection().getConnection().prepareStatement(query);
+
+                            s.setInt(1, representationId);
+
+                            s.executeUpdate();
+                        } catch (SQLException ex) {
+                            if (s != null) {
+                                LOG.error(
+                                    "Error while deleting publish style tags of the Representation "
+                                            + representationId
+                                            + ". Query: "
+                                            + s.toString(),
+                                    ex);
+                            } else {
+                                LOG.error(
+                                    "Error while deleting publish style tags of the Representation "
+                                            + representationId,
+                                    ex);
+                            }
+                        }
+                    }
+                });
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   cidsBeans  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private Collection<Integer> getIdsOfTags(final Collection<CidsBean> cidsBeans) {
+        final ArrayList<Integer> ids = new ArrayList<Integer>(cidsBeans.size());
+        for (final CidsBean cb : cidsBeans) {
+            ids.add(cb.getPrimaryKeyValue());
+        }
+        return ids;
     }
 
     /**
