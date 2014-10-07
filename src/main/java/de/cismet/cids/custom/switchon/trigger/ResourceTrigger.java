@@ -257,6 +257,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
         if ((layername == null) || layername.trim().equals("")) {
             layername = prefix;
         }
+        layername = urlEncode(layername);
 
         final String contentType = representation.getProperty("contenttype").toString();
         switch (contentType) {
@@ -329,6 +330,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
         }
         boolean uploaded = false;
         if (layername != null) {
+            layername = urlEncode(layername);
             uploaded = geoServerRESTPublisher.publishShp(workspace, workspace + "-shape", layername, shapeZip);
         } else {
             throw new Exception("No entry in zip file with extension 'shp' found.");
