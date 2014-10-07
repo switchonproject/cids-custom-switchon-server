@@ -135,7 +135,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
                 for (final CidsBean publishStyleTag : publishStyles) {
                     final String publishStyle = (String)publishStyleTag.getProperty("name");
-                    if ("geotiff".equals(publishStyle) || "shapefile".equals(publishStyle)) {
+                    if ("geoserver".equals(publishStyle)) {
                         try {
                             final String url = GEOSERVER_REST_URL
                                         + "/wms?service=wms&version=1.1.1&request=GetCapabilities&namespace="
@@ -143,7 +143,6 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                             final CidsBean layerRepresentation = createLayerRepresentation(representation, url);
                             newRepresentations.add(layerRepresentation);
                             uploadToGeoServerInformation.add(new UploadToGeoServerInformation(
-                                    publishStyleTag,
                                     workspace,
                                     representation,
                                     layerRepresentation));
@@ -164,12 +163,11 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     /**
      * DOCUMENT ME!
      *
-     * @param  publishStyle         DOCUMENT ME!
      * @param  workspace            DOCUMENT ME!
      * @param  representation       DOCUMENT ME!
      * @param  layerRepresentation  DOCUMENT ME!
      */
-    private void uploadToGeoServerWorker(final CidsBean publishStyle,
+    private void uploadToGeoServerWorker(
             final String workspace,
             final CidsBean representation,
             final CidsBean layerRepresentation) {
@@ -180,7 +178,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                     CidsBean uploadStatusTag = null;
                     String uploadMessage = null;
                     try {
-                        uploadToGeoServer(publishStyle, workspace, representation);
+                        uploadToGeoServer(workspace, representation);
                         uploadStatusTag = fetchTagByName("finished");
                         uploadMessage = "The upload was successful";
                     } catch (Exception ex) {
@@ -235,15 +233,14 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     /**
      * DOCUMENT ME!
      *
-     * @param   publishStyle    DOCUMENT ME!
      * @param   workspace       DOCUMENT ME!
      * @param   representation  DOCUMENT ME!
      *
      * @throws  MalformedURLException  DOCUMENT ME!
      * @throws  Exception              DOCUMENT ME!
      */
-    private void uploadToGeoServer(final CidsBean publishStyle, final String workspace, final CidsBean representation)
-            throws MalformedURLException, Exception {
+    private void uploadToGeoServer(final String workspace, final CidsBean representation) throws MalformedURLException,
+        Exception {
         if (!geoServerRESTReader.existGeoserver()) {
             final String message = "The URL '" + GEOSERVER_REST_URL + "' doesn't point to a GeoServer."; // NOI18N
             LOG.error(message);
@@ -261,12 +258,15 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
             layername = prefix;
         }
 
-        switch ((String)publishStyle.getProperty("name")) {
-            case "geotiff": {
+        final String contentType = representation.getProperty("contenttype").toString();
+        switch (contentType) {
+            case "image/tiff":
+            case "image/geotiff": {
                 uploadGeoTiff(workspace, fileToUpload, layername);
                 break;
             }
-            case "shapefile": {
+            case "application/zip":
+            case "applicatopn/shp": {
                 uploadShapeFile(workspace, fileToUpload);
                 break;
             }
@@ -379,7 +379,6 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     public void afterInsert(final CidsBean cidsBean, final User user) {
         for (final UploadToGeoServerInformation info : uploadToGeoServerInformation) {
             uploadToGeoServerWorker(
-                info.publishStyle,
                 info.workspace,
                 info.sourceRepresentation,
                 info.layerRepresentation);
@@ -397,7 +396,6 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     public void afterUpdate(final CidsBean cidsBean, final User user) {
         for (final UploadToGeoServerInformation info : uploadToGeoServerInformation) {
             uploadToGeoServerWorker(
-                info.publishStyle,
                 info.workspace,
                 info.sourceRepresentation,
                 info.layerRepresentation);
@@ -544,7 +542,6 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
         //~ Instance fields ----------------------------------------------------
 
-        CidsBean publishStyle;
         String workspace;
         CidsBean sourceRepresentation;
         CidsBean layerRepresentation;
@@ -554,16 +551,14 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
         /**
          * Creates a new UploadToGeoServerInformation object.
          *
-         * @param  publishStyle          DOCUMENT ME!
          * @param  workspace             DOCUMENT ME!
          * @param  sourceRepresentation  DOCUMENT ME!
          * @param  layerRepresentation   DOCUMENT ME!
          */
-        public UploadToGeoServerInformation(final CidsBean publishStyle,
+        public UploadToGeoServerInformation(
                 final String workspace,
                 final CidsBean sourceRepresentation,
                 final CidsBean layerRepresentation) {
-            this.publishStyle = publishStyle;
             this.workspace = workspace;
             this.sourceRepresentation = sourceRepresentation;
             this.layerRepresentation = layerRepresentation;
