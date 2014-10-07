@@ -82,7 +82,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     public static final String UPDATE_UPLOADSTATUS = "UPDATE representation"
-                + " SET uploadstatus = ? "
+                + " SET uploadstatus = ?, uploadmessage = ? "
                 + " WHERE uuid = ? ";
 
     //~ Instance fields --------------------------------------------------------
@@ -176,32 +176,42 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                 @Override
                 public void run() {
                     CidsBean uploadStatusTag = null;
+                    String uploadMessage = null;
                     try {
                         uploadToGeoServer(publishStyle, workspace, representation);
                         uploadStatusTag = fetchTagByName("finished");
+                        uploadMessage = "The upload was successful";
                     } catch (Exception ex) {
                         try {
+                            uploadMessage = ex.getMessage();
                             uploadStatusTag = fetchTagByName("failed");
                         } catch (Exception ex1) {
                             LOG.error(ex1, ex1);
                         }
                     } finally {
                         try {
-                            updateLayerRepresentation((String)layerRepresentation.getProperty("uuid"), uploadStatusTag);
+                            updateLayerRepresentation(
+                                (String)layerRepresentation.getProperty("uuid"),
+                                uploadStatusTag,
+                                uploadMessage);
                         } catch (Exception ex) {
                             LOG.error(ex, ex);
                         }
                     }
                 }
 
-                private void updateLayerRepresentation(final String uuid, final CidsBean uploadStatusTag) {
+                private void updateLayerRepresentation(final String uuid,
+                        final CidsBean uploadStatusTag,
+                        final String uploadMessage) {
                     PreparedStatement s = null;
                     try {
                         s = getDbServer().getActiveDBConnection().getConnection().prepareStatement(UPDATE_UPLOADSTATUS);
 
                         s.setInt(1, uploadStatusTag.getPrimaryKeyValue());
 
-                        s.setString(2, uuid);
+                        s.setString(2, uploadMessage);
+
+                        s.setString(3, uuid);
 
                         s.executeUpdate();
                     } catch (SQLException ex) {
