@@ -2,9 +2,9 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.3.3
+-- Dumped from database version 9.3.5
 -- Dumped by pg_dump version 9.3.1
--- Started on 2014-07-17 19:11:55
+-- Started on 2014-10-07 16:31:11
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,7 +20,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 194 (class 1259 OID 260763)
+-- TOC entry 252 (class 1259 OID 18323)
 -- Name: cs_all_attr_mapping; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -36,7 +36,7 @@ CREATE TABLE cs_all_attr_mapping (
 ALTER TABLE public.cs_all_attr_mapping OWNER TO postgres;
 
 --
--- TOC entry 195 (class 1259 OID 260767)
+-- TOC entry 253 (class 1259 OID 18327)
 -- Name: cs_attr; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -70,7 +70,7 @@ CREATE TABLE cs_attr (
 ALTER TABLE public.cs_attr OWNER TO postgres;
 
 --
--- TOC entry 196 (class 1259 OID 260782)
+-- TOC entry 254 (class 1259 OID 18342)
 -- Name: cs_attr_object; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -85,7 +85,7 @@ CREATE TABLE cs_attr_object (
 ALTER TABLE public.cs_attr_object OWNER TO postgres;
 
 --
--- TOC entry 197 (class 1259 OID 260785)
+-- TOC entry 255 (class 1259 OID 18345)
 -- Name: cs_attr_object_derived; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -100,7 +100,7 @@ CREATE TABLE cs_attr_object_derived (
 ALTER TABLE public.cs_attr_object_derived OWNER TO postgres;
 
 --
--- TOC entry 199 (class 1259 OID 260790)
+-- TOC entry 257 (class 1259 OID 18350)
 -- Name: cs_attr_string; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -115,7 +115,7 @@ CREATE TABLE cs_attr_string (
 ALTER TABLE public.cs_attr_string OWNER TO postgres;
 
 --
--- TOC entry 201 (class 1259 OID 260798)
+-- TOC entry 259 (class 1259 OID 18358)
 -- Name: cs_cat_link; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -131,7 +131,7 @@ CREATE TABLE cs_cat_link (
 ALTER TABLE public.cs_cat_link OWNER TO postgres;
 
 --
--- TOC entry 202 (class 1259 OID 260805)
+-- TOC entry 260 (class 1259 OID 18365)
 -- Name: cs_cat_node; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -157,7 +157,7 @@ CREATE TABLE cs_cat_node (
 ALTER TABLE public.cs_cat_node OWNER TO postgres;
 
 --
--- TOC entry 204 (class 1259 OID 260818)
+-- TOC entry 262 (class 1259 OID 18378)
 -- Name: cs_class; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -182,7 +182,7 @@ CREATE TABLE cs_class (
 ALTER TABLE public.cs_class OWNER TO postgres;
 
 --
--- TOC entry 206 (class 1259 OID 260830)
+-- TOC entry 264 (class 1259 OID 18390)
 -- Name: cs_class_attr; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -198,7 +198,7 @@ CREATE TABLE cs_class_attr (
 ALTER TABLE public.cs_class_attr OWNER TO postgres;
 
 --
--- TOC entry 210 (class 1259 OID 260845)
+-- TOC entry 268 (class 1259 OID 18405)
 -- Name: cs_config_attr_exempt; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -213,7 +213,7 @@ CREATE TABLE cs_config_attr_exempt (
 ALTER TABLE public.cs_config_attr_exempt OWNER TO postgres;
 
 --
--- TOC entry 212 (class 1259 OID 260851)
+-- TOC entry 270 (class 1259 OID 18411)
 -- Name: cs_config_attr_jt; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -231,7 +231,7 @@ CREATE TABLE cs_config_attr_jt (
 ALTER TABLE public.cs_config_attr_jt OWNER TO postgres;
 
 --
--- TOC entry 214 (class 1259 OID 260857)
+-- TOC entry 272 (class 1259 OID 18417)
 -- Name: cs_config_attr_key; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -244,7 +244,7 @@ CREATE TABLE cs_config_attr_key (
 ALTER TABLE public.cs_config_attr_key OWNER TO postgres;
 
 --
--- TOC entry 216 (class 1259 OID 260863)
+-- TOC entry 274 (class 1259 OID 18423)
 -- Name: cs_config_attr_type; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -258,7 +258,7 @@ CREATE TABLE cs_config_attr_type (
 ALTER TABLE public.cs_config_attr_type OWNER TO postgres;
 
 --
--- TOC entry 218 (class 1259 OID 260869)
+-- TOC entry 276 (class 1259 OID 18429)
 -- Name: cs_config_attr_value; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -271,7 +271,7 @@ CREATE TABLE cs_config_attr_value (
 ALTER TABLE public.cs_config_attr_value OWNER TO postgres;
 
 --
--- TOC entry 220 (class 1259 OID 260878)
+-- TOC entry 278 (class 1259 OID 18438)
 -- Name: cs_domain; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -284,7 +284,7 @@ CREATE TABLE cs_domain (
 ALTER TABLE public.cs_domain OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 260882)
+-- TOC entry 279 (class 1259 OID 18442)
 -- Name: cs_dynamic_children_helper; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -298,7 +298,7 @@ CREATE TABLE cs_dynamic_children_helper (
 ALTER TABLE public.cs_dynamic_children_helper OWNER TO postgres;
 
 --
--- TOC entry 222 (class 1259 OID 260888)
+-- TOC entry 280 (class 1259 OID 18448)
 -- Name: cs_history; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -315,7 +315,7 @@ CREATE TABLE cs_history (
 ALTER TABLE public.cs_history OWNER TO postgres;
 
 --
--- TOC entry 224 (class 1259 OID 260896)
+-- TOC entry 282 (class 1259 OID 18456)
 -- Name: cs_icon; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -329,7 +329,7 @@ CREATE TABLE cs_icon (
 ALTER TABLE public.cs_icon OWNER TO postgres;
 
 --
--- TOC entry 226 (class 1259 OID 260903)
+-- TOC entry 284 (class 1259 OID 18463)
 -- Name: cs_java_class; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -344,7 +344,7 @@ CREATE TABLE cs_java_class (
 ALTER TABLE public.cs_java_class OWNER TO postgres;
 
 --
--- TOC entry 228 (class 1259 OID 260913)
+-- TOC entry 286 (class 1259 OID 18473)
 -- Name: cs_locks; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -360,7 +360,7 @@ CREATE TABLE cs_locks (
 ALTER TABLE public.cs_locks OWNER TO postgres;
 
 --
--- TOC entry 229 (class 1259 OID 260920)
+-- TOC entry 287 (class 1259 OID 18480)
 -- Name: cs_method; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -377,7 +377,7 @@ CREATE TABLE cs_method (
 ALTER TABLE public.cs_method OWNER TO postgres;
 
 --
--- TOC entry 231 (class 1259 OID 260933)
+-- TOC entry 289 (class 1259 OID 18493)
 -- Name: cs_method_class_assoc; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -391,7 +391,7 @@ CREATE TABLE cs_method_class_assoc (
 ALTER TABLE public.cs_method_class_assoc OWNER TO postgres;
 
 --
--- TOC entry 234 (class 1259 OID 260941)
+-- TOC entry 292 (class 1259 OID 18501)
 -- Name: cs_permission; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -405,7 +405,7 @@ CREATE TABLE cs_permission (
 ALTER TABLE public.cs_permission OWNER TO postgres;
 
 --
--- TOC entry 236 (class 1259 OID 260947)
+-- TOC entry 294 (class 1259 OID 18507)
 -- Name: cs_policy; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -418,7 +418,7 @@ CREATE TABLE cs_policy (
 ALTER TABLE public.cs_policy OWNER TO postgres;
 
 --
--- TOC entry 238 (class 1259 OID 260953)
+-- TOC entry 296 (class 1259 OID 18513)
 -- Name: cs_policy_rule; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -433,7 +433,7 @@ CREATE TABLE cs_policy_rule (
 ALTER TABLE public.cs_policy_rule OWNER TO postgres;
 
 --
--- TOC entry 239 (class 1259 OID 260957)
+-- TOC entry 297 (class 1259 OID 18517)
 -- Name: cs_query; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -455,7 +455,7 @@ CREATE TABLE cs_query (
 ALTER TABLE public.cs_query OWNER TO postgres;
 
 --
--- TOC entry 241 (class 1259 OID 260972)
+-- TOC entry 299 (class 1259 OID 18532)
 -- Name: cs_query_class_assoc; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -469,7 +469,7 @@ CREATE TABLE cs_query_class_assoc (
 ALTER TABLE public.cs_query_class_assoc OWNER TO postgres;
 
 --
--- TOC entry 243 (class 1259 OID 260978)
+-- TOC entry 301 (class 1259 OID 18538)
 -- Name: cs_query_link; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -484,7 +484,7 @@ CREATE TABLE cs_query_link (
 ALTER TABLE public.cs_query_link OWNER TO postgres;
 
 --
--- TOC entry 244 (class 1259 OID 260982)
+-- TOC entry 302 (class 1259 OID 18542)
 -- Name: cs_query_parameter; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -502,7 +502,7 @@ CREATE TABLE cs_query_parameter (
 ALTER TABLE public.cs_query_parameter OWNER TO postgres;
 
 --
--- TOC entry 248 (class 1259 OID 260997)
+-- TOC entry 306 (class 1259 OID 18557)
 -- Name: cs_query_store; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -517,7 +517,7 @@ CREATE TABLE cs_query_store (
 ALTER TABLE public.cs_query_store OWNER TO postgres;
 
 --
--- TOC entry 250 (class 1259 OID 261003)
+-- TOC entry 308 (class 1259 OID 18563)
 -- Name: cs_query_store_ug_assoc; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -533,7 +533,7 @@ CREATE TABLE cs_query_store_ug_assoc (
 ALTER TABLE public.cs_query_store_ug_assoc OWNER TO postgres;
 
 --
--- TOC entry 252 (class 1259 OID 261009)
+-- TOC entry 310 (class 1259 OID 18569)
 -- Name: cs_query_ug_assoc; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -549,7 +549,7 @@ CREATE TABLE cs_query_ug_assoc (
 ALTER TABLE public.cs_query_ug_assoc OWNER TO postgres;
 
 --
--- TOC entry 253 (class 1259 OID 261013)
+-- TOC entry 311 (class 1259 OID 18573)
 -- Name: cs_stringrepcache; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -563,7 +563,7 @@ CREATE TABLE cs_stringrepcache (
 ALTER TABLE public.cs_stringrepcache OWNER TO postgres;
 
 --
--- TOC entry 254 (class 1259 OID 261019)
+-- TOC entry 312 (class 1259 OID 18579)
 -- Name: cs_type; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -581,7 +581,7 @@ CREATE TABLE cs_type (
 ALTER TABLE public.cs_type OWNER TO postgres;
 
 --
--- TOC entry 257 (class 1259 OID 261031)
+-- TOC entry 315 (class 1259 OID 18591)
 -- Name: cs_ug; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -597,7 +597,7 @@ CREATE TABLE cs_ug (
 ALTER TABLE public.cs_ug OWNER TO postgres;
 
 --
--- TOC entry 258 (class 1259 OID 261038)
+-- TOC entry 316 (class 1259 OID 18598)
 -- Name: cs_ug_attr_perm; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -613,7 +613,7 @@ CREATE TABLE cs_ug_attr_perm (
 ALTER TABLE public.cs_ug_attr_perm OWNER TO postgres;
 
 --
--- TOC entry 260 (class 1259 OID 261044)
+-- TOC entry 318 (class 1259 OID 18604)
 -- Name: cs_ug_cat_node_perm; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -629,7 +629,7 @@ CREATE TABLE cs_ug_cat_node_perm (
 ALTER TABLE public.cs_ug_cat_node_perm OWNER TO postgres;
 
 --
--- TOC entry 263 (class 1259 OID 261052)
+-- TOC entry 321 (class 1259 OID 18612)
 -- Name: cs_ug_class_perm; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -645,7 +645,7 @@ CREATE TABLE cs_ug_class_perm (
 ALTER TABLE public.cs_ug_class_perm OWNER TO postgres;
 
 --
--- TOC entry 265 (class 1259 OID 261058)
+-- TOC entry 323 (class 1259 OID 18618)
 -- Name: cs_ug_membership; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -660,7 +660,7 @@ CREATE TABLE cs_ug_membership (
 ALTER TABLE public.cs_ug_membership OWNER TO postgres;
 
 --
--- TOC entry 266 (class 1259 OID 261062)
+-- TOC entry 324 (class 1259 OID 18622)
 -- Name: cs_ug_method_perm; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -676,7 +676,7 @@ CREATE TABLE cs_ug_method_perm (
 ALTER TABLE public.cs_ug_method_perm OWNER TO postgres;
 
 --
--- TOC entry 268 (class 1259 OID 261068)
+-- TOC entry 326 (class 1259 OID 18628)
 -- Name: cs_usr; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -692,16 +692,16 @@ CREATE TABLE cs_usr (
 ALTER TABLE public.cs_usr OWNER TO postgres;
 
 --
--- TOC entry 3797 (class 0 OID 260763)
--- Dependencies: 194
+-- TOC entry 4019 (class 0 OID 18323)
+-- Dependencies: 252
 -- Data for Name: cs_all_attr_mapping; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3798 (class 0 OID 260767)
--- Dependencies: 195
+-- TOC entry 4020 (class 0 OID 18327)
+-- Dependencies: 253
 -- Data for Name: cs_attr; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -714,285 +714,346 @@ INSERT INTO cs_attr VALUES (6, 3, 9, 'SERVER', 'SERVER', false, false, NULL, NUL
 INSERT INTO cs_attr VALUES (7, 2, 2, 'ID', 'ID', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (8, 2, 9, 'OBJECT_NAME', 'OBJECT_NAME', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 2, NULL, NULL, false);
 INSERT INTO cs_attr VALUES (9, 2, 17, 'URL_BASE_ID', 'URL_BASE_ID', true, false, 3, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (40, 20, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (45, 8, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (43, 4, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (33, 20, 8, 'name', 'name', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, 64, NULL, false);
-INSERT INTO cs_attr VALUES (46, 18, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (88, 11, 2, 'resource_reference', 'resource_reference', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (39, 19, 8, 'name', 'name', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, 200, NULL, false);
-INSERT INTO cs_attr VALUES (86, 12, 2, 'resource_reference', 'resource_reference', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (87, 10, 2, 'representation_reference', 'representation_reference', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (84, 7, 2, 'resource_reference', 'resource_reference', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (90, 5, 2, 'relationship_reference', 'relationship_reference', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (53, 9, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (41, 19, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (44, 15, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (47, 12, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (50, 10, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (80, 16, 21, 'metadata', 'metadata', true, false, 6, '', true, false, true, 'relationship_reference', NULL, NULL, NULL, false, NULL, NULL, 6, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (81, 8, 2, 'metadata_reference', 'metadata_reference', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (16, 16, 8, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 2, 200, NULL, false);
-INSERT INTO cs_attr VALUES (55, 5, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (20, 18, 8, 'name', 'name', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, 150, NULL, false);
-INSERT INTO cs_attr VALUES (26, 18, 9, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (38, 16, 8, 'name', 'name', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 1, 150, NULL, false);
-INSERT INTO cs_attr VALUES (51, 11, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (83, 6, 2, 'relationship_reference', 'relationship_reference', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (89, 9, 2, 'relationship_reference', 'relationship_reference', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (52, 16, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (48, 7, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (54, 6, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (19, 20, 8, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 2, 800, NULL, false);
-INSERT INTO cs_attr VALUES (49, 17, 4, 'id', 'id', false, false, NULL, 'Primärschlüssel', false, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (28, 15, 9, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 4, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (15, 4, 8, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 2, 200, NULL, false);
-INSERT INTO cs_attr VALUES (22, 18, 14, 'fromDate', 'fromdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 11, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (70, 15, 29, 'contact', 'contact', true, false, 4, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 13, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (18, 15, 9, 'content', 'content', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 11, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (27, 17, 9, 'description', 'description', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (76, 17, 20, 'tags', 'tags', true, false, 10, '', true, false, true, 'representation_reference', NULL, NULL, NULL, true, NULL, NULL, 6, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (34, 17, 8, 'name', 'name', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, 150, NULL, false);
-INSERT INTO cs_attr VALUES (25, 17, 9, 'content', 'content', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 10, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (11, 15, 14, 'creationDate', 'creationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (75, 18, 22, 'metadata', 'metadata', true, false, 7, '', true, false, true, 'resource_reference', NULL, NULL, NULL, false, NULL, NULL, 18, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (73, 18, 36, 'tags', 'tags', true, false, 12, '', true, false, true, 'resource_reference', NULL, NULL, NULL, false, NULL, NULL, 5, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (57, 18, 19, 'spatialCoverage', 'spatialcoverage', true, false, 1, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 6, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (29, 15, 8, 'name', 'name', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 3, 150, NULL, false);
-INSERT INTO cs_attr VALUES (72, 15, 31, 'tags', 'tags', true, false, 8, '', true, false, true, 'metadata_reference', NULL, NULL, NULL, false, NULL, NULL, 7, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (64, 18, 29, 'contact', 'contact', true, false, 4, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 17, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (74, 18, 30, 'representation', 'representation', true, false, 11, '', true, false, true, 'resource_reference', NULL, NULL, NULL, false, NULL, NULL, 19, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (10, 4, 8, 'organisation', 'organisation', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 3, 100, NULL, false);
-INSERT INTO cs_attr VALUES (78, 16, 32, 'fromResources', 'fromresources', true, false, 5, '', true, false, true, 'relationship_reference', NULL, NULL, NULL, false, NULL, NULL, 8, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (77, 16, 23, 'tags', 'tags', true, false, 9, '', true, false, true, 'relationship_reference', NULL, NULL, NULL, false, NULL, NULL, 4, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (58, 18, 28, 'accessConditions', 'accessconditions', true, false, 19, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 24, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (32, 18, 14, 'publicationDate', 'publicationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 14, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (30, 18, 14, 'lastModificationDate', 'lastmodificationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 16, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (63, 7, 26, 'metadata', 'metaid', true, false, 15, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (68, 8, 28, 'tag', 'tagid', true, false, 19, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (60, 5, 34, 'resource', 'resid', true, false, 18, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (69, 6, 26, 'metadata', 'metaid', true, false, 15, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 1, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (62, 9, 28, 'tag', 'tagid', true, false, 19, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (59, 10, 28, 'tag', 'tagid', true, false, 19, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (61, 11, 33, 'representation', 'repid', true, false, 17, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (65, 12, 28, 'tag', 'tagid', true, false, 19, '', true, false, false, '', NULL, NULL, NULL, false, NULL, NULL, 2, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (119, 18, 28, 'location', 'location', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 9, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (106, 16, 28, 'type', 'type', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (129, 18, 28, 'topicCategory', 'topiccategory', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 20, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (14, 18, 14, 'toDate', 'todate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (97, 4, 28, 'role', 'role', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 6, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (115, 18, 28, 'conformity', 'conformity', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 23, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (23, 18, 14, 'creationDate', 'creationdate', false, false, NULL, '', true, false, false, '', NULL, NULL, NULL, true, NULL, NULL, 13, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (100, 17, 28, 'contentType', 'contenttype', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (98, 19, 27, 'taggroup', 'taggroup', true, false, 20, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 3, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (102, 16, 34, 'toResource', 'toresource', true, false, 18, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (107, 16, 28, 'applicationProfile', 'applicationprofile', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 9, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (118, 18, 28, 'accessLimitations', 'accesslimitations', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 25, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (121, 17, 8, 'uuid', 'uuid', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, 50, NULL, false);
-INSERT INTO cs_attr VALUES (111, 17, 28, 'type', 'type', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 5, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (114, 18, 28, 'language', 'language', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 21, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (122, 18, 9, 'licenseStatement', 'licensestatement', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 26, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (130, 17, 2, 'spatialScale', 'spatialscale', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 15, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (131, 17, 8, 'temporalResolution', 'temporalresolution', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 16, 100, NULL, false);
-INSERT INTO cs_attr VALUES (132, 17, 8, 'spatialResolution', 'spatialresolution', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 14, 100, NULL, false);
-INSERT INTO cs_attr VALUES (133, 18, 8, 'uuid', 'uuid', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 27, 200, NULL, false);
-INSERT INTO cs_attr VALUES (134, 4, 8, 'name', 'name', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 10, 100, NULL, false);
-INSERT INTO cs_attr VALUES (123, 15, 8, 'uuid', 'uuid', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 2, 100, NULL, false);
-INSERT INTO cs_attr VALUES (104, 15, 28, 'type', 'type', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 5, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (135, 4, 8, 'email', 'email', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 9, 200, NULL, false);
-INSERT INTO cs_attr VALUES (136, 18, 28, 'collection', 'collection', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 28, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (137, 19, 9, 'description', 'description', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 4, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (99, 15, 28, 'contentType', 'contenttype', true, false, 19, NULL, true, true, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 8, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (109, 17, 28, 'protocol', 'protocol', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 11, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (110, 17, 28, 'applicationProfile', 'applicationprofile', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 13, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (108, 17, 28, 'function', 'function', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (105, 15, 28, 'standard', 'standard', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 15, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (103, 15, 28, 'language', 'language', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 14, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (128, 18, 28, 'type', 'type', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 4, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (113, 18, 28, 'geography', 'geography', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 10, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (117, 18, 28, 'srid', 'srid', true, false, 19, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
-INSERT INTO cs_attr VALUES (139, 17, 8, 'contentLocation', 'contentlocation', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 17, 1024, NULL, false);
-INSERT INTO cs_attr VALUES (140, 15, 8, 'contentLocation', 'contentlocation', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 16, 1024, NULL, false);
-INSERT INTO cs_attr VALUES (141, 4, 8, 'url', 'url', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 11, 1024, NULL, false);
+INSERT INTO cs_attr VALUES (10, 4, 8, 'organisation', 'organisation', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, 100, NULL, false);
+INSERT INTO cs_attr VALUES (11, 4, 8, 'name', 'name', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 3, 100, NULL, false);
+INSERT INTO cs_attr VALUES (12, 4, 8, 'description', 'description', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, 200, NULL, false);
+INSERT INTO cs_attr VALUES (13, 4, 8, 'email', 'email', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 4, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (14, 4, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (15, 4, 8, 'url', 'url', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 5, 1024, NULL, false);
+INSERT INTO cs_attr VALUES (16, 5, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (17, 5, 8, 'name', 'name', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, 64, NULL, false);
+INSERT INTO cs_attr VALUES (18, 5, 8, 'description', 'description', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, 800, NULL, false);
+INSERT INTO cs_attr VALUES (19, 6, 8, 'name', 'name', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, 200, NULL, false);
+INSERT INTO cs_attr VALUES (20, 6, 21, 'taggroup', 'taggroup', true, false, 5, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (21, 6, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (22, 6, 9, 'description', 'description', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (24, 4, 22, 'role', 'role', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 6, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (25, 7, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (29, 7, 8, 'contentLocation', 'contentlocation', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 13, 1024, NULL, false);
+INSERT INTO cs_attr VALUES (30, 7, 8, 'temporalResolution', 'temporalresolution', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 10, 100, NULL, false);
+INSERT INTO cs_attr VALUES (31, 7, 22, 'protocol', 'protocol', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (32, 7, 9, 'content', 'content', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 4, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (33, 7, 2, 'spatialScale', 'spatialscale', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (34, 7, 22, 'function', 'function', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 6, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (36, 7, 8, 'spatialResolution', 'spatialresolution', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 11, 100, NULL, false);
+INSERT INTO cs_attr VALUES (37, 7, 22, 'applicationprofile', 'applicationprofile', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 8, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (38, 7, 22, 'type', 'type', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 5, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (39, 8, 22, 'tag', 'tagid', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (40, 8, 2, 'representation_reference', 'representation_reference', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (41, 8, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (42, 7, 24, 'tags', 'tags', true, false, 8, NULL, true, false, true, 'representation_reference', NULL, NULL, NULL, true, NULL, NULL, 14, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (43, 9, 22, 'tag', 'tagid', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (44, 9, 2, 'resource_reference', 'resource_reference', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (45, 9, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (46, 10, 22, 'tag', 'tagid', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (47, 10, 2, 'metadata_reference', 'metadata_reference', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (48, 10, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (49, 11, 22, 'tag', 'tagid', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (50, 11, 2, 'relationship_reference', 'relationship_reference', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (51, 11, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (53, 12, 2, 'resource_reference', 'resource_reference', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (54, 12, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (55, 13, 22, 'type', 'type', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 9, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (56, 13, 14, 'fromDate', 'fromdate', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (57, 13, 22, 'location', 'location', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 10, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (58, 13, 22, 'topiccategory', 'topiccategory', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 11, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (59, 13, 14, 'creationdate', 'creationdate', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (62, 13, 20, 'contact', 'contact', true, false, 4, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 16, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (63, 13, 22, 'accessconditions', 'accessconditions', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (64, 13, 14, 'lastModificationDate', 'lastmodificationdate', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 19, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (65, 13, 22, 'geography', 'geography', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 17, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (68, 13, 22, 'conformity', 'conformity', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 6, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (69, 13, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (70, 13, 22, 'srid', 'srid', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 5, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (72, 13, 22, 'language', 'language', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (73, 13, 25, 'tags', 'tags', true, false, 9, NULL, true, false, true, 'resource_reference', NULL, NULL, NULL, true, NULL, NULL, 15, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (74, 13, 9, 'licensestatement', 'licensestatement', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 14, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (75, 13, 14, 'toDate', 'todate', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 4, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (76, 14, 2, 'resource_reference', 'resource_reference', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (77, 14, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (78, 15, 8, 'contentLocation', 'contentlocation', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 9, 1024, NULL, false);
+INSERT INTO cs_attr VALUES (79, 15, 22, 'language', 'language', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 6, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (80, 15, 22, 'type', 'type', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 5, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (81, 15, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (82, 15, 9, 'description', 'description', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (83, 15, 26, 'tags', 'tags', true, false, 10, NULL, true, false, true, 'metadata_reference', NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (84, 15, 8, 'name', 'name', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, 150, NULL, false);
+INSERT INTO cs_attr VALUES (86, 15, 22, 'standard', 'standard', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (89, 13, 22, 'collection', 'collection', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 24, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (90, 13, 8, 'uuid', 'uuid', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 23, 200, NULL, false);
+INSERT INTO cs_attr VALUES (92, 13, 22, 'accesslimitations', 'accesslimitations', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 22, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (87, 15, 20, 'contact', 'contact', true, false, 4, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 4, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (66, 13, 8, 'name', 'name', false, false, NULL, NULL, true, true, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 13, 150, NULL, false);
+INSERT INTO cs_attr VALUES (60, 13, 9, 'description', 'description', false, false, NULL, NULL, true, true, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 8, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (67, 13, 19, 'spatialCoverage', 'spatialcoverage', true, false, 1, NULL, true, true, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (93, 13, 30, 'metadata', 'metadata', true, false, 14, NULL, true, false, true, 'resource_reference', NULL, NULL, NULL, true, NULL, NULL, 20, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (95, 16, 2, 'relationship_reference', 'relationship_reference', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (96, 16, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (98, 17, 2, 'relationship_reference', 'relationship_reference', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (99, 17, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (88, 14, 31, 'metadata', 'metadataid', true, false, 15, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (97, 17, 31, 'metadata', 'metadataid', true, false, 15, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (94, 16, 29, 'resource', 'resourceid', true, false, 13, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (85, 15, 8, 'uuid', 'uuid', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 8, 200, NULL, false);
+INSERT INTO cs_attr VALUES (61, 13, 28, 'representation', 'representation', true, false, 12, NULL, true, false, true, 'resource_reference', NULL, NULL, NULL, true, NULL, NULL, 18, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (52, 12, 23, 'representation', 'representationid', true, false, 7, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (100, 18, 33, 'metadata', 'metadata', true, false, 17, NULL, true, false, true, 'relationship_reference', NULL, NULL, NULL, true, NULL, NULL, 4, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (101, 18, 32, 'fromResources', 'fromresources', true, false, 16, NULL, true, false, true, 'relationship_reference', NULL, NULL, NULL, true, NULL, NULL, 5, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (102, 18, 8, 'description', 'description', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, 200, NULL, false);
+INSERT INTO cs_attr VALUES (103, 18, 29, 'toResource', 'toresource', true, false, 13, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 6, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (104, 18, 2, 'id', 'ID', false, false, NULL, 'PrimÃ¤rschlÃ¼ssel', false, false, false, NULL, NULL, NULL, NULL, false, NULL, NULL, 0, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (105, 18, 27, 'tags', 'tags', true, false, 11, NULL, true, false, true, 'relationship_reference', NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (106, 18, 8, 'name', 'name', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 1, 150, NULL, false);
+INSERT INTO cs_attr VALUES (107, 18, 22, 'type', 'type', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 7, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (108, 7, 22, 'contentType', 'contenttype', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 15, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (109, 15, 22, 'contenttype', 'contenttype', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 11, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (110, 15, 13, 'creationDate', 'creationdate', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 10, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (111, 15, 9, 'content', 'content', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 12, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (23, 7, 8, 'name', 'name', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 2, 200, NULL, false);
+INSERT INTO cs_attr VALUES (28, 7, 9, 'description', 'description', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 3, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (27, 13, 14, 'publicationDate', 'publicationdate', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 25, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (35, 7, 8, 'uuid', 'uuid', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 9, 200, NULL, false);
+INSERT INTO cs_attr VALUES (112, 7, 22, 'uploadStatus', 'uploadstatus', true, false, 6, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 16, NULL, NULL, false);
+INSERT INTO cs_attr VALUES (113, 7, 9, 'uploadMessage', 'uploadmessage', false, false, NULL, NULL, true, false, false, NULL, NULL, NULL, NULL, true, NULL, NULL, 17, NULL, NULL, false);
 
 
 --
--- TOC entry 3799 (class 0 OID 260782)
--- Dependencies: 196
+-- TOC entry 4021 (class 0 OID 18342)
+-- Dependencies: 254
 -- Data for Name: cs_attr_object; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO cs_attr_object VALUES (13, 7235, 1, 7239);
+INSERT INTO cs_attr_object VALUES (13, 7209, 1, 7213);
+INSERT INTO cs_attr_object VALUES (13, 7204, 1, 7208);
+INSERT INTO cs_attr_object VALUES (13, 7221, 1, 7225);
+INSERT INTO cs_attr_object VALUES (13, 7187, 1, 7191);
+INSERT INTO cs_attr_object VALUES (13, 7230, 1, 7234);
+INSERT INTO cs_attr_object VALUES (13, 7231, 1, 7235);
+INSERT INTO cs_attr_object VALUES (13, 7232, 1, 7236);
+INSERT INTO cs_attr_object VALUES (13, 7236, 1, 7240);
+INSERT INTO cs_attr_object VALUES (13, 7224, 1, 7338);
+INSERT INTO cs_attr_object VALUES (13, 7242, 1, 7339);
+INSERT INTO cs_attr_object VALUES (13, 7243, 1, 7340);
+INSERT INTO cs_attr_object VALUES (13, 7245, 1, 7341);
+INSERT INTO cs_attr_object VALUES (13, 7239, 1, 7315);
+INSERT INTO cs_attr_object VALUES (13, 7246, 1, 7343);
+INSERT INTO cs_attr_object VALUES (13, 7247, 1, 7344);
+INSERT INTO cs_attr_object VALUES (13, 7244, 1, 7345);
+INSERT INTO cs_attr_object VALUES (13, 7240, 1, 7317);
+INSERT INTO cs_attr_object VALUES (13, 7249, 1, 7347);
+INSERT INTO cs_attr_object VALUES (13, 7248, 1, 7348);
+INSERT INTO cs_attr_object VALUES (13, 7250, 1, 7349);
+INSERT INTO cs_attr_object VALUES (13, 7251, 1, 7350);
+INSERT INTO cs_attr_object VALUES (13, 7252, 1, 7352);
+INSERT INTO cs_attr_object VALUES (13, 7253, 1, 7351);
+INSERT INTO cs_attr_object VALUES (13, 7254, 1, 7353);
+INSERT INTO cs_attr_object VALUES (13, 7255, 1, 7354);
+INSERT INTO cs_attr_object VALUES (13, 7257, 1, 7355);
+INSERT INTO cs_attr_object VALUES (13, 7256, 1, 7357);
 
 
 --
--- TOC entry 3800 (class 0 OID 260785)
--- Dependencies: 197
+-- TOC entry 4022 (class 0 OID 18345)
+-- Dependencies: 255
 -- Data for Name: cs_attr_object_derived; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3801 (class 0 OID 260790)
--- Dependencies: 199
+-- TOC entry 4023 (class 0 OID 18350)
+-- Dependencies: 257
 -- Data for Name: cs_attr_string; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO cs_attr_string VALUES (13, 60, 7235, 'expert');
+INSERT INTO cs_attr_string VALUES (13, 66, 7235, 'expert');
+INSERT INTO cs_attr_string VALUES (13, 60, 7209, 'Tool that can generate a rainevent from an IDF curve');
+INSERT INTO cs_attr_string VALUES (13, 66, 7209, 'IDF to Rainevent Generator Tool');
+INSERT INTO cs_attr_string VALUES (13, 60, 7221, 'advanced resource');
+INSERT INTO cs_attr_string VALUES (13, 66, 7221, 'advanced resource');
+INSERT INTO cs_attr_string VALUES (13, 60, 7187, 'The Advanced Microwave Scanning Radiometer - Earth Observing System (AMSR-E) instrument on the NASA Earth Observing System (EOS) Aqua satellite provides global passive microwave measurements of terrestrial, oceanic, and atmospheric variables for the investigation of water and energy cycles. Soil moisture and other land surface variables are key variables in understanding land surface hydrology and in modeling ecosystems, weather, and climate. This gridded Level-3 land surface product (AE_Land3) includes daily measurements of surface soil moisture and vegetation/roughness water content interpretive information, as well as brightness temperatures and quality control variables. Ancillary data include time, geolocation, and quality assessment. Input brightness temperature data, corresponding to a 56 km mean spatial resolution, are resampled to a global cylindrical 25 km Equal-Area Scalable Earth Grid (EASE-Grid) cell spacing. Data are stored in HDF-EOS format, and are available from 19 June 2002 to the present via FTP.');
+INSERT INTO cs_attr_string VALUES (13, 66, 7187, 'AMSR-E/Aqua Daily L3 Surface Soil Moisture, Interpretive Parameters, & QC EASE-Grids');
+INSERT INTO cs_attr_string VALUES (13, 60, 7204, 'IDF curve from the Austria Lebensministerium dataset');
+INSERT INTO cs_attr_string VALUES (13, 66, 7204, 'Kostra IDF Curve 3093');
+INSERT INTO cs_attr_string VALUES (13, 60, 7230, 'f');
+INSERT INTO cs_attr_string VALUES (13, 66, 7230, 'f');
+INSERT INTO cs_attr_string VALUES (13, 60, 7231, 'jop');
+INSERT INTO cs_attr_string VALUES (13, 66, 7231, 'new basic');
+INSERT INTO cs_attr_string VALUES (13, 60, 7232, 'ff');
+INSERT INTO cs_attr_string VALUES (13, 66, 7232, 'ff');
+INSERT INTO cs_attr_string VALUES (13, 60, 7244, 'uploadTest');
+INSERT INTO cs_attr_string VALUES (13, 66, 7244, 'uploadTest');
+INSERT INTO cs_attr_string VALUES (13, 60, 7236, 'fe');
+INSERT INTO cs_attr_string VALUES (13, 66, 7236, 'fre');
+INSERT INTO cs_attr_string VALUES (13, 60, 7239, '"Eurostat''s mission: to be the leading provider of high quality statistics on Europe. 
+Eurostat is the statistical office of the European Union situated in Luxembourg. Its task is to provide the European Union with statistics at European level that enable comparisons between countries and regions. 
+This is a key task. Democratic societies do not function properly without a solid basis of reliable and objective statistics. On one hand, decision-makers at EU level, in Member States, in local government and in business need statistics to make those decisions. On the other hand, the public and media need statistics for an accurate picture of contemporary society and to evaluate the performance of politicians and others. Of course, national statistics are still important for national purposes in Member States whereas EU statistics are essential for decisions and evaluation at European level."');
+INSERT INTO cs_attr_string VALUES (13, 66, 7239, 'Land use by NUTS 2 regions');
+INSERT INTO cs_attr_string VALUES (13, 60, 7249, 'fe');
+INSERT INTO cs_attr_string VALUES (13, 66, 7249, 'newUpload');
+INSERT INTO cs_attr_string VALUES (13, 60, 7248, 'fe');
+INSERT INTO cs_attr_string VALUES (13, 66, 7248, 'newUpload');
+INSERT INTO cs_attr_string VALUES (13, 60, 7240, '"Eurostat''s mission: to be the leading provider of high quality statistics on Europe. 
+Eurostat is the statistical office of the European Union situated in Luxembourg. Its task is to provide the European Union with statistics at European level that enable comparisons between countries and regions. 
+This is a key task. Democratic societies do not function properly without a solid basis of reliable and objective statistics. On one hand, decision-makers at EU level, in Member States, in local government and in business need statistics to make those decisions. On the other hand, the public and media need statistics for an accurate picture of contemporary society and to evaluate the performance of politicians and others. Of course, national statistics are still important for national purposes in Member States whereas EU statistics are essential for decisions and evaluation at European level."');
+INSERT INTO cs_attr_string VALUES (13, 66, 7240, 'Land use by NUTS 2 regionsXXX');
+INSERT INTO cs_attr_string VALUES (13, 60, 7250, 'veryNewUpdate');
+INSERT INTO cs_attr_string VALUES (13, 66, 7250, 'veryNewUpdate');
+INSERT INTO cs_attr_string VALUES (13, 60, 7251, 'veryNewUpdate');
+INSERT INTO cs_attr_string VALUES (13, 66, 7251, 'veryNewUpdate');
+INSERT INTO cs_attr_string VALUES (13, 60, 7252, 'fef');
+INSERT INTO cs_attr_string VALUES (13, 66, 7252, 'ultiNewUpdate');
+INSERT INTO cs_attr_string VALUES (13, 60, 7253, 'fef');
+INSERT INTO cs_attr_string VALUES (13, 66, 7253, 'ultiNewUpdate');
+INSERT INTO cs_attr_string VALUES (13, 60, 7254, 'fr');
+INSERT INTO cs_attr_string VALUES (13, 66, 7254, 'foobar');
+INSERT INTO cs_attr_string VALUES (13, 60, 7255, 'fr');
+INSERT INTO cs_attr_string VALUES (13, 66, 7255, 'foobar');
+INSERT INTO cs_attr_string VALUES (13, 60, 7224, 'Land use based on subbasin division. The data shows proportions of land-use for each land-use class and subbasin.Unit of measurement: %');
+INSERT INTO cs_attr_string VALUES (13, 66, 7224, 'Land-use on subbasins');
+INSERT INTO cs_attr_string VALUES (13, 60, 7257, 'fobar2');
+INSERT INTO cs_attr_string VALUES (13, 66, 7257, 'fobar2');
+INSERT INTO cs_attr_string VALUES (13, 60, 7242, 'g');
+INSERT INTO cs_attr_string VALUES (13, 66, 7242, 'g');
+INSERT INTO cs_attr_string VALUES (13, 60, 7243, 'g');
+INSERT INTO cs_attr_string VALUES (13, 66, 7243, 'g');
+INSERT INTO cs_attr_string VALUES (13, 60, 7245, 'uploadTest');
+INSERT INTO cs_attr_string VALUES (13, 66, 7245, 'uploadTest');
+INSERT INTO cs_attr_string VALUES (13, 60, 7246, 'testUpload');
+INSERT INTO cs_attr_string VALUES (13, 66, 7246, 'testUpload');
+INSERT INTO cs_attr_string VALUES (13, 60, 7247, 'testUpload');
+INSERT INTO cs_attr_string VALUES (13, 66, 7247, 'testUpload');
+INSERT INTO cs_attr_string VALUES (13, 60, 7256, 'fobar2');
+INSERT INTO cs_attr_string VALUES (13, 66, 7256, 'fobar2');
 
 
 --
--- TOC entry 3802 (class 0 OID 260798)
--- Dependencies: 201
+-- TOC entry 4024 (class 0 OID 18358)
+-- Dependencies: 259
 -- Data for Name: cs_cat_link; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO cs_cat_link VALUES (3, 1, NULL, 1, 3);
+INSERT INTO cs_cat_link VALUES (3, 2, NULL, 1, 4);
+INSERT INTO cs_cat_link VALUES (3, 4, NULL, 1, 5);
+INSERT INTO cs_cat_link VALUES (3, 9, NULL, 1, 9);
 
 
 --
--- TOC entry 3803 (class 0 OID 260805)
--- Dependencies: 202
+-- TOC entry 4025 (class 0 OID 18365)
+-- Dependencies: 260
 -- Data for Name: cs_cat_node; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO cs_cat_node VALUES (1, 'Internal', 1, 19, NULL, 'N', false, NULL, 'SELECT 
+INSERT INTO cs_cat_node VALUES (1, 'Internal', NULL, NULL, NULL, 'N', false, NULL, 'SELECT  	-1 as id,  	tag.name,  	cs_class.id as class_id,  	null as object_id,  	''N'' as node_type,  	null as url,  	csdc.hydrologicalconcepts(tag.id) as dynamic_children, 	false as sql_sort      FROM  	tag 	LEFT JOIN taggroup ON 		tag.taggroup = taggroup.id,         cs_class     WHERE         cs_class.name = ''tag'' AND 	taggroup.name = ''geography''     GROUP BY  	tag.name, 	tag.id,        cs_class.id     ORDER BY tag.name;', false, NULL, false, NULL, '', '');
+INSERT INTO cs_cat_node VALUES (4, 'Administration', NULL, NULL, NULL, 'N', false, NULL, 'SELECT 
 	-1 as id, 
+	cs_class.name, 
+	cs_class.id as class_id, 
+	null as object_id, 
+	''N'' as node_type, 
+	null as url, 
+	csdc.cidsobjects(cs_class.id::varchar , cs_class.table_name) as dynamic_children, 
+	false as sql_sort 
+    FROM 
+	cs_class,
+	cs_attr
+    WHERE cs_class.id = cs_attr.class_id
+	AND cs_attr.field_name ilike ''name''', true, NULL, false, NULL, NULL, NULL);
+INSERT INTO cs_cat_node VALUES (3, 'SWITCH-ON', NULL, NULL, NULL, 'N', true, NULL, NULL, true, NULL, false, NULL, NULL, NULL);
+INSERT INTO cs_cat_node VALUES (9, 'Taggroups', NULL, NULL, NULL, 'N', false, NULL, 'SELECT  	-1 as id,  	taggroup.name,  	cs_class.id as class_id,  	null as object_id,  	''N'' as node_type,  	null as url,  	csdc.tags(taggroup.id) as dynamic_children, 	false as sql_sort      FROM  	taggroup,        cs_class     WHERE         cs_class.name = ''taggroup''     ORDER BY taggroup.name;', false, NULL, false, NULL, NULL, NULL);
+INSERT INTO cs_cat_node VALUES (2, 'External', NULL, NULL, NULL, 'N', false, NULL, 'SELECT 
+        -1 as id, 
 	tag.name, 
 	cs_class.id as class_id, 
 	null as object_id, 
 	''N'' as node_type, 
 	null as url, 
-	csdc.hydrologicalconcepts(tag.id) as dynamic_children,
+	csdc.collectionsexternal(tag.id) as dynamic_children,
 	false as sql_sort 
     FROM 
 	tag
 	LEFT JOIN taggroup ON
-		tag.taggroup = taggroup.id,
-        cs_class
+		tag.taggroup = taggroup.id
+        LEFT JOIN resource  ON
+             resource.collection = tag.id,
+        cs_class        
     WHERE
         cs_class.name = ''tag'' AND
-	taggroup.name = ''geography''
+	taggroup.name = ''collection'' 
     GROUP BY 
 	tag.name,
 	tag.id,
-        cs_class.id;', false, NULL, false, NULL, '', '');
-INSERT INTO cs_cat_node VALUES (3, 'SWITCH-ON', NULL, NULL, NULL, 'N', true, NULL, 'SELECT 
-	id, 
-	name, 
-	class_id, 
-	object_id, 
-	node_type, 
-	null as url,
-	dynamic_children,
-	sql_sort 
-    FROM 
-	cs_cat_node
-    WHERE
-        descr = 1', true, NULL, false, NULL, NULL, NULL);
-INSERT INTO cs_cat_node VALUES (2, 'External', 1, 19, NULL, 'N', false, NULL, 'SELECT 
-	-1 as id, 
-	tag.name, 
-	cs_class.id as class_id, 
-	null as object_id, 
-	''N'' as node_type, 
-	null as url, 
-	csdc.collections(tag.id) as dynamic_children,
-	false as sql_sort 
-    FROM 
-	tag
-	LEFT JOIN taggroup ON
-		tag.taggroup = taggroup.id,
-        cs_class
-    WHERE
-        cs_class.name = ''tag'' AND
-	taggroup.name = ''collection''
-    GROUP BY 
-	tag.name,
-	tag.id,
-        cs_class.id;', false, NULL, false, NULL, NULL, NULL);
-INSERT INTO cs_cat_node VALUES (4, 'External_II', NULL, 19, NULL, 'N', false, NULL, 'SELECT 
-	-1 as id, 
-	tag.name, 
-	cs_class.id as class_id, 
-	null as object_id, 
-	''N'' as node_type, 
-	null as url, 
-	csdc.collectionsExternal(tag.id) as dynamic_children,
-	false as sql_sort 
-    FROM 
-	tag
-	LEFT JOIN taggroup ON
-		tag.taggroup = taggroup.id,
-        cs_class
-    WHERE
-        cs_class.name = ''tag'' AND
-	taggroup.name = ''collection''
-    GROUP BY 
-	tag.name,
-	tag.id,
-        cs_class.id;', false, NULL, false, NULL, NULL, NULL);
+        cs_class.id 
+    HAVING ( COUNT(resource.id) > 0 )
+    ORDER BY tag.name ASC;', true, NULL, false, NULL, NULL, NULL);
 
 
 --
--- TOC entry 3804 (class 0 OID 260818)
--- Dependencies: 204
+-- TOC entry 4026 (class 0 OID 18378)
+-- Dependencies: 262
 -- Data for Name: cs_class; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO cs_class VALUES (1, 'GEOM', 'Cids Geodatentyp', 1, 1, 'GEOM', 'ID', true, NULL, NULL, NULL, false, NULL, NULL);
 INSERT INTO cs_class VALUES (2, 'URL', NULL, 2, 2, 'URL', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
 INSERT INTO cs_class VALUES (3, 'URL_BASE', NULL, 2, 2, 'URL_BASE', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
-INSERT INTO cs_class VALUES (5, 'jt_fromresource_relationship', '''', 1, 1, 'JT_FROMRESOURCE_RELATIONSHIP', 'id', false, NULL, NULL, NULL, true, NULL, NULL);
-INSERT INTO cs_class VALUES (6, 'jt_metadata_relationship', '''', 1, 1, 'JT_METADATA_RELATIONSHIP', 'id', false, NULL, NULL, NULL, true, NULL, NULL);
-INSERT INTO cs_class VALUES (7, 'jt_metadata_resource', '''', 1, 1, 'JT_METADATA_RESOURCE', 'id', false, NULL, NULL, NULL, true, NULL, NULL);
-INSERT INTO cs_class VALUES (8, 'jt_metadata_tag', '''', 1, 1, 'JT_METADATA_TAG', 'id', false, NULL, NULL, NULL, true, NULL, NULL);
-INSERT INTO cs_class VALUES (9, 'jt_relationship_tag', '''', 1, 1, 'JT_RELATIONSHIP_TAG', 'id', false, NULL, NULL, NULL, true, NULL, NULL);
-INSERT INTO cs_class VALUES (10, 'jt_representation_tag', '''', 1, 1, 'JT_REPRESENTATION_TAG', 'id', false, NULL, NULL, NULL, true, NULL, NULL);
-INSERT INTO cs_class VALUES (11, 'jt_resource_representation', '''', 1, 1, 'JT_RESOURCE_REPRESENTATION', 'id', false, NULL, NULL, NULL, true, NULL, NULL);
-INSERT INTO cs_class VALUES (12, 'jt_resource_tag', '''', 1, 1, 'JT_RESOURCE_TAG', 'id', false, NULL, NULL, NULL, true, NULL, NULL);
-INSERT INTO cs_class VALUES (16, 'relationship', '''', 1, 1, 'RELATIONSHIP', 'id', false, NULL, NULL, NULL, false, NULL, NULL);
-INSERT INTO cs_class VALUES (18, 'resource', 'SWITCH-ON Main Resource Class', 1, 1, 'RESOURCE', 'id', false, NULL, NULL, NULL, false, NULL, NULL);
-INSERT INTO cs_class VALUES (17, 'representation', 'Representation of the Resourrce', 1, 1, 'REPRESENTATION', 'id', false, NULL, NULL, NULL, false, NULL, NULL);
-INSERT INTO cs_class VALUES (15, 'metadata', 'Additional Quality, Lineage and Origin Meta-Data', 1, 1, 'METADATA', 'id', false, NULL, NULL, NULL, false, NULL, NULL);
-INSERT INTO cs_class VALUES (19, 'tag', 'Tags', 1, 1, 'TAG', 'id', false, NULL, NULL, NULL, false, NULL, NULL);
-INSERT INTO cs_class VALUES (20, 'taggroup', 'Tag Group', 1, 1, 'TAGGROUP', 'id', false, NULL, NULL, NULL, false, NULL, NULL);
-INSERT INTO cs_class VALUES (4, 'contact', 'Contact for Resources and Meta-Data', 1, 1, 'CONTACT', 'id', false, NULL, NULL, NULL, false, NULL, NULL);
+INSERT INTO cs_class VALUES (5, 'taggroup', '', 2, 2, 'TAGGROUP', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
+INSERT INTO cs_class VALUES (6, 'tag', '', 2, 2, 'TAG', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
+INSERT INTO cs_class VALUES (7, 'representation', '', 2, 2, 'REPRESENTATION', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
+INSERT INTO cs_class VALUES (8, 'jt_representation_tag', '', 2, 2, 'JT_REPRESENTATION_TAG', 'ID', false, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cs_class VALUES (9, 'jt_resource_tag', '', 2, 2, 'JT_RESOURCE_TAG', 'ID', false, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cs_class VALUES (10, 'jt_metadata_tag', '', 2, 2, 'JT_METADATA_TAG', 'ID', false, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cs_class VALUES (11, 'jt_relationship_tag', '', 2, 2, 'JT_RELATIONSHIP_TAG', 'ID', false, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cs_class VALUES (12, 'jt_resource_representation', '', 2, 2, 'JT_RESOURCE_REPRESENTATION', 'ID', false, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cs_class VALUES (15, 'metadata', '', 2, 2, 'METADATA', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
+INSERT INTO cs_class VALUES (14, 'jt_metadata_resource', '', 2, 2, 'JT_METADATA_RESOURCE', 'ID', false, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cs_class VALUES (16, 'jt_fromresource_relationship', '', 2, 2, 'JT_FROMRESOURCE_RELATIONSHIP', 'ID', false, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cs_class VALUES (17, 'jt_metadata_relationship', '', 2, 2, 'JT_METADATA_RELATIONSHIP', 'ID', false, NULL, NULL, NULL, true, NULL, NULL);
+INSERT INTO cs_class VALUES (18, 'relationship', '', 2, 2, 'RELATIONSHIP', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
+INSERT INTO cs_class VALUES (13, 'resource', '', 2, 2, 'RESOURCE', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
+INSERT INTO cs_class VALUES (4, 'contact', '', 2, 2, 'CONTACT', 'ID', false, NULL, NULL, NULL, false, NULL, NULL);
 
 
 --
--- TOC entry 3805 (class 0 OID 260830)
--- Dependencies: 206
+-- TOC entry 4027 (class 0 OID 18390)
+-- Dependencies: 264
 -- Data for Name: cs_class_attr; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3806 (class 0 OID 260845)
--- Dependencies: 210
+-- TOC entry 4028 (class 0 OID 18405)
+-- Dependencies: 268
 -- Data for Name: cs_config_attr_exempt; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3807 (class 0 OID 260851)
--- Dependencies: 212
+-- TOC entry 4029 (class 0 OID 18411)
+-- Dependencies: 270
 -- Data for Name: cs_config_attr_jt; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO cs_config_attr_jt VALUES (1, NULL, 1, 1, 1, 1, 2);
 
 
 --
--- TOC entry 3808 (class 0 OID 260857)
--- Dependencies: 214
+-- TOC entry 4030 (class 0 OID 18417)
+-- Dependencies: 272
 -- Data for Name: cs_config_attr_key; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO cs_config_attr_key VALUES (1, 'csa://webDavTunnelAction');
 
 
 --
--- TOC entry 3809 (class 0 OID 260863)
--- Dependencies: 216
+-- TOC entry 4031 (class 0 OID 18423)
+-- Dependencies: 274
 -- Data for Name: cs_config_attr_type; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1002,16 +1063,17 @@ INSERT INTO cs_config_attr_type VALUES (3, 'X', 'XML configuration attribute, XM
 
 
 --
--- TOC entry 3810 (class 0 OID 260869)
--- Dependencies: 218
+-- TOC entry 4032 (class 0 OID 18429)
+-- Dependencies: 276
 -- Data for Name: cs_config_attr_value; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO cs_config_attr_value VALUES (1, 'true');
 
 
 --
--- TOC entry 3811 (class 0 OID 260878)
--- Dependencies: 220
+-- TOC entry 4033 (class 0 OID 18438)
+-- Dependencies: 278
 -- Data for Name: cs_domain; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1019,30 +1081,69 @@ INSERT INTO cs_domain VALUES (1, 'LOCAL');
 
 
 --
--- TOC entry 3812 (class 0 OID 260882)
--- Dependencies: 221
+-- TOC entry 4034 (class 0 OID 18442)
+-- Dependencies: 279
 -- Data for Name: cs_dynamic_children_helper; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO cs_dynamic_children_helper VALUES (1, 'CidsObjects(class_id varchar, table_name varchar)', 'SELECT -1 AS id,
-	name AS name,
-	<ds::param name=''class_id''>1</ds::param> AS class_id,
-	id AS object_id,
+INSERT INTO cs_dynamic_children_helper VALUES (5, 'tags(taggroup_id integer)', 'SELECT 
+  -1 as id, 
+	tag.name, 
+	cs_class.id as class_id, 
+	null as object_id, 
+	''N'' as node_type, 
+	null as url, 
+	csdc.collectionsexternal(tag.id) as dynamic_children,
+	false as sql_sort 
+FROM 
+	tag
+	LEFT JOIN taggroup ON
+		tag.taggroup = taggroup.id,    
+  cs_class
+WHERE
+  cs_class.name = ''tag'' AND
+	taggroup.id = 	<ds::param name=''taggroup_id''>1</ds::param> 
+GROUP BY 
+  	tag.name,
+  	tag.id,
+    cs_class.id 
+ORDER BY tag.name ASC;');
+INSERT INTO cs_dynamic_children_helper VALUES (3, 'Entities(level_id integer, hydroCon_id integer)', 'SELECT DISTINCT -1 AS id,
+	resource.name AS name,
+	cs_class.id AS class_id,
+	resource.id AS object_id,
 	''O'' AS node_type,
 	null AS url,
-	null AS dynamic_children,
+	NULL as dynamic_children,
 	false AS sql_sort,
 	true AS derive_permissions_from_class
-	from <ds::param name=''table_name''>2</ds::param>
-	order by id
-	');
+    FROM 
+	resource
+	LEFT JOIN tag as tag_1 ON
+		resource.geography = tag_1.id
+	LEFT JOIN jt_resource_tag as jtrt_2 ON
+		jtrt_2.resource_reference = resource.id
+	LEFT JOIN tag as tag_2 ON
+		jtrt_2.tagid = tag_2.id,
+        tag as rType,
+        cs_class
+    WHERE
+        cs_class.name = ''resource'' AND
+	tag_1.id = <ds::param name=''level_id''>1</ds::param> AND
+	tag_2.id = <ds::param name=''hydroCon_id''>2</ds::param> AND
+        resource.type = rType.id AND
+        rType.name != ''external data''
+      Group by
+	resource.name,
+	resource.id,
+        cs_class.id;');
 INSERT INTO cs_dynamic_children_helper VALUES (2, 'HydrologicalConcepts(level_id integer)', 'SELECT -1 AS id,
 	tag.name AS name,
 	cs_class.id AS class_id,
 	NULL AS object_id,
 	''N'' AS node_type,
 	null AS url,
-        csdc.entities(<ds::param name=''class_id''>1</ds::param> , tag.id) as dynamic_children, --first Tag = Level, second tag = hydroConc
+        csdc.entities(<ds::param name=''level_id''>1</ds::param> , tag.id) as dynamic_children, 
 	false AS sql_sort,
 	true AS derive_permissions_from_class
     FROM
@@ -1057,64 +1158,14 @@ INSERT INTO cs_dynamic_children_helper VALUES (2, 'HydrologicalConcepts(level_id
 	tag.name,
 	tag.id,
         cs_class.id;');
-INSERT INTO cs_dynamic_children_helper VALUES (3, 'Entities(level_id integer, hydroCon_id integer)', 'SELECT -1 AS id,
-	resource.name AS name,
-	cs_class.id AS class_id,
-	resource.id AS object_id,
-	''O'' AS node_type,
-	null AS url,
-	NULL as dynamic_children, --first Tag = Level, second tag = hydroConc
-	false AS sql_sort,
-	true AS derive_permissions_from_class
-    FROM 
-	resource
-	LEFT JOIN jt_resource_tag as jtrt_1 ON
-		jtrt_1.resource_reference = resource.id
-	LEFT JOIN tag as tag_1 ON
-		jtrt_1.tagid = tag_1.id
-	LEFT JOIN jt_resource_tag as jtrt_2 ON
-		jtrt_2.resource_reference = resource.id
-	LEFT JOIN tag as tag_2 ON
-		jtrt_2.tagid = tag_2.id,
-        tag as rType,
-        cs_class
-    WHERE
-        cs_class.name = ''resource'' AND
-	tag_1.id = <ds::param name=''level_id''>1</ds::param> AND
-	tag_2.id = <ds::param name=''hydroCon_id''>2</ds::param> AND
-        resource.type = rType.id AND
-        rType.name != ''external Data''
-      Group by
-	resource.name,
-	resource.id,
-        cs_class.id;');
-INSERT INTO cs_dynamic_children_helper VALUES (5, 'collections(collection_id integer)', 'SELECT -1 AS id,
-	resource.name AS name,
-	cs_class.id AS class_id,
-	resource.id AS object_id,
-	''O'' AS node_type,
-	null AS url,
-	NULL as dynamic_children, --first Tag = Level, second tag = hydroConc
-	false AS sql_sort,
-	true AS derive_permissions_from_class
-    FROM 
-	resource,
-        tag as rType,
-        cs_class
-    WHERE
-        cs_class.name = ''resource'' AND
-	collection = <ds::param name=''collection_id''>1</ds::param>
-      Group by
-	resource.name,
-	resource.id,
-        cs_class.id;');
+INSERT INTO cs_dynamic_children_helper VALUES (1, 'CidsObjects(class_id varchar, table_name varchar)', 'SELECT -1 AS id, 	null AS name, 	<ds::param name=''class_id''>1</ds::param> AS class_id, 	id AS object_id, 	''O'' AS node_type, 	null AS url, 	null AS dynamic_children, 	false AS sql_sort, 	true AS derive_permissions_from_class 	from <ds::param name=''table_name''>2</ds::param> 	order by name');
 INSERT INTO cs_dynamic_children_helper VALUES (4, 'collectionsExternal(collection_id integer)', 'SELECT -1 AS id,
 	resource.name AS name,
 	cs_class.id AS class_id,
 	resource.id AS object_id,
 	''O'' AS node_type,
 	null AS url,
-	NULL as dynamic_children, --first Tag = Level, second tag = hydroConc
+	NULL as dynamic_children,
 	false AS sql_sort,
 	true AS derive_permissions_from_class
     FROM 
@@ -1129,63 +1180,65 @@ INSERT INTO cs_dynamic_children_helper VALUES (4, 'collectionsExternal(collectio
       Group by
 	resource.name,
 	resource.id,
-        cs_class.id;');
+        cs_class.id
+	ORDER BY resource.name;
+');
 
 
 --
--- TOC entry 3813 (class 0 OID 260888)
--- Dependencies: 222
+-- TOC entry 4035 (class 0 OID 18448)
+-- Dependencies: 280
 -- Data for Name: cs_history; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3814 (class 0 OID 260896)
--- Dependencies: 224
+-- TOC entry 4036 (class 0 OID 18456)
+-- Dependencies: 282
 -- Data for Name: cs_icon; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO cs_icon VALUES (1, 'Georeferenz', 'georeferenz_16.gif');
-INSERT INTO cs_icon VALUES (2, 'Erde', 'erde_16.gif');
+INSERT INTO cs_icon VALUES (1, 'Georeferenz', 'georeferenz.gif');
+INSERT INTO cs_icon VALUES (2, 'Erde', 'erde.gif');
 
 
 --
--- TOC entry 3815 (class 0 OID 260903)
--- Dependencies: 226
+-- TOC entry 4037 (class 0 OID 18463)
+-- Dependencies: 284
 -- Data for Name: cs_java_class; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3816 (class 0 OID 260913)
--- Dependencies: 228
+-- TOC entry 4038 (class 0 OID 18473)
+-- Dependencies: 286
 -- Data for Name: cs_locks; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO cs_locks VALUES (NULL, NULL, NULL, NULL, 1);
+INSERT INTO cs_locks VALUES (NULL, NULL, 'ABF_EXCLUSIVE_LOCK_1412691510555', 'pascal@KNECHT-RUPRECHT', 33);
 
 
 --
--- TOC entry 3817 (class 0 OID 260920)
--- Dependencies: 229
+-- TOC entry 4039 (class 0 OID 18480)
+-- Dependencies: 287
 -- Data for Name: cs_method; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3818 (class 0 OID 260933)
--- Dependencies: 231
+-- TOC entry 4040 (class 0 OID 18493)
+-- Dependencies: 289
 -- Data for Name: cs_method_class_assoc; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3819 (class 0 OID 260941)
--- Dependencies: 234
+-- TOC entry 4041 (class 0 OID 18501)
+-- Dependencies: 292
 -- Data for Name: cs_permission; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1194,8 +1247,8 @@ INSERT INTO cs_permission VALUES (1, 'write', 'Schreibrecht');
 
 
 --
--- TOC entry 3820 (class 0 OID 260947)
--- Dependencies: 236
+-- TOC entry 4042 (class 0 OID 18507)
+-- Dependencies: 294
 -- Data for Name: cs_policy; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1205,8 +1258,8 @@ INSERT INTO cs_policy VALUES (2, 'SECURE');
 
 
 --
--- TOC entry 3821 (class 0 OID 260953)
--- Dependencies: 238
+-- TOC entry 4043 (class 0 OID 18513)
+-- Dependencies: 296
 -- Data for Name: cs_policy_rule; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1219,72 +1272,72 @@ INSERT INTO cs_policy_rule VALUES (6, 2, 1, false);
 
 
 --
--- TOC entry 3822 (class 0 OID 260957)
--- Dependencies: 239
+-- TOC entry 4044 (class 0 OID 18517)
+-- Dependencies: 297
 -- Data for Name: cs_query; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3823 (class 0 OID 260972)
--- Dependencies: 241
+-- TOC entry 4045 (class 0 OID 18532)
+-- Dependencies: 299
 -- Data for Name: cs_query_class_assoc; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3824 (class 0 OID 260978)
--- Dependencies: 243
+-- TOC entry 4046 (class 0 OID 18538)
+-- Dependencies: 301
 -- Data for Name: cs_query_link; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3825 (class 0 OID 260982)
--- Dependencies: 244
+-- TOC entry 4047 (class 0 OID 18542)
+-- Dependencies: 302
 -- Data for Name: cs_query_parameter; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3826 (class 0 OID 260997)
--- Dependencies: 248
+-- TOC entry 4048 (class 0 OID 18557)
+-- Dependencies: 306
 -- Data for Name: cs_query_store; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3827 (class 0 OID 261003)
--- Dependencies: 250
+-- TOC entry 4049 (class 0 OID 18563)
+-- Dependencies: 308
 -- Data for Name: cs_query_store_ug_assoc; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3828 (class 0 OID 261009)
--- Dependencies: 252
+-- TOC entry 4050 (class 0 OID 18569)
+-- Dependencies: 310
 -- Data for Name: cs_query_ug_assoc; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3829 (class 0 OID 261013)
--- Dependencies: 253
+-- TOC entry 4051 (class 0 OID 18573)
+-- Dependencies: 311
 -- Data for Name: cs_stringrepcache; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3830 (class 0 OID 261019)
--- Dependencies: 254
+-- TOC entry 4052 (class 0 OID 18579)
+-- Dependencies: 312
 -- Data for Name: cs_type; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1307,26 +1360,26 @@ INSERT INTO cs_type VALUES (16, 'Extension Type', NULL, false, NULL, NULL, NULL)
 INSERT INTO cs_type VALUES (17, 'URL_BASE', 3, true, NULL, NULL, NULL);
 INSERT INTO cs_type VALUES (18, 'URL', 2, true, NULL, NULL, NULL);
 INSERT INTO cs_type VALUES (19, 'GEOM', 1, true, NULL, NULL, NULL);
-INSERT INTO cs_type VALUES (28, 'tag', 19, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (27, 'taggroup', 20, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (29, 'contact', 4, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (26, 'metadata', 15, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (33, 'representation', 17, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (34, 'resource', 18, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (35, 'relationship', 16, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (36, 'jt_resource_tag', 12, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (30, 'jt_resource_representation', 11, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (20, 'jt_representation_tag', 10, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (23, 'jt_relationship_tag', 9, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (31, 'jt_metadata_tag', 8, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (22, 'jt_metadata_resource', 7, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (21, 'jt_metadata_relationship', 6, true, '''', NULL, NULL);
-INSERT INTO cs_type VALUES (32, 'jt_fromresource_relationship', 5, true, '''', NULL, NULL);
+INSERT INTO cs_type VALUES (21, 'taggroup', 5, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (22, 'tag', 6, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (23, 'representation', 7, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (24, 'jt_representation_tag', 8, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (25, 'jt_resource_tag', 9, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (26, 'jt_metadata_tag', 10, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (27, 'jt_relationship_tag', 11, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (28, 'jt_resource_representation', 12, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (29, 'resource', 13, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (30, 'jt_metadata_resource', 14, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (31, 'metadata', 15, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (32, 'jt_fromresource_relationship', 16, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (33, 'jt_metadata_relationship', 17, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (34, 'relationship', 18, true, NULL, NULL, NULL);
+INSERT INTO cs_type VALUES (20, 'contact', 4, true, NULL, NULL, NULL);
 
 
 --
--- TOC entry 3831 (class 0 OID 261031)
--- Dependencies: 257
+-- TOC entry 4053 (class 0 OID 18591)
+-- Dependencies: 315
 -- Data for Name: cs_ug; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1335,32 +1388,50 @@ INSERT INTO cs_ug VALUES (2, 'Gäste', NULL, 1, 1);
 
 
 --
--- TOC entry 3832 (class 0 OID 261038)
--- Dependencies: 258
+-- TOC entry 4054 (class 0 OID 18598)
+-- Dependencies: 316
 -- Data for Name: cs_ug_attr_perm; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3833 (class 0 OID 261044)
--- Dependencies: 260
+-- TOC entry 4055 (class 0 OID 18604)
+-- Dependencies: 318
 -- Data for Name: cs_ug_cat_node_perm; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3834 (class 0 OID 261052)
--- Dependencies: 263
+-- TOC entry 4056 (class 0 OID 18612)
+-- Dependencies: 321
 -- Data for Name: cs_ug_class_perm; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
+INSERT INTO cs_ug_class_perm VALUES (3, 1, 5, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (4, 1, 6, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (6, 1, 7, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (7, 1, 8, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (8, 1, 9, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (9, 1, 10, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (10, 1, 11, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (11, 1, 12, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (13, 1, 14, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (14, 1, 13, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (16, 1, 17, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (17, 1, 18, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (18, 1, 15, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (19, 1, 1, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (20, 1, 16, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (21, 1, 2, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (22, 1, 3, 1, NULL);
+INSERT INTO cs_ug_class_perm VALUES (1, 1, 4, 1, NULL);
 
 
 --
--- TOC entry 3835 (class 0 OID 261058)
--- Dependencies: 265
+-- TOC entry 4057 (class 0 OID 18618)
+-- Dependencies: 323
 -- Data for Name: cs_ug_membership; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1369,33 +1440,33 @@ INSERT INTO cs_ug_membership VALUES (2, 2, NULL, 2);
 
 
 --
--- TOC entry 3836 (class 0 OID 261062)
--- Dependencies: 266
+-- TOC entry 4058 (class 0 OID 18622)
+-- Dependencies: 324
 -- Data for Name: cs_ug_method_perm; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3837 (class 0 OID 261068)
--- Dependencies: 268
+-- TOC entry 4059 (class 0 OID 18628)
+-- Dependencies: 326
 -- Data for Name: cs_usr; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-INSERT INTO cs_usr VALUES (1, 'admin', 'cismet', '2014-05-26 09:38:00.104', true);
-INSERT INTO cs_usr VALUES (2, 'gast', 'cismet', '2014-05-26 09:38:00.104', false);
+INSERT INTO cs_usr VALUES (1, 'admin', 'cismet', '2014-08-21 22:10:06.114849', true);
+INSERT INTO cs_usr VALUES (2, 'gast', 'cismet', '2014-08-21 22:10:06.114849', false);
 
 
 --
--- TOC entry 3494 (class 0 OID 259563)
--- Dependencies: 173
+-- TOC entry 3717 (class 0 OID 16668)
+-- Dependencies: 176
 -- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 3654 (class 2606 OID 261241)
+-- TOC entry 3877 (class 2606 OID 46687)
 -- Name: attr_perm_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1404,7 +1475,7 @@ ALTER TABLE ONLY cs_ug_attr_perm
 
 
 --
--- TOC entry 3656 (class 2606 OID 261243)
+-- TOC entry 3879 (class 2606 OID 46689)
 -- Name: cat_node_perm_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1413,7 +1484,7 @@ ALTER TABLE ONLY cs_ug_cat_node_perm
 
 
 --
--- TOC entry 3644 (class 2606 OID 261245)
+-- TOC entry 3867 (class 2606 OID 46691)
 -- Name: cid_oid; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1422,7 +1493,7 @@ ALTER TABLE ONLY cs_stringrepcache
 
 
 --
--- TOC entry 3658 (class 2606 OID 261247)
+-- TOC entry 3881 (class 2606 OID 46693)
 -- Name: class_perm_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1431,7 +1502,7 @@ ALTER TABLE ONLY cs_ug_class_perm
 
 
 --
--- TOC entry 3566 (class 2606 OID 261251)
+-- TOC entry 3789 (class 2606 OID 46698)
 -- Name: cs_all_attr_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1440,7 +1511,7 @@ ALTER TABLE ONLY cs_all_attr_mapping
 
 
 --
--- TOC entry 3577 (class 2606 OID 261253)
+-- TOC entry 3800 (class 2606 OID 46700)
 -- Name: cs_cat_link_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1449,7 +1520,7 @@ ALTER TABLE ONLY cs_cat_link
 
 
 --
--- TOC entry 3588 (class 2606 OID 261255)
+-- TOC entry 3811 (class 2606 OID 46702)
 -- Name: cs_class_attr_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1458,7 +1529,7 @@ ALTER TABLE ONLY cs_class_attr
 
 
 --
--- TOC entry 3590 (class 2606 OID 261257)
+-- TOC entry 3813 (class 2606 OID 46704)
 -- Name: cs_config_attr_exempt_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1467,7 +1538,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3592 (class 2606 OID 261259)
+-- TOC entry 3815 (class 2606 OID 46706)
 -- Name: cs_config_attr_exempt_usr_id_key_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1476,7 +1547,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3594 (class 2606 OID 261261)
+-- TOC entry 3817 (class 2606 OID 46708)
 -- Name: cs_config_attr_jt_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1485,7 +1556,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3596 (class 2606 OID 261263)
+-- TOC entry 3819 (class 2606 OID 46710)
 -- Name: cs_config_attr_jt_usr_id_ug_id_dom_id_key_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1494,7 +1565,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3598 (class 2606 OID 261265)
+-- TOC entry 3821 (class 2606 OID 46712)
 -- Name: cs_config_attr_key_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1503,7 +1574,7 @@ ALTER TABLE ONLY cs_config_attr_key
 
 
 --
--- TOC entry 3600 (class 2606 OID 261267)
+-- TOC entry 3823 (class 2606 OID 46714)
 -- Name: cs_config_attr_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1512,7 +1583,7 @@ ALTER TABLE ONLY cs_config_attr_type
 
 
 --
--- TOC entry 3602 (class 2606 OID 261269)
+-- TOC entry 3825 (class 2606 OID 46716)
 -- Name: cs_config_attr_value_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1521,7 +1592,7 @@ ALTER TABLE ONLY cs_config_attr_value
 
 
 --
--- TOC entry 3604 (class 2606 OID 261271)
+-- TOC entry 3827 (class 2606 OID 46718)
 -- Name: cs_domain_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1530,7 +1601,7 @@ ALTER TABLE ONLY cs_domain
 
 
 --
--- TOC entry 3606 (class 2606 OID 261273)
+-- TOC entry 3829 (class 2606 OID 46720)
 -- Name: cs_dynamic_children_helper_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1539,7 +1610,7 @@ ALTER TABLE ONLY cs_dynamic_children_helper
 
 
 --
--- TOC entry 3608 (class 2606 OID 261275)
+-- TOC entry 3831 (class 2606 OID 46722)
 -- Name: cs_history_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1548,7 +1619,7 @@ ALTER TABLE ONLY cs_history
 
 
 --
--- TOC entry 3610 (class 2606 OID 261277)
+-- TOC entry 3833 (class 2606 OID 46724)
 -- Name: cs_icon_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1557,7 +1628,7 @@ ALTER TABLE ONLY cs_icon
 
 
 --
--- TOC entry 3612 (class 2606 OID 261279)
+-- TOC entry 3835 (class 2606 OID 46726)
 -- Name: cs_java_class_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1566,7 +1637,7 @@ ALTER TABLE ONLY cs_java_class
 
 
 --
--- TOC entry 3614 (class 2606 OID 261281)
+-- TOC entry 3837 (class 2606 OID 46728)
 -- Name: cs_locks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1575,7 +1646,7 @@ ALTER TABLE ONLY cs_locks
 
 
 --
--- TOC entry 3618 (class 2606 OID 261283)
+-- TOC entry 3841 (class 2606 OID 46730)
 -- Name: cs_method_class_assoc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1584,7 +1655,7 @@ ALTER TABLE ONLY cs_method_class_assoc
 
 
 --
--- TOC entry 3620 (class 2606 OID 261285)
+-- TOC entry 3843 (class 2606 OID 46732)
 -- Name: cs_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1593,7 +1664,7 @@ ALTER TABLE ONLY cs_permission
 
 
 --
--- TOC entry 3622 (class 2606 OID 261287)
+-- TOC entry 3845 (class 2606 OID 46734)
 -- Name: cs_policy_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1602,7 +1673,7 @@ ALTER TABLE ONLY cs_policy
 
 
 --
--- TOC entry 3624 (class 2606 OID 261289)
+-- TOC entry 3847 (class 2606 OID 46736)
 -- Name: cs_policy_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1611,7 +1682,7 @@ ALTER TABLE ONLY cs_policy_rule
 
 
 --
--- TOC entry 3626 (class 2606 OID 261291)
+-- TOC entry 3849 (class 2606 OID 46738)
 -- Name: cs_policy_rule_policy_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1620,7 +1691,7 @@ ALTER TABLE ONLY cs_policy_rule
 
 
 --
--- TOC entry 3632 (class 2606 OID 261293)
+-- TOC entry 3855 (class 2606 OID 46740)
 -- Name: cs_query_class_assoc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1629,7 +1700,7 @@ ALTER TABLE ONLY cs_query_class_assoc
 
 
 --
--- TOC entry 3634 (class 2606 OID 261295)
+-- TOC entry 3857 (class 2606 OID 46742)
 -- Name: cs_query_link_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1638,7 +1709,7 @@ ALTER TABLE ONLY cs_query_link
 
 
 --
--- TOC entry 3638 (class 2606 OID 261297)
+-- TOC entry 3861 (class 2606 OID 46744)
 -- Name: cs_query_store_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1647,7 +1718,7 @@ ALTER TABLE ONLY cs_query_store
 
 
 --
--- TOC entry 3640 (class 2606 OID 261299)
+-- TOC entry 3863 (class 2606 OID 46746)
 -- Name: cs_query_store_ug_assoc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1656,7 +1727,7 @@ ALTER TABLE ONLY cs_query_store_ug_assoc
 
 
 --
--- TOC entry 3642 (class 2606 OID 261301)
+-- TOC entry 3865 (class 2606 OID 46748)
 -- Name: cs_query_ug_assoc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1665,7 +1736,7 @@ ALTER TABLE ONLY cs_query_ug_assoc
 
 
 --
--- TOC entry 3660 (class 2606 OID 261303)
+-- TOC entry 3883 (class 2606 OID 46750)
 -- Name: cs_ug_membership_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1674,7 +1745,7 @@ ALTER TABLE ONLY cs_ug_membership
 
 
 --
--- TOC entry 3650 (class 2606 OID 261305)
+-- TOC entry 3873 (class 2606 OID 46752)
 -- Name: cs_ug_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1683,7 +1754,7 @@ ALTER TABLE ONLY cs_ug
 
 
 --
--- TOC entry 3652 (class 2606 OID 261307)
+-- TOC entry 3875 (class 2606 OID 46754)
 -- Name: cs_ug_prio_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1692,7 +1763,7 @@ ALTER TABLE ONLY cs_ug
 
 
 --
--- TOC entry 3662 (class 2606 OID 261355)
+-- TOC entry 3885 (class 2606 OID 46776)
 -- Name: method_perm_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1701,7 +1772,7 @@ ALTER TABLE ONLY cs_ug_method_perm
 
 
 --
--- TOC entry 3568 (class 2606 OID 261371)
+-- TOC entry 3791 (class 2606 OID 46792)
 -- Name: x_cs_attr_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1710,7 +1781,7 @@ ALTER TABLE ONLY cs_attr
 
 
 --
--- TOC entry 3582 (class 2606 OID 261373)
+-- TOC entry 3805 (class 2606 OID 46794)
 -- Name: x_cs_cat_node_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1719,7 +1790,7 @@ ALTER TABLE ONLY cs_cat_node
 
 
 --
--- TOC entry 3584 (class 2606 OID 261375)
+-- TOC entry 3807 (class 2606 OID 46796)
 -- Name: x_cs_class_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1728,7 +1799,7 @@ ALTER TABLE ONLY cs_class
 
 
 --
--- TOC entry 3586 (class 2606 OID 261377)
+-- TOC entry 3809 (class 2606 OID 46798)
 -- Name: x_cs_class_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1737,7 +1808,7 @@ ALTER TABLE ONLY cs_class
 
 
 --
--- TOC entry 3616 (class 2606 OID 261379)
+-- TOC entry 3839 (class 2606 OID 46800)
 -- Name: x_cs_method_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1746,7 +1817,7 @@ ALTER TABLE ONLY cs_method
 
 
 --
--- TOC entry 3628 (class 2606 OID 261381)
+-- TOC entry 3851 (class 2606 OID 46802)
 -- Name: x_cs_query_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1755,7 +1826,7 @@ ALTER TABLE ONLY cs_query
 
 
 --
--- TOC entry 3636 (class 2606 OID 261383)
+-- TOC entry 3859 (class 2606 OID 46804)
 -- Name: x_cs_query_parameter_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1764,7 +1835,7 @@ ALTER TABLE ONLY cs_query_parameter
 
 
 --
--- TOC entry 3630 (class 2606 OID 261385)
+-- TOC entry 3853 (class 2606 OID 46806)
 -- Name: x_cs_query_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1773,7 +1844,7 @@ ALTER TABLE ONLY cs_query
 
 
 --
--- TOC entry 3646 (class 2606 OID 261387)
+-- TOC entry 3869 (class 2606 OID 46808)
 -- Name: x_cs_type_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1782,7 +1853,7 @@ ALTER TABLE ONLY cs_type
 
 
 --
--- TOC entry 3648 (class 2606 OID 261389)
+-- TOC entry 3871 (class 2606 OID 46810)
 -- Name: x_cs_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1791,7 +1862,7 @@ ALTER TABLE ONLY cs_type
 
 
 --
--- TOC entry 3664 (class 2606 OID 261391)
+-- TOC entry 3887 (class 2606 OID 46812)
 -- Name: x_cs_usr_login_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1800,7 +1871,7 @@ ALTER TABLE ONLY cs_usr
 
 
 --
--- TOC entry 3666 (class 2606 OID 261393)
+-- TOC entry 3889 (class 2606 OID 46814)
 -- Name: x_cs_usr_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1809,7 +1880,7 @@ ALTER TABLE ONLY cs_usr
 
 
 --
--- TOC entry 3570 (class 1259 OID 261394)
+-- TOC entry 3793 (class 1259 OID 46815)
 -- Name: attr_object_derived_index; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1817,7 +1888,7 @@ CREATE INDEX attr_object_derived_index ON cs_attr_object_derived USING btree (cl
 
 
 --
--- TOC entry 3571 (class 1259 OID 261395)
+-- TOC entry 3794 (class 1259 OID 46816)
 -- Name: attr_object_derived_index_acid_aoid; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1825,7 +1896,7 @@ CREATE INDEX attr_object_derived_index_acid_aoid ON cs_attr_object_derived USING
 
 
 --
--- TOC entry 3572 (class 1259 OID 261396)
+-- TOC entry 3795 (class 1259 OID 46817)
 -- Name: attr_object_derived_index_cid_oid; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1833,7 +1904,7 @@ CREATE INDEX attr_object_derived_index_cid_oid ON cs_attr_object_derived USING b
 
 
 --
--- TOC entry 3569 (class 1259 OID 261397)
+-- TOC entry 3792 (class 1259 OID 46818)
 -- Name: attr_object_index; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1841,7 +1912,7 @@ CREATE INDEX attr_object_index ON cs_attr_object USING btree (class_id, object_i
 
 
 --
--- TOC entry 3578 (class 1259 OID 261398)
+-- TOC entry 3801 (class 1259 OID 46819)
 -- Name: cl_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1849,7 +1920,7 @@ CREATE INDEX cl_idx ON cs_cat_node USING btree (class_id);
 
 
 --
--- TOC entry 3562 (class 1259 OID 261399)
+-- TOC entry 3785 (class 1259 OID 46821)
 -- Name: cs_all_attr_mapping_index1; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1857,7 +1928,7 @@ CREATE INDEX cs_all_attr_mapping_index1 ON cs_all_attr_mapping USING btree (clas
 
 
 --
--- TOC entry 3563 (class 1259 OID 261400)
+-- TOC entry 3786 (class 1259 OID 46822)
 -- Name: cs_all_attr_mapping_index2; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1865,7 +1936,7 @@ CREATE INDEX cs_all_attr_mapping_index2 ON cs_all_attr_mapping USING btree (attr
 
 
 --
--- TOC entry 3564 (class 1259 OID 261401)
+-- TOC entry 3787 (class 1259 OID 46823)
 -- Name: cs_all_attr_mapping_index3; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1873,7 +1944,7 @@ CREATE INDEX cs_all_attr_mapping_index3 ON cs_all_attr_mapping USING btree (attr
 
 
 --
--- TOC entry 3573 (class 1259 OID 261402)
+-- TOC entry 3796 (class 1259 OID 46824)
 -- Name: cs_attr_string_class_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1881,7 +1952,7 @@ CREATE INDEX cs_attr_string_class_idx ON cs_attr_string USING btree (class_id);
 
 
 --
--- TOC entry 3574 (class 1259 OID 261403)
+-- TOC entry 3797 (class 1259 OID 46825)
 -- Name: cs_attr_string_object_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1889,7 +1960,7 @@ CREATE INDEX cs_attr_string_object_idx ON cs_attr_string USING btree (object_id)
 
 
 --
--- TOC entry 3575 (class 1259 OID 261405)
+-- TOC entry 3798 (class 1259 OID 46827)
 -- Name: i_cs_attr_string_aco_id; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1897,7 +1968,7 @@ CREATE INDEX i_cs_attr_string_aco_id ON cs_attr_string USING btree (attr_id, cla
 
 
 --
--- TOC entry 3579 (class 1259 OID 261406)
+-- TOC entry 3802 (class 1259 OID 46829)
 -- Name: ob_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1905,7 +1976,7 @@ CREATE INDEX ob_idx ON cs_cat_node USING btree (object_id);
 
 
 --
--- TOC entry 3580 (class 1259 OID 261407)
+-- TOC entry 3803 (class 1259 OID 46830)
 -- Name: obj_cl_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -1913,7 +1984,7 @@ CREATE INDEX obj_cl_idx ON cs_cat_node USING btree (class_id, object_id);
 
 
 --
--- TOC entry 3667 (class 2606 OID 261411)
+-- TOC entry 3890 (class 2606 OID 46836)
 -- Name: cs_config_attr_exempt_key_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1922,7 +1993,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3668 (class 2606 OID 261416)
+-- TOC entry 3891 (class 2606 OID 46841)
 -- Name: cs_config_attr_exempt_ug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1931,7 +2002,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3669 (class 2606 OID 261421)
+-- TOC entry 3892 (class 2606 OID 46846)
 -- Name: cs_config_attr_exempt_usr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1940,7 +2011,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3670 (class 2606 OID 261426)
+-- TOC entry 3893 (class 2606 OID 46851)
 -- Name: cs_config_attr_jt_dom_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1949,7 +2020,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3671 (class 2606 OID 261431)
+-- TOC entry 3894 (class 2606 OID 46856)
 -- Name: cs_config_attr_jt_key_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1958,7 +2029,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3672 (class 2606 OID 261436)
+-- TOC entry 3895 (class 2606 OID 46861)
 -- Name: cs_config_attr_jt_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1967,7 +2038,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3673 (class 2606 OID 261441)
+-- TOC entry 3896 (class 2606 OID 46866)
 -- Name: cs_config_attr_jt_ug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1976,7 +2047,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3674 (class 2606 OID 261446)
+-- TOC entry 3897 (class 2606 OID 46871)
 -- Name: cs_config_attr_jt_usr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1985,7 +2056,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3675 (class 2606 OID 261451)
+-- TOC entry 3898 (class 2606 OID 46876)
 -- Name: cs_config_attr_jt_val_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -1994,7 +2065,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3676 (class 2606 OID 261456)
+-- TOC entry 3899 (class 2606 OID 46881)
 -- Name: cs_history_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2003,7 +2074,7 @@ ALTER TABLE ONLY cs_history
 
 
 --
--- TOC entry 3677 (class 2606 OID 261461)
+-- TOC entry 3900 (class 2606 OID 46886)
 -- Name: cs_history_ug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2012,7 +2083,7 @@ ALTER TABLE ONLY cs_history
 
 
 --
--- TOC entry 3678 (class 2606 OID 261466)
+-- TOC entry 3901 (class 2606 OID 46891)
 -- Name: cs_history_usr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -2020,7 +2091,7 @@ ALTER TABLE ONLY cs_history
     ADD CONSTRAINT cs_history_usr_id_fkey FOREIGN KEY (usr_id) REFERENCES cs_usr(id);
 
 
--- Completed on 2014-07-17 19:11:58
+-- Completed on 2014-10-07 16:31:14
 
 --
 -- PostgreSQL database dump complete

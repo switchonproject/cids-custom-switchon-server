@@ -1,6 +1,7 @@
 -- Dynamic Children Helper
 
 -- cs_dynamic_children_helper
+DROP TABLE IF EXISTS cs_dynamic_children_helper;
 CREATE TABLE cs_dynamic_children_helper
 (
   id numeric NOT NULL,
