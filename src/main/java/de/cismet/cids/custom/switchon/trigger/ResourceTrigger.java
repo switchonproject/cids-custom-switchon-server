@@ -52,7 +52,11 @@ import de.cismet.tools.PasswordEncrypter;
 import de.cismet.tools.PropertyReader;
 
 /**
- * DOCUMENT ME!
+ * Checks if the inserted or updated Resource has a representation s with a certain publish type tag. If this is the
+ * case, a new representation l will be added to the resource, this e.g. represents a layer from a geoserver. Then the
+ * resource will be saved. After the save, the content of s will be uploaded to a server, e.g. a geotiff or a shapefile
+ * will be uploaded to a geoserver. Then the url is saved as contentlocation to l. Furthermore a state (Finished,
+ * Failed) and a message will be saved to lo.
  *
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
@@ -119,7 +123,9 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Iterates over the representations of the resource. The goal is later on to upload the content of those
+     * representations, which are new or modified and which have a publish type. Therefore the needed information is
+     * saved, such that the content can be uploaded in the after* methods.
      *
      * @param  resource  DOCUMENT ME!
      */
@@ -161,7 +167,9 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     /**
-     * DOCUMENT ME!
+     * This is called from the after* methods and initializes a Runnable which uploads the content to a server. This has
+     * to be done in a thread because otherwise the GUI of the client may freeze as it waits till the persist and thus
+     * also the trigger is finished.
      *
      * @param  workspace            DOCUMENT ME!
      * @param  representation       DOCUMENT ME!
@@ -200,6 +208,14 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                     }
                 }
 
+                /**
+                 * Set the upload status and message to the newly created representation. It has to be identified as its
+                 * database id is not known.
+                 *
+                 * @param  uuid             DOCUMENT ME!
+                 * @param  uploadStatusTag  DOCUMENT ME!
+                 * @param  uploadMessage    DOCUMENT ME!
+                 */
                 private void updateLayerRepresentation(final String uuid,
                         final CidsBean uploadStatusTag,
                         final String uploadMessage) {
@@ -231,7 +247,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     /**
-     * DOCUMENT ME!
+     * Prepares the upload to the server, decides if the content should be uploaded as geotiff or shapefile.
      *
      * @param   workspace       DOCUMENT ME!
      * @param   representation  DOCUMENT ME!
@@ -275,7 +291,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     /**
-     * DOCUMENT ME!
+     * Does some checks if it is really a geotiff and calls GeoServerRESTPublisher.publishGeoTIFF().
      *
      * @param   workspace  DOCUMENT ME!
      * @param   geoTiff    DOCUMENT ME!
@@ -302,7 +318,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     /**
-     * DOCUMENT ME!
+     * Does some checks if it is really a zip with a shape file and calls GeoServerRESTPublisher.publishShp().
      *
      * @param   workspace  DOCUMENT ME!
      * @param   shapeZip   DOCUMENT ME!
@@ -341,7 +357,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     /**
-     * DOCUMENT ME!
+     * Creates a new representation, representing a layer on a geoserver.
      *
      * @param   representation  DOCUMENT ME!
      * @param   url             DOCUMENT ME!
@@ -462,7 +478,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     /**
-     * DOCUMENT ME!
+     * Checks if a workspace on the geoserver already exists.
      *
      * @param   resource  DOCUMENT ME!
      *
@@ -536,7 +552,8 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     //~ Inner Classes ----------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Contains some information to make the upload in the after* methods. These objects are filled in before* methods
+     * and submethods.
      *
      * @version  $Revision$, $Date$
      */
