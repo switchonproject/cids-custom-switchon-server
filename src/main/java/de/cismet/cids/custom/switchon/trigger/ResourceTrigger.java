@@ -137,11 +137,11 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
             final int status = representation.getMetaObject().getStatus();
             if ((status == MetaObject.NEW) || (status == MetaObject.MODIFIED)) {
                 final List<CidsBean> tags = representation.getBeanCollectionProperty("tags");
-                final List<CidsBean> publishStyles = returnAllOccurrencesOfTaggroup(tags, "publish type");
+                final List<CidsBean> publishTypes = returnAllOccurrencesOfTaggroup(tags, "publish type");
 
-                for (final CidsBean publishStyleTag : publishStyles) {
-                    final String publishStyle = (String)publishStyleTag.getProperty("name");
-                    if ("geoserver".equals(publishStyle)) {
+                for (final CidsBean publishTypeTag : publishTypes) {
+                    final String publishType = (String)publishTypeTag.getProperty("name");
+                    if ("geoserver".equals(publishType)) {
                         try {
                             final String url = GEOSERVER_REST_URL
                                         + "/wms?service=wms&version=1.1.1&request=GetCapabilities&namespace="
@@ -159,7 +159,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                         }
                     }
                     // this works because the representation will be saved anyway
-                    tags.remove(publishStyleTag);
+                    tags.remove(publishTypeTag);
                 }
             }
         }
