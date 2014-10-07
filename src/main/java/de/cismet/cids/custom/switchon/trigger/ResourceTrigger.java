@@ -283,7 +283,9 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                 "GeoTiff invalid, the used coordinate system must be of the type projection or geographic.");
         }
 
-        geoServerRESTPublisher.publishGeoTIFF(workspace, workspace + "-geotiff", layername, geoTiff);
+        if (!geoServerRESTPublisher.publishGeoTIFF(workspace, workspace + "-geotiff", layername, geoTiff)) {
+            throw new Exception("An error occured while uploading the GeoTiff.");
+        }
     }
 
     /**
@@ -313,10 +315,14 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                 break;
             }
         }
+        boolean uploaded = false;
         if (layername != null) {
-            geoServerRESTPublisher.publishShp(workspace, workspace + "-shape", layername, shapeZip);
+            uploaded = geoServerRESTPublisher.publishShp(workspace, workspace + "-shape", layername, shapeZip);
         } else {
             throw new Exception("No entry in zip file with extension 'shp' found.");
+        }
+        if (!uploaded) {
+            throw new Exception("An error occured while uploading the ShapeFile.");
         }
     }
 
