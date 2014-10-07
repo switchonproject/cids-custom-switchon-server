@@ -295,7 +295,6 @@ VALUES
 ('WWW:WSDL','Web Service Description Language XML document describing service operation',tgid),
 ('OpenSearch1.1','OpenSearch template',tgid),
 ('OpenSearch1.1:Description','OpenSearch description document',tgid),
-('ZIP:$contentType','ZIF File containing  the actual data',tgid),
 ('ZIP:application/x-netcdf','Compressed netCDF-CF/Network Common Data Form dataset',tgid),
 ('WWW:RIA','Rich Internet Application (JavaScript/HTML5 application)',tgid),
 ('WWW:FORM','Web form',tgid),
@@ -373,7 +372,7 @@ VALUES
 ('Commission Regulation No 967/2009','COMMISSION REGULATION (EC) No 976/2009 of 19 October 2009 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards the Network Services;2009-10-20',tgid),
 ('Commission Regulation No 268/2010','COMMISSION REGULATION (EU) No 268/2010 of 29 March 2010 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards the access to spatial data sets and services of the Member States by Community institutions and bodies under harmonised conditions;2010-03-30',tgid),
 ('Commission Decision of 5 June 2009','Commission Decision of 5 June 2009 implementing Directive 2007/2/EC of the European Parliament and of the Council as regards monitoring and reporting (notified under document number C(2009) 4199) (2009/442/EC);2009-06-11',tgid),
-('Not evaluated','Not evaluated',tgid);
+('Not evaluated','Conformity to EU Commission regulations was not evaluated',tgid);
 
 tgid = (SELECT id from taggroup where name = 'resource type');
 INSERT INTO tag (name, description, taggroup)
