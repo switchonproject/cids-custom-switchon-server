@@ -1,1 +1,0 @@
-UPDATE geom SET geo_field = (ST_GeomFromText('Polygon((-179 -89, 179 -89, 179 89,-179 89, -179 -89))' , 4326)) where geo_field = (ST_GeomFromText('Polygon((-180 -90, 180 -90, 180 90,-180 90, -180 -90))' , 4326));
