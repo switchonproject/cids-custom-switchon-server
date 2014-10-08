@@ -23,8 +23,9 @@ VALUES
 ('role','Function performed by the responsible party (fixed group, standard codelist).'),
 ('scope','Scope of the resource. A codelist used in hierarchyLevel, DQ_Scope.level, and updateScope (fixed group with tags from a standard codelist)'),
 ('srid','The Spatial Reference System Identifier (SRID) of the spatial coverage of the resource EPSG format (open group with some predefined tags).'),
-('topic category','High-level classification of resources in accordance with ISO 19115 for grouping and topic-based search (fixed group).');
-
+('topic category','High-level classification of resources in accordance with ISO 19115 for grouping and topic-based search (fixed group).'),
+('publish type','The publish type is used to determine how an imported file has to be postprocessed in order to publish it to an Andvanced Data Repository.'),
+('upload status','The upload status represents a transient property that temporarily stores the status of the upload process to an Advanced Data Repository.');
 DO $$
 DECLARE tgid integer;
 BEGIN
@@ -401,5 +402,19 @@ VALUES
 ('service','information applies to a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behaviour, such as a use case',tgid),
 ('model','information applies to a copy or imitation of an existing or hypothetical object',tgid),
 ('tile','information applies to a tile, a spatial subset of geographic data',tgid);
+
+tgid = (SELECT id from taggroup where name = 'publish type');
+INSERT INTO tag (name, description, taggroup)
+VALUES
+('Geoserver','The imported representation is published as WMS or WFS Layer to a Geoserver instance. Supported file types are for example SHP and GeoTIFF.',tgid),
+('THREDDS','The imported representation is published to a THREDDS Data Server. A supported file type is for example NetCDF.',tgid);
+
+tgid = (SELECT id from taggroup where name = 'upload status');
+INSERT INTO tag (name, description, taggroup)
+VALUES
+('uploading','The newly imported representation is currently being uploaded to an Advanced Data Repository like Geoserver or THREDDS.',tgid),
+('finished','The upload of the newly imported representation to an Advanced Data Repository like Geoserver or THREDDS has been completed successfully.',tgid),
+('failed','The upload of the newly imported representation to an Advanced Data Repository like Geoserver or THREDDS has failed.',tgid);
+
 END;
 $$
