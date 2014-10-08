@@ -4,7 +4,7 @@
 DROP TABLE IF EXISTS cs_dynamic_children_helper;
 CREATE TABLE cs_dynamic_children_helper
 (
-  id numeric NOT NULL,
+  id SERIAL NOT NULL,
   name character varying(256),
   code text,
   CONSTRAINT cs_dynamic_children_helper_pkey PRIMARY KEY (id)
@@ -33,11 +33,16 @@ $BODY$
 CREATE OR REPLACE FUNCTION cs_refresh_dynchilds_functions()
   RETURNS character varying AS
 $BODY$
+DECLARE
+   dropSchema boolean;
 BEGIN
- 
-DROP schema csdc cascade;
-CREATE schema csdc;
-perform execute('CREATE OR REPLACE FUNCTION csdc.'||name||' RETURNS VARCHAR AS $$ select'''||regexp_replace(REPLACE(code,'''',''''''),'(.*?)<ds::param.*>(.*?)</ds::param>(.*?)',E'\\1''||$\\2||''\\3','g')||'''::varchar $$ LANGUAGE ''sql'';') FROM cs_dynamic_children_helper;
+SELECT EXISTS(SELECT * FROM information_schema.schemata WHERE schema_name = 'csdc_backup') INTO dropSchema;
+IF dropSchema THEN
+    drop schema csdc_backup cascade;
+END IF;
+ALTER SCHEMA csdc RENAME TO csdc_backup;
+create schema csdc;
+perform execute('CREATE OR REPLACE FUNCTION csdc.'||name||' RETURNS VARCHAR AS $$ select'''||regexp_replace(replace(code,'''',''''''),'(.*?)<ds::param.*>(.*?)</ds::param>(.*?)',E'\\1''||$\\2||''\\3','g')||'''::varchar $$ LANGUAGE ''sql'';') from cs_dynamic_children_helper;
     RETURN 'Functions refreshed';
 EXCEPTION
     WHEN OTHERS THEN
@@ -45,7 +50,6 @@ EXCEPTION
 END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
-  COST 100;
-
+  COST 100; 
 
 
