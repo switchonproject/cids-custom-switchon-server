@@ -9,7 +9,6 @@ package de.cismet.cids.custom.switchon.search.server;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
 import Sirius.server.middleware.types.MetaObject;
-import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
 
 import org.apache.log4j.Logger;
@@ -46,7 +45,7 @@ public class MetaObjectUsageRelationshipsSearchStatement extends AbstractCidsSer
                 + " WHERE   name ilike 'relationship' "
                 + " ), rel.id, rel.name from relationship as rel "
                 + " join jt_fromresource_relationship as jt on jt.relationship_reference = rel.id "
-                + "where jt.resid =  ";
+                + "where jt.resourceid =  ";
 
     //~ Constructors -----------------------------------------------------------
 
