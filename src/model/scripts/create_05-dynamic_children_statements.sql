@@ -8,10 +8,9 @@ INSERT INTO "public".cs_dynamic_children_helper ("name", code)
  	''O'' AS node_type,
  	null AS url,
  	null AS dynamic_children,
- 	true AS sql_sort,
+ 	false AS sql_sort,
  	true AS derive_permissions_from_class
- 	from <ds::param name=''table_name''>2</ds::param>
- 	ORDER BY name');
+ 	from <ds::param name=''table_name''>2</ds::param>;');
    
 INSERT INTO "public".cs_dynamic_children_helper ("name", code) 
 	VALUES ('HydrologicalConcepts(level_id integer)', 'SELECT -1 AS id,
