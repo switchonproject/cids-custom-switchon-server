@@ -112,8 +112,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
      *
      * @param   query  The query that defines the criteria of the resources that have
      *
-     * @throws  UnsupportedOperationException  if the query could not be decoded
-     *          URLDecoder.decode(query, "UTF-8")
+     * @throws  UnsupportedOperationException  if the query could not be decoded URLDecoder.decode(query, "UTF-8")
      */
     public void setQuery(final String query) {
         try {
@@ -124,17 +123,16 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     }
 
     /**
-     * interprets the filter query and use the informations to create a
-     * MetaObjectNodeResourceSearchStatement and set the found filter values
+     * interprets the filter query and use the informations to create a MetaObjectNodeResourceSearchStatement and set
+     * the found filter values.
      *
      * @param   query  the query to interpret
      *
-     * @return  MetaObjectNodeResourceSearchStatement 
+     * @return  MetaObjectNodeResourceSearchStatement
      *
-     * @throws  SearchException  
+     * @throws  SearchException  DOCUMENT ME!
      */
     private MetaObjectNodeResourceSearchStatement interpretQuery(final String query) throws SearchException {
-
         final boolean isValid = Pattern.compile("^(" + REGEX_QUERY + ")+$").matcher(query).find();
 
         if (isValid) {
@@ -159,7 +157,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
 
             // find all filters
             final Matcher matcher = Pattern.compile(REGEX_QUERY).matcher(query);
-            while (matcher.find()) {                
+            while (matcher.find()) {
                 final String key = matcher.group(1).trim();
                 final String value = matcher.group(2);
 
