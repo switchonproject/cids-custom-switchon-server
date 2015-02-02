@@ -61,16 +61,18 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     private static final String DOMAIN = "SWITCHON";
     private static final int GEOM_SRID = 4326;
 
-    private static final String REGEX_QUERY = "(\\w+?):\"(.+?)\"\\s?";
+    private static final String REGEX_QUERY = "([A-Za-z_\\-]+?):\"(.+?)\"\\s?";
 
     private static final String FILTER__CLASS = "class";
     private static final String FILTER__KEYWORD = "keyword";
     private static final String FILTER__TEXT = "text";
+    private static final String FILTER__TOPIC = "topic";
 
     private static final String FILTER__TEMPORAL__FROMDATE = "fromdate";
     private static final String FILTER__TEMPORAL__TODATE = "todate";
     private static final String FILTER__SPATIAL__GEO = "geo";
-    private static final String FILTER__SPATIAL__GEO_INTERSECTS = "geo_intersects";
+    private static final String FILTER__SPATIAL__GEO_INTERSECTS = "geo-intersects";
+    private static final String FILTER__SPATIAL__GEO_BUFFER = "geo-buffer";
 
     private static final String METACLASSNAME__RESOURCE = "resource";
 
@@ -146,7 +148,9 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             Date toDate = null;
             Geometry geometryToSearchFor = null;
             boolean isGeoIntersectsEnabled = false;
+            float geoBuffer = 0;
             String fulltext = null;
+            String topic = null;
 
             // add resource class by default
             try {
@@ -191,6 +195,14 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                         isGeoIntersectsEnabled = value.trim().toLowerCase().equals("true");
                         break;
                     }
+                    case FILTER__SPATIAL__GEO_BUFFER: {
+                        try {
+                            geoBuffer = Float.parseFloat(value);
+                        } catch (NumberFormatException numberFormatException) {
+                            LOG.warn("could not parse: " + key + " = " + value + " to float", numberFormatException);
+                        }
+                        break;
+                    }
                     case FILTER__CLASS: {
                         try {
                             classList.add(ms.getClassByTableName(getUser(), value.trim()));
@@ -205,6 +217,10 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     }
                     case FILTER__TEXT: {
                         fulltext = value;
+                        break;
+                    }
+                    case FILTER__TOPIC: {
+                        topic = value;
                         break;
                     }
                     default: {
@@ -258,6 +274,12 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                                 + MetaObjectNodeResourceSearchStatement.GeometryFunction.CONTAINS.toString() + "\"");
                 }
             }
+            if (geoBuffer > 0) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("searching with geo buffer: \"" + geoBuffer + "\"");
+                }
+                nrs.setGeoBuffer(geoBuffer);
+            }
             if (fulltext != null) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("fulltext search in title and description for: \"" + fulltext + "\"");
@@ -265,6 +287,13 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                 nrs.setTitle(fulltext);
                 nrs.setDescription(fulltext);
             }
+            if ((topic != null) && (topic.length() > 0)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("INSIRE topic category search for: \"" + topic + "\"");
+                }
+                nrs.setTopicCategory(topic);
+            }
+
             return nrs;
         } else {
             throw new SearchException("invalid query");

@@ -104,6 +104,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected Timestamp fromDate;
     protected Timestamp toDate;
     protected String location;
+    protected float geoBuffer = 0.000001f;
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
 
     //~ Constructors -----------------------------------------------------------
@@ -181,7 +182,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         query.append(" WHERE TRUE ");
         appendGeometry();
         appendKeywords();
-        appendTempora();
+        appendTemporal();
         appendTitleDescription();
         appendtopic();
         appendLocation();
@@ -206,13 +207,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                         .append("(")
                         .append("st_buffer(st_geometryfromtext('")
                         .append(geostring)
-                        .append("'), 0.000001)")
+                        .append("'), ")
+                        .append(geoBuffer)
+                        .append(")")
                         .append(", ")
                         .append("")
-                        .append("st_buffer(geo_field, 0.000001)")
-                        .append(")");
+                        .append("st_buffer(geo_field, 0.000001)") // <-- why ?????
+                .append(")");
             } else {
-                // without buffer for geostring
+                // without buffer for geostring <-- why ?????
                 query.append(" and ")
                         .append(geometryFunction)
                         .append("(")
@@ -229,7 +232,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     /**
      * DOCUMENT ME!
      */
-    private void appendTempora() {
+    private void appendTemporal() {
         if (fromDate != null) {
             query.append(" and r.fromDate >= '").append(fromDate.toString()).append("'");
             if (toDate != null) {
@@ -377,5 +380,23 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setGeometryFunction(final GeometryFunction geometryFunction) {
         this.geometryFunction = geometryFunction;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public float getGeoBuffer() {
+        return geoBuffer;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  geoBuffer  DOCUMENT ME!
+     */
+    public void setGeoBuffer(final float geoBuffer) {
+        this.geoBuffer = geoBuffer;
     }
 }
