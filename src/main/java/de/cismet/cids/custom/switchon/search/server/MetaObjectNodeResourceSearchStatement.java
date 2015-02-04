@@ -163,10 +163,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected String generateQuery() {
         query = new StringBuilder();
         query.append("SELECT DISTINCT " + "(SELECT id "
-                    + "FROM    cs_class "
-                    + "WHERE   name ilike 'resource' "
+                    + "FROM cs_class "
+                    + "WHERE name ilike 'resource' "
                     + "), r.id, r.name ");
-        query.append(" FROM resource r");
+        query.append("FROM resource r");
         if (geometryToSearchFor != null) {
             query.append(" join geom g ON r.spatialcoverage = g.id ");
         }
@@ -251,12 +251,14 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             query.append(" and ( kwt.name ilike '").append(keywords[0]).append("' and kwt_tg.name like 'keywords%'");
             if (keywords.length > 1) {
                 for (int i = 1; i < keywords.length; i++) {
-                    query.append(" OR kwt.name ilike '")
-                            .append(keywords[i])
-                            .append("' and kwt_tg.name like 'keywords%'");
+                    query.append(" OR kwt.name ilike '").append(keywords[i]).append("'");
                 }
+                query.append(") GROUP by r.id HAVING COUNT(kwt.id) = ").append(keywords.length);
             }
-            query.append(")");
+            else
+            {
+                query.append(")");
+            }
         }
     }
 
