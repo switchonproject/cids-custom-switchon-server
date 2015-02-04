@@ -105,6 +105,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected Timestamp toDate;
     protected String location;
     protected float geoBuffer = 0.000001f;
+    private int limit = 0;
+
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
 
     //~ Constructors -----------------------------------------------------------
@@ -186,6 +188,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         appendTitleDescription();
         appendtopic();
         appendLocation();
+        appendLimit();
 
         return query.toString();
     }
@@ -289,6 +292,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private void appendLocation() {
         if (location != null) {
             query.append(" and lct.name ilike '").append(location).append("'");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendLimit() {
+        if (limit > 0) {
+            query.append(" LIMIT ").append(limit);
         }
     }
 
@@ -398,5 +410,23 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setGeoBuffer(final float geoBuffer) {
         this.geoBuffer = geoBuffer;
+    }
+
+    /**
+     * Get the value of limit.
+     *
+     * @return  the value of limit
+     */
+    public int getLimit() {
+        return limit;
+    }
+
+    /**
+     * Set the value of limit.
+     *
+     * @param  limit  new value of limit
+     */
+    public void setLimit(final int limit) {
+        this.limit = limit;
     }
 }

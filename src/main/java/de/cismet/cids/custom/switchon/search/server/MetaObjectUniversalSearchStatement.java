@@ -73,6 +73,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     private static final String FILTER__SPATIAL__GEO = "geo";
     private static final String FILTER__SPATIAL__GEO_INTERSECTS = "geo-intersects";
     private static final String FILTER__SPATIAL__GEO_BUFFER = "geo-buffer";
+    private static final String FILTER__LIMIT = "limit";
 
     private static final String METACLASSNAME__RESOURCE = "resource";
 
@@ -151,6 +152,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             float geoBuffer = 0;
             String fulltext = null;
             String topic = null;
+            int limit = -1;
 
             // add resource class by default
             try {
@@ -197,9 +199,12 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     }
                     case FILTER__SPATIAL__GEO_BUFFER: {
                         try {
-                            geoBuffer = Float.parseFloat(value);
+                            final int geoBufferTemp = Integer.parseInt(value);
+                            if (geoBufferTemp > 0) {
+                                geoBuffer = geoBufferTemp;
+                            }
                         } catch (NumberFormatException numberFormatException) {
-                            LOG.warn("could not parse: " + key + " = " + value + " to float", numberFormatException);
+                            LOG.warn("could not parse: " + key + " = " + value + " to integer", numberFormatException);
                         }
                         break;
                     }
@@ -221,6 +226,17 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     }
                     case FILTER__TOPIC: {
                         topic = value;
+                        break;
+                    }
+                    case FILTER__LIMIT: {
+                        try {
+                            final int limitTemp = Integer.parseInt(value);
+                            if (limitTemp > 0) {
+                                limit = limitTemp;
+                            }
+                        } catch (NumberFormatException numberFormatException) {
+                            LOG.warn("could not parse: " + key + " = " + value + " to integer", numberFormatException);
+                        }
                         break;
                     }
                     default: {
@@ -292,6 +308,13 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     LOG.debug("INSIRE topic category search for: \"" + topic + "\"");
                 }
                 nrs.setTopicCategory(topic);
+            }
+            if(limit > 0)
+            {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("LIMIT: \"" + limit + "\"");
+                }
+                nrs.setLimit(limit);
             }
 
             return nrs;
