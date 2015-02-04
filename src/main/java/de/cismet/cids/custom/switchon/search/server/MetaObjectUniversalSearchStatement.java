@@ -143,13 +143,13 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             nrs.setUser(getUser());
             nrs.setActiveLocalServers(getActiveLocalServers());
 
-            final List<String> keywordList = new ArrayList<String>();
-            final List<MetaClass> classList = new ArrayList<MetaClass>();
+            final List<String> keywordList = new ArrayList<>();
+            final List<MetaClass> classList = new ArrayList<>();
             Date fromDate = null;
             Date toDate = null;
             Geometry geometryToSearchFor = null;
             boolean isGeoIntersectsEnabled = false;
-            float geoBuffer = 0;
+            long geoBuffer = 0;
             String fulltext = null;
             String topic = null;
             int limit = -1;
@@ -199,12 +199,12 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     }
                     case FILTER__SPATIAL__GEO_BUFFER: {
                         try {
-                            final int geoBufferTemp = Integer.parseInt(value);
+                            final long geoBufferTemp = Long.parseLong(value);
                             if (geoBufferTemp > 0) {
                                 geoBuffer = geoBufferTemp;
                             }
                         } catch (NumberFormatException numberFormatException) {
-                            LOG.warn("could not parse: " + key + " = " + value + " to integer", numberFormatException);
+                            LOG.warn("could not parse: " + key + " = " + value + " to long", numberFormatException);
                         }
                         break;
                     }

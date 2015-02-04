@@ -208,15 +208,12 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                 query.append(" and ")
                         .append(geometryFunction)
                         .append("(")
-                        .append("st_buffer(st_geometryfromtext('")
+                        .append("st_transform( st_buffer( st_transform(st_geometryfromtext('")
                         .append(geostring)
-                        .append("'), ")
-                        .append(geoBuffer)
-                        .append(")")
-                        .append(", ")
-                        .append("")
-                        .append("st_buffer(geo_field, 0.000001)") // <-- why ?????
-                .append(")");
+                        .append("'),3857), ")
+                        .append(String.valueOf(geoBuffer))
+                        .append("), 4326), ")
+                        .append("st_buffer(geo_field, 0.000001))"); // <-- why ?????
             } else {
                 // without buffer for geostring <-- why ?????
                 query.append(" and ")
@@ -409,7 +406,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      * @param  geoBuffer  DOCUMENT ME!
      */
     public void setGeoBuffer(final float geoBuffer) {
-        this.geoBuffer = geoBuffer;
+        
+        if(geoBuffer > 0 && geoBuffer < 10000000000l)
+        {
+            this.geoBuffer = geoBuffer;
+        }
+        else
+        {
+            LOG.warn("invalid geo buffer: "+geoBuffer);
+        }
     }
 
     /**
