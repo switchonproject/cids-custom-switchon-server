@@ -104,6 +104,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected Timestamp fromDate;
     protected Timestamp toDate;
     protected String location;
+    protected float geoBuffer = 0.000001f;
+    private int limit = 0;
+
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
 
     //~ Constructors -----------------------------------------------------------
@@ -160,10 +163,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected String generateQuery() {
         query = new StringBuilder();
         query.append("SELECT DISTINCT " + "(SELECT id "
-                    + "FROM    cs_class "
-                    + "WHERE   name ilike 'resource' "
+                    + "FROM cs_class "
+                    + "WHERE name ilike 'resource' "
                     + "), r.id, r.name ");
-        query.append(" FROM resource r");
+        query.append("FROM resource r");
         if (geometryToSearchFor != null) {
             query.append(" join geom g ON r.spatialcoverage = g.id ");
         }
@@ -181,10 +184,11 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         query.append(" WHERE TRUE ");
         appendGeometry();
         appendKeywords();
-        appendTempora();
+        appendTemporal();
         appendTitleDescription();
         appendtopic();
         appendLocation();
+        appendLimit();
 
         return query.toString();
     }
@@ -204,15 +208,14 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                 query.append(" and ")
                         .append(geometryFunction)
                         .append("(")
-                        .append("st_buffer(st_geometryfromtext('")
+                        .append("st_transform( st_buffer( st_transform(st_geometryfromtext('")
                         .append(geostring)
-                        .append("'), 0.000001)")
-                        .append(", ")
-                        .append("")
-                        .append("st_buffer(geo_field, 0.000001)")
-                        .append(")");
+                        .append("'),3857), ")
+                        .append(String.valueOf(geoBuffer))
+                        .append("), 4326), ")
+                        .append("st_buffer(geo_field, 0.000001))"); // <-- why ?????
             } else {
-                // without buffer for geostring
+                // without buffer for geostring <-- why ?????
                 query.append(" and ")
                         .append(geometryFunction)
                         .append("(")
@@ -229,7 +232,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     /**
      * DOCUMENT ME!
      */
-    private void appendTempora() {
+    private void appendTemporal() {
         if (fromDate != null) {
             query.append(" and r.fromDate >= '").append(fromDate.toString()).append("'");
             if (toDate != null) {
@@ -248,12 +251,14 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             query.append(" and ( kwt.name ilike '").append(keywords[0]).append("' and kwt_tg.name like 'keywords%'");
             if (keywords.length > 1) {
                 for (int i = 1; i < keywords.length; i++) {
-                    query.append(" OR kwt.name ilike '")
-                            .append(keywords[i])
-                            .append("' and kwt_tg.name like 'keywords%'");
+                    query.append(" OR kwt.name ilike '").append(keywords[i]).append("'");
                 }
+                query.append(") GROUP by r.id HAVING COUNT(kwt.id) = ").append(keywords.length);
             }
-            query.append(")");
+            else
+            {
+                query.append(")");
+            }
         }
     }
 
@@ -286,6 +291,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private void appendLocation() {
         if (location != null) {
             query.append(" and lct.name ilike '").append(location).append("'");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendLimit() {
+        if (limit > 0) {
+            query.append(" LIMIT ").append(limit);
         }
     }
 
@@ -377,5 +391,49 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setGeometryFunction(final GeometryFunction geometryFunction) {
         this.geometryFunction = geometryFunction;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public float getGeoBuffer() {
+        return geoBuffer;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  geoBuffer  DOCUMENT ME!
+     */
+    public void setGeoBuffer(final float geoBuffer) {
+        
+        if(geoBuffer > 0 && geoBuffer < 10000000000l)
+        {
+            this.geoBuffer = geoBuffer;
+        }
+        else
+        {
+            LOG.warn("invalid geo buffer: "+geoBuffer);
+        }
+    }
+
+    /**
+     * Get the value of limit.
+     *
+     * @return  the value of limit
+     */
+    public int getLimit() {
+        return limit;
+    }
+
+    /**
+     * Set the value of limit.
+     *
+     * @param  limit  new value of limit
+     */
+    public void setLimit(final int limit) {
+        this.limit = limit;
     }
 }
