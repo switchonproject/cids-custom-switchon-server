@@ -105,6 +105,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected Timestamp toDate;
     protected String location;
     protected float geoBuffer = 0.000001f;
+    protected List<String[]> keywordGroupList;
     private int limit = 0;
 
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
@@ -159,7 +160,6 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @return  DOCUMENT ME!
      */
-
     protected String generateQuery() {
         query = new StringBuilder();
         query.append("SELECT DISTINCT " + "(SELECT id "
@@ -170,7 +170,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if (geometryToSearchFor != null) {
             query.append(" join geom g ON r.spatialcoverage = g.id ");
         }
-        if ((keywordList != null) && !keywordList.isEmpty()) {
+        if (((keywordList != null) && !keywordList.isEmpty())
+                    || ((keywordGroupList != null) && !keywordGroupList.isEmpty())) {
             query.append(" join jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
                     .append(" join tag kwt ON jtrt.tagid = kwt.id")
                     .append(" join taggroup kwt_tg ON kwt.taggroup = kwt_tg.id");
@@ -184,6 +185,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         query.append(" WHERE TRUE ");
         appendGeometry();
         appendKeywords();
+        appendKeywordGroups();
+        appendKeywordCombination();
         appendTemporal();
         appendTitleDescription();
         appendtopic();
@@ -194,7 +197,6 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     }
 
     // - Append queryables and setter ------------------------------------------
-
     /**
      * DOCUMENT ME!
      */
@@ -248,17 +250,56 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if ((keywordList != null) && !keywordList.isEmpty()) {
             String[] keywords = new String[keywordList.size()];
             keywords = keywordList.toArray(keywords);
-            query.append(" and ( kwt.name ilike '").append(keywords[0]).append("' and kwt_tg.name like 'keywords%'");
+            query.append("AND ( kwt.name ilike '").append(keywords[0]).append("' and kwt_tg.name like 'keywords%'");
             if (keywords.length > 1) {
                 for (int i = 1; i < keywords.length; i++) {
                     query.append(" OR kwt.name ilike '").append(keywords[i]).append("'");
                 }
-                query.append(") GROUP by r.id HAVING COUNT(kwt.id) = ").append(keywords.length);
             }
-            else
-            {
-                query.append(")");
+            query.append(")");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendKeywordGroups() {
+        if ((keywordGroupList != null) && !keywordGroupList.isEmpty()) {
+            if ((keywordList != null) && !keywordList.isEmpty()) {
+                query.append("OR ");
+            } else {
+                query.append("AND ");
             }
+
+            query.append("(kwt.name ilike '")
+                    .append(keywordGroupList.get(0)[1])
+                    .append("' and kwt_tg.name ilike '")
+                    .append("keywords - ")
+                    .append(keywordGroupList.get(0)[0])
+                    .append("'");
+            if (keywordGroupList.size() > 1) {
+                for (int i = 1; i < keywordGroupList.size(); i++) {
+                    query.append(" OR kwt.name ilike '")
+                            .append(keywordGroupList.get(i)[1])
+                            .append("' and kwt_tg.name ilike '")
+                            .append(keywordGroupList.get(i)[0])
+                            .append("'");
+                }
+            }
+            query.append(")");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendKeywordCombination() {
+        int size = 0;
+        size += (keywordList != null) ? keywordList.size() : 0;
+        size += (keywordGroupList != null) ? keywordGroupList.size() : 0;
+
+        if (size > 0) {
+            query.append(" GROUP by r.id HAVING COUNT(kwt.id) = ").append(size);
         }
     }
 
@@ -408,14 +449,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      * @param  geoBuffer  DOCUMENT ME!
      */
     public void setGeoBuffer(final float geoBuffer) {
-        
-        if(geoBuffer > 0 && geoBuffer < 10000000000l)
-        {
+        if ((geoBuffer > 0) && (geoBuffer < 10000000000L)) {
             this.geoBuffer = geoBuffer;
-        }
-        else
-        {
-            LOG.warn("invalid geo buffer: "+geoBuffer);
+        } else {
+            LOG.warn("invalid geo buffer: " + geoBuffer);
         }
     }
 
@@ -435,5 +472,23 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setLimit(final int limit) {
         this.limit = limit;
+    }
+
+    /**
+     * Get the value of keywordGroupList.
+     *
+     * @return  the value of keywordGroupList
+     */
+    public List<String[]> getKeywordGroupList() {
+        return keywordGroupList;
+    }
+
+    /**
+     * Set the value of keywordGroupList.
+     *
+     * @param  keywordGroupList  new value of keywordGroupList
+     */
+    public void setKeywordGroupList(final List<String[]> keywordGroupList) {
+        this.keywordGroupList = keywordGroupList;
     }
 }
