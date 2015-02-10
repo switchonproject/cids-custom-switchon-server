@@ -143,8 +143,9 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             nrs.setUser(getUser());
             nrs.setActiveLocalServers(getActiveLocalServers());
 
-            final List<String> keywordList = new ArrayList<>();
-            final List<MetaClass> classList = new ArrayList<>();
+            final List<String> keywordList = new ArrayList<String>();
+            final List<String[]> keywordGroupList = new ArrayList<String[]>();
+            final List<MetaClass> classList = new ArrayList<MetaClass>();
             Date fromDate = null;
             Date toDate = null;
             Geometry geometryToSearchFor = null;
@@ -240,7 +241,15 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                         break;
                     }
                     default: {
-                        LOG.warn("unknown key: " + key + " = " + value);
+                        if ((key.length() > 8) && key.startsWith("keyword-", 0)) {
+                            final String[] keywordGroup = new String[] { key.substring(8), value };
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("keywordGroup '" + keywordGroup[0] + "' found in: " + key + " = " + value);
+                            }
+                            keywordGroupList.add(keywordGroup);
+                        } else {
+                            LOG.warn("unknown key: " + key + " = " + value);
+                        }
                     }
                 }
             }
@@ -249,6 +258,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             if (!classList.isEmpty()) {
                 // not yet defined what to do with other classes then resource
             }
+
             if (!keywordList.isEmpty()) {
                 nrs.setKeywordList(keywordList);
                 if (LOG.isDebugEnabled()) {
@@ -259,6 +269,18 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     }
                 }
             }
+
+            if (!keywordGroupList.isEmpty()) {
+                nrs.setKeywordGroupList(keywordGroupList);
+                if (LOG.isDebugEnabled()) {
+                    for (final String[] keywordGroup : keywordGroupList) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("keyword \"" + keywordGroup[1] + "\" of group \"" + keywordGroup[0] + "\" added");
+                        }
+                    }
+                }
+            }
+
             if (fromDate != null) {
                 nrs.setFromDate(new Timestamp(fromDate.getTime()));
                 if (LOG.isDebugEnabled()) {
@@ -309,8 +331,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                 }
                 nrs.setTopicCategory(topic);
             }
-            if(limit > 0)
-            {
+            if (limit > 0) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("LIMIT: \"" + limit + "\"");
                 }

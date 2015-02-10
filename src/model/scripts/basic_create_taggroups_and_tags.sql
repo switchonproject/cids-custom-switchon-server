@@ -26,7 +26,7 @@ VALUES
 ('topic category','High-level classification of resources in accordance with ISO 19115 for grouping and topic-based search (fixed group).'),
 ('publish type','The publish type is used to determine how an imported file has to be postprocessed in order to publish it to an Andvanced Data Repository.'),
 ('upload status','The upload status represents a transient property that temporarily stores the status of the upload process to an Advanced Data Repository.'),
-('CUASHI', 'CUASHI Hydrologic Ontology for Discovery');
+('keywords - CUASHI', 'CUASHI Hydrologic Ontology for Discovery');
 DO $$
 DECLARE tgid integer;
 BEGIN
