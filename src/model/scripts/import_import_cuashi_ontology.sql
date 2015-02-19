@@ -1,11 +1,11 @@
--- import the CUASHI Tabluar Ontology into new CUASHI keyword list.
+-- import the CUAHSI Tabluar Ontology into new CUAHSI keyword list.
 -- skip duplicate keywords
 INSERT INTO taggroup
 (name, description)
-SELECT 'keywords - CUASHI', 'CUASHI Hydrologic Ontology for Discovery'
+SELECT 'keywords - CUAHSI', 'CUAHSI Hydrologic Ontology for Discovery'
 WHERE
     NOT EXISTS (
-        SELECT name FROM taggroup WHERE name = 'keywords - CUASHI'
+        SELECT name FROM taggroup WHERE name = 'keywords - CUAHSI'
     );
 DO $$
 DECLARE tag_raw character varying;
@@ -15,7 +15,7 @@ DECLARE taggroupID integer = NULL;
 DECLARE tagname character varying;
 DECLARE tagdescription character varying;
 BEGIN
-    taggroupID = (SELECT id FROM taggroup WHERE name = 'keywords - CUASHI');
+    taggroupID = (SELECT id FROM taggroup WHERE name = 'keywords - CUAHSI');
     FOREACH tag_raw IN ARRAY (SELECT ARRAY['Area', 'Area, atmosphere', 'Area, ice', 'Benthic', 'Benthic species', 'Biological', 'Biological community', 'Biological taxa', 'Biomass, phytoplankton ', 'Biomass, zooplankton', 'Carbon', 'Chemical', 'Density', 'Descriptive', 'Dissolved Gas', 'Dissolved Solids', 'Energy', 'Energy, flux', 'Fish', 'Fish species', 'Flux', 'Flux, discharge', 'Flux, dissolved gas', 'Flux, evaporation', 'Flux, precipitation', 'Flux, wind', 'Indicator Organisms', 'Inorganic', 'Length', 'Level', 'Level, ice', 'Level, lake', 'Level, ocean', 'Level, snow', 'Level, stream', 'Macrophyte species', 'Major', 'Minor', 'Nekton', 'Nekton species', 'Nitrogen', 'Nutrient', 'Optical', 'Optical, water', 'Organic', 'Other organic chemical', 'Oxygen Demand', 'PCBs', 'Pesticide', 'Phosphorus', 'Physical', 'Phytoplankton species', 'Pigment', 'Pressure', 'Pressure, air', 'Pressure, water', 'Radiochemical ', 'Stable Isotopes', 'Temperature', 'Velocity', 'Velocity, wind', 'Volume', 'Volume, lake', 'Water', 'Water content', 'Water content, air', 'Water content, snow', 'Water content, soil', 'Water, descriptive', 'Water, dissolved solids', 'Water, suspended solids', 'Zooplankton species'])
     LOOP
             tag_trimmed = trim(tag_raw);
