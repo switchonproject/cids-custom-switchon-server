@@ -106,6 +106,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected String location;
     protected float geoBuffer = 0.000001f;
     protected List<String[]> keywordGroupList;
+    protected List<String> negatedKeywordList;
     private int limit = 0;
 
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
@@ -165,7 +166,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         query.append("SELECT DISTINCT " + "(SELECT id "
                     + "FROM cs_class "
                     + "WHERE name ilike 'resource' "
-                    + "), r.id, r.name ");
+                    + ") as class_id, r.id, r.name ");
         query.append("FROM resource r");
         if (geometryToSearchFor != null) {
             query.append(" join geom g ON r.spatialcoverage = g.id ");
@@ -189,8 +190,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         appendKeywordCombination();
         appendTemporal();
         appendTitleDescription();
-        appendtopic();
+        appendTopicCategory();
         appendLocation();
+        appendNegatedKeywords();
         appendLimit();
 
         return query.toString();
@@ -249,14 +251,19 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private void appendKeywords() {
         if ((keywordList != null) && !keywordList.isEmpty()) {
             String[] keywords = new String[keywordList.size()];
+
             keywords = keywordList.toArray(keywords);
-            query.append("AND ( kwt.name ilike '").append(keywords[0]).append("' and kwt_tg.name like 'keywords%'");
-            if (keywords.length > 1) {
-                for (int i = 1; i < keywords.length; i++) {
-                    query.append(" OR kwt.name ilike '").append(keywords[i]).append("'");
+            query.append("AND (");
+
+            for (int i = 0; i < keywords.length; i++) {
+                if (i > 0) {
+                    query.append(" OR");
                 }
+
+                query.append(" kwt.name ilike '").append(keywords[i]).append("'");
             }
-            query.append(")");
+
+            query.append(" AND kwt_tg.name like 'keywords%')");
         }
     }
 
@@ -266,49 +273,67 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private void appendKeywordGroups() {
         if ((keywordGroupList != null) && !keywordGroupList.isEmpty()) {
             if ((keywordList != null) && !keywordList.isEmpty()) {
-                query.append("OR ");
+                query.append(" OR (");
             } else {
-                query.append("AND ");
+                query.append(" AND (");
             }
 
-            query.append("(kwt.name ilike '")
-                    .append(keywordGroupList.get(0)[1])
-                    .append("' and kwt_tg.name ilike '")
-                    .append("keywords - ")
-                    .append(keywordGroupList.get(0)[0])
-                    .append("'");
-            if (keywordGroupList.size() > 1) {
-                for (int i = 1; i < keywordGroupList.size(); i++) {
-                    query.append(" OR kwt.name ilike '")
-                            .append(keywordGroupList.get(i)[1])
-                            .append("' and kwt_tg.name ilike '")
-                            .append(keywordGroupList.get(i)[0])
-                            .append("'");
+            String currentGroup = keywordGroupList.get(0)[0];
+            int inGroupCount = 0;
+            int groupCount = 0;
+
+            for (int i = 0; i < keywordGroupList.size(); i++) {
+                // check for new group
+                if (!keywordGroupList.get(i)[0].equals(currentGroup)) {
+                    groupCount++;
+                    inGroupCount = 0;
                 }
+
+                // start of first or new group
+                if (inGroupCount == 0) {
+                    // start of new group: close previous group
+                    if (groupCount > 0) {
+                        currentGroup = keywordGroupList.get(i)[0];
+                        query.append(" AND kwt_tg.name ilike '")
+                                .append("keywords - ")
+                                .append(currentGroup)
+                                .append("'")
+                                .append(")")
+                                .append(" AND");
+                    }
+                } else {
+                    query.append(" OR");
+                }
+
+                query.append(" kwt.name ilike '").append(keywordGroupList.get(i)[1]).append("'");
+                inGroupCount++;
             }
-            query.append(")");
+
+            // end of loop: close last group
+            query.append(" AND kwt_tg.name ilike '").append("keywords - ").append(currentGroup).append("'").append(")");
         }
     }
 
     /**
-     * DOCUMENT ME!
+     * FAKE AND Statement for keywords. Filter by groups, e.g.
      */
     private void appendKeywordCombination() {
         int size = 0;
         size += (keywordList != null) ? keywordList.size() : 0;
         size += (keywordGroupList != null) ? keywordGroupList.size() : 0;
-
-        if (size > 0) {
-            query.append(" GROUP by r.id HAVING COUNT(kwt.id) = ").append(size);
-        }
     }
 
     /**
      * DOCUMENT ME!
      */
-    private void appendtopic() {
+    private void appendTopicCategory() {
         if (topicCategory != null) {
-            query.append(" and tct.name ilike '").append(topicCategory).append("'");
+            final StringBuilder topicCategoryParameter = new StringBuilder(topicCategory);
+            if (checkForNot(topicCategoryParameter)) {
+                query.append(" and tct.name ilike '").append(topicCategoryParameter).append("'");
+            } else {
+                query.append(" and tct.name NOT ilike '").append(topicCategoryParameter).append("'");
+            }
         }
     }
 
@@ -317,12 +342,33 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendTitleDescription() {
         if ((title != null) && (description == null)) {
-            query.append(" and r.name ilike '%").append(title).append("%'");
+            final StringBuilder titleParameter = new StringBuilder(title);
+            if (checkForNot(titleParameter)) {
+                query.append(" and r.name NOT ilike '%").append(titleParameter).append("%'");
+            } else {
+                query.append(" and r.name ilike '%").append(titleParameter).append("%'");
+            }
         } else if ((title != null) && (description != null)) {
-            query.append(" and (r.name ilike '%").append(title).append("%'");
-            query.append(" or r.description ilike '%").append(description).append("%')");
+            final StringBuilder titleParameter = new StringBuilder(title);
+            if (checkForNot(titleParameter)) {
+                query.append(" and (r.name NOT ilike '%").append(titleParameter).append("%'");
+            } else {
+                query.append(" and (r.name ilike '%").append(titleParameter).append("%'");
+            }
+
+            final StringBuilder descriptionParameter = new StringBuilder(description);
+            if (checkForNot(descriptionParameter)) {
+                query.append(" or r.description NOT ilike '%").append(descriptionParameter).append("%')");
+            } else {
+                query.append(" or r.description ilike '%").append(descriptionParameter).append("%')");
+            }
         } else if ((title == null) && (description != null)) {
-            query.append(" and r.description ilike '%").append(description).append("%'");
+            final StringBuilder descriptionParameter = new StringBuilder(description);
+            if (checkForNot(descriptionParameter)) {
+                query.append(" and r.description ilike '%").append(descriptionParameter).append("%'");
+            } else {
+                query.append(" and r.description ilike '%").append(descriptionParameter).append("%'");
+            }
         }
     }
 
@@ -342,6 +388,47 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if (limit > 0) {
             query.append(" LIMIT ").append(limit);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendNegatedKeywords() {
+        if ((negatedKeywordList != null) && !negatedKeywordList.isEmpty()) {
+            String[] negatedKeywords = new String[negatedKeywordList.size()];
+
+            negatedKeywords = negatedKeywordList.toArray(negatedKeywords);
+            query.insert(0, "SELECT rresource.class_id, rresource.id, rresource.name FROM (");
+            query.append(") AS rresource WHERE rresource.id NOT IN")
+                    .append(
+                            " (SELECT rr.id from resource rr, jt_resource_tag, tag WHERE jt_resource_tag.resource_reference = rr.id")
+                    .append(" AND tag.id = jt_resource_tag.tagid AND");
+
+            for (int i = 0; i < negatedKeywords.length; i++) {
+                if (i > 0) {
+                    query.append(" OR");
+                }
+
+                query.append(" tag.name ilike '").append(negatedKeywords[i]).append("'");
+            }
+            query.append(")");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   parameter  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean checkForNot(final StringBuilder parameter) {
+        if (parameter.indexOf("!") == 0) {
+            parameter.deleteCharAt(0);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -490,5 +577,23 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setKeywordGroupList(final List<String[]> keywordGroupList) {
         this.keywordGroupList = keywordGroupList;
+    }
+
+    /**
+     * Get the value of negatedKeywordsLis.
+     *
+     * @return  the value of negatedKeywordsLis
+     */
+    public List<String> getNegatedKeywordList() {
+        return negatedKeywordList;
+    }
+
+    /**
+     * Set the value of negatedKeywordsLis.
+     *
+     * @param  negatedKeywordList  new value of negatedKeywordsLis
+     */
+    public void setNegatedKeywordList(final List<String> negatedKeywordList) {
+        this.negatedKeywordList = negatedKeywordList;
     }
 }
