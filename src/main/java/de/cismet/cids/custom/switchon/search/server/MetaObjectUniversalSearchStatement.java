@@ -33,7 +33,6 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedList;
@@ -138,7 +137,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
      *
      * @throws  SearchException  DOCUMENT ME!
      */
-    private MetaObjectNodeResourceSearchStatement interpretQuery(final String query) throws SearchException {
+    protected MetaObjectNodeResourceSearchStatement interpretQuery(final String query) throws SearchException {
         if (LOG.isDebugEnabled()) {
             LOG.debug("interpreting query: \n" + query);
         }
