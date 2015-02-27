@@ -36,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -61,7 +62,9 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     private static final String DOMAIN = "SWITCHON";
     private static final int GEOM_SRID = 4326;
 
-    private static final String REGEX_QUERY = "([A-Za-z_\\-]+?):\"(.+?)\"\\s?";
+    private static final String REGEX_QUERY = "(!?[A-Za-z_\\-]+?):\"(.+?)\"\\s?";
+
+    private static final String NOT_FILTER = "!";
 
     private static final String FILTER__CLASS = "class";
     private static final String FILTER__KEYWORD = "keyword";
@@ -136,6 +139,9 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
      * @throws  SearchException  DOCUMENT ME!
      */
     private MetaObjectNodeResourceSearchStatement interpretQuery(final String query) throws SearchException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("interpreting query: \n" + query);
+        }
         final boolean isValid = Pattern.compile("^(" + REGEX_QUERY + ")+$").matcher(query).find();
 
         if (isValid) {
@@ -143,9 +149,10 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             nrs.setUser(getUser());
             nrs.setActiveLocalServers(getActiveLocalServers());
 
-            final List<String> keywordList = new ArrayList<String>();
-            final List<String[]> keywordGroupList = new ArrayList<String[]>();
-            final List<MetaClass> classList = new ArrayList<MetaClass>();
+            final List<String> keywordList = new LinkedList<String>();
+            final List<String[]> keywordGroupList = new LinkedList<String[]>();
+            final List<String> negatedKeywordList = new LinkedList<String>();
+            final List<MetaClass> classList = new LinkedList<MetaClass>();
             Date fromDate = null;
             Date toDate = null;
             Geometry geometryToSearchFor = null;
@@ -165,8 +172,17 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             // find all filters
             final Matcher matcher = Pattern.compile(REGEX_QUERY).matcher(query);
             while (matcher.find()) {
-                final String key = matcher.group(1).trim();
-                final String value = matcher.group(2);
+                String key = matcher.group(1).trim();
+                String value = matcher.group(2);
+                final boolean notFilter;
+
+                if (key.startsWith(NOT_FILTER)) {
+                    LOG.info("found a NOT filter for parameter '" + key + "'");
+                    key = key.substring(1);
+                    notFilter = true;
+                } else {
+                    notFilter = false;
+                }
 
                 switch (key) {
                     case FILTER__TEMPORAL__FROMDATE: {
@@ -218,14 +234,36 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                         break;
                     }
                     case FILTER__KEYWORD: {
-                        keywordList.add(value);
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            negatedKeywordList.add(value);
+                        } else {
+                            keywordList.add(value);
+                        }
+
                         break;
                     }
                     case FILTER__TEXT: {
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            value = "!" + value;
+                        }
+
                         fulltext = value;
                         break;
                     }
                     case FILTER__TOPIC: {
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            value = "!" + value;
+                        }
+
                         topic = value;
                         break;
                     }
@@ -242,13 +280,21 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     }
                     default: {
                         if ((key.length() > 8) && key.startsWith("keyword-", 0)) {
-                            final String[] keywordGroup = new String[] { key.substring(8), value };
-                            if (LOG.isDebugEnabled()) {
-                                LOG.debug("keywordGroup '" + keywordGroup[0] + "' found in: " + key + " = " + value);
+                            if (notFilter) {
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                                }
+                                negatedKeywordList.add(value);
+                            } else {
+                                final String[] keywordGroup = new String[] { key.substring(8), value };
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("keywordGroup '" + keywordGroup[0] + "' found in: " + key + " = "
+                                                + value);
+                                }
+                                keywordGroupList.add(keywordGroup);
                             }
-                            keywordGroupList.add(keywordGroup);
                         } else {
-                            LOG.warn("unknown key: " + key + " = " + value);
+                            LOG.error("ignoring unknown key: " + key + " = " + value);
                         }
                     }
                 }
@@ -265,6 +311,17 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     for (final String keyword : keywordList) {
                         if (LOG.isDebugEnabled()) {
                             LOG.debug("keyword \"" + keyword + "\" added");
+                        }
+                    }
+                }
+            }
+
+            if (!negatedKeywordList.isEmpty()) {
+                nrs.setNegatedKeywordList(negatedKeywordList);
+                if (LOG.isDebugEnabled()) {
+                    for (final String keyword : negatedKeywordList) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("negated keyword \"" + keyword + "\" added");
                         }
                     }
                 }
@@ -340,7 +397,8 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
 
             return nrs;
         } else {
-            throw new SearchException("invalid query");
+            LOG.error("invalid query: " + query);
+            throw new SearchException("invalid query: " + query);
         }
     }
 
