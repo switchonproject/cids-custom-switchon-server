@@ -21,11 +21,11 @@ import com.vividsolutions.jts.io.WKTReader;
 
 import org.apache.log4j.Logger;
 
+import org.openide.util.lookup.ServiceProvider;
+
 import java.io.UnsupportedEncodingException;
 
 import java.net.URLDecoder;
-
-import java.rmi.RemoteException;
 
 import java.sql.Timestamp;
 
@@ -51,7 +51,7 @@ import de.cismet.cids.server.search.SearchException;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-@org.openide.util.lookup.ServiceProvider(service = CidsServerSearch.class)
+@ServiceProvider(service = CidsServerSearch.class)
 public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch implements MetaObjectNodeServerSearch {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -88,7 +88,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
 
     protected String query;
 
-    private MetaService ms;
+    private MetaService metaService = null;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -123,7 +123,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
         try {
             this.query = URLDecoder.decode(query, "UTF-8");
         } catch (final UnsupportedEncodingException ex) {
-            throw new UnsupportedOperationException("query couldn't be decoded", ex);
+            throw new UnsupportedOperationException("query '" + query + "' couldn't be decoded", ex);
         }
     }
 
@@ -141,12 +141,25 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
         if (LOG.isDebugEnabled()) {
             LOG.debug("interpreting query: \n" + query);
         }
+
+        if (this.metaService == null) {
+            if (this.getActiveLocalServers().containsKey(DOMAIN)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("initializing MetaService");
+                }
+                this.metaService = (MetaService)getActiveLocalServers().get(DOMAIN);
+            } else {
+                final String msg = "no metaservice for domain '" + DOMAIN + "' found!";
+                LOG.error(msg);
+                throw new SearchException(msg);
+            }
+        }
+
         final boolean isValid = Pattern.compile("^(" + REGEX_QUERY + ")+$").matcher(query).find();
 
         if (isValid) {
-            final MetaObjectNodeResourceSearchStatement nrs = new MetaObjectNodeResourceSearchStatement(getUser());
-            nrs.setUser(getUser());
-            nrs.setActiveLocalServers(getActiveLocalServers());
+            final MetaObjectNodeResourceSearchStatement nrs = new MetaObjectNodeResourceSearchStatement(this.getUser());
+            nrs.setActiveLocalServers(this.getActiveLocalServers());
 
             final List<String> keywordList = new LinkedList<String>();
             final List<String[]> keywordGroupList = new LinkedList<String[]>();
@@ -163,8 +176,8 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
 
             // add resource class by default
             try {
-                classList.add(ms.getClassByTableName(getUser(), METACLASSNAME__RESOURCE));
-            } catch (final RemoteException ex) {
+                classList.add(metaService.getClassByTableName(getUser(), METACLASSNAME__RESOURCE));
+            } catch (final Exception ex) {
                 LOG.warn("metaclass \"" + METACLASSNAME__RESOURCE + "\" couldn't be loaded", ex);
             }
 
@@ -226,8 +239,8 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     }
                     case FILTER__CLASS: {
                         try {
-                            classList.add(ms.getClassByTableName(getUser(), value.trim()));
-                        } catch (final RemoteException ex) {
+                            classList.add(metaService.getClassByTableName(getUser(), value.trim()));
+                        } catch (final Exception ex) {
                             throw new SearchException("metaclass \"" + value.trim() + "\" couldn't be loaded", ex);
                         }
                         break;
@@ -403,12 +416,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
 
     @Override
     public Collection<MetaObjectNode> performServerSearch() throws SearchException {
-        if ((ms = (MetaService)getActiveLocalServers().get(DOMAIN)) != null) {
-            final MetaObjectNodeResourceSearchStatement nrs = interpretQuery(this.query);
-            return nrs.performServerSearch();
-        } else {
-            LOG.error("active local server not found"); // NOI18N
-            return null;
-        }
+        final MetaObjectNodeResourceSearchStatement nrs = interpretQuery(this.query);
+        return nrs.performServerSearch();
     }
 }
