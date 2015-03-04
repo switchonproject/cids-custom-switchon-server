@@ -40,7 +40,7 @@ public class MetaObjectProvenanceRelationshipSearchStatement extends AbstractCid
 
     private String query = " select (SELECT id "
                 + " FROM    cs_class "
-                + " WHERE   name ilike 'relationship' "
+                + " WHERE   name = 'relationship' "
                 + " ), rel.id, rel.name from relationship as rel "
                 + " where toresource = ";
     private User user;

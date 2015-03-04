@@ -135,7 +135,11 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(" JOIN jt_resource_tag rjtrt ON rrr.id = rjtrt.resource_reference");
                             queryBuilder.append(" JOIN tag rtag ON rjtrt.tagid = rtag.id");
                             queryBuilder.append(" JOIN taggroup rtag_tg ON rtag.taggroup = rtag_tg.id");
-                            queryBuilder.append("WHERE TRUE AND rtag_tg.name ilike '").append(tagGroup).append("'");
+                            queryBuilder.append("WHERE TRUE AND");
+                            queryBuilder.append(" to_tsvector('english', rtag_tg.name) @@ to_tsquery('''")
+                                    .append(tagGroup)
+                                    .append("''')");
+
                             break;
                         }
                         case TAGGROUP_FILTER_ACCESS_CONDITONS: {

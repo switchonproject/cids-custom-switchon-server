@@ -42,7 +42,7 @@ public class MetaObjectUsageRelationshipsSearchStatement extends AbstractCidsSer
 
     private String query = " select (SELECT id "
                 + " FROM    cs_class "
-                + " WHERE   name ilike 'relationship' "
+                + " WHERE   name = 'relationship' "
                 + " ), rel.id, rel.name from relationship as rel "
                 + " join jt_fromresource_relationship as jt on jt.relationship_reference = rel.id "
                 + "where jt.resourceid =  ";
