@@ -163,11 +163,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     protected String generateQuery() {
         query = new StringBuilder();
-        query.append("SELECT DISTINCT " + "(SELECT id "
-                    + "FROM cs_class "
-                    + "WHERE name ilike 'resource' "
-                    + ") as class_id, r.id, r.name ");
-        query.append("FROM resource r");
+        query.append("SELECT DISTINCT (SELECT id FROM cs_class WHERE name ilike 'resource')");
+        query.append(" as class_id, r.id, r.name FROM resource r");
         if (geometryToSearchFor != null) {
             query.append(" join geom g ON r.spatialcoverage = g.id ");
         }
