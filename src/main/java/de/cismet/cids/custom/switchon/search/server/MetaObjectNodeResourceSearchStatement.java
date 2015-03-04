@@ -163,32 +163,32 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     protected String generateQuery() {
         query = new StringBuilder();
-        query.append("SELECT DISTINCT (SELECT id FROM cs_class WHERE name ilike 'resource')");
-        query.append(" as class_id, r.id, r.name FROM resource r");
+        query.append("SELECT DISTINCT (SELECT id FROM cs_class WHERE name = 'resource')");
+        query.append(" AS class_id, r.id, r.name FROM resource r");
         if (geometryToSearchFor != null) {
-            query.append(" join geom g ON r.spatialcoverage = g.id ");
+            query.append(" JOIN geom g ON r.spatialcoverage = g.id ");
         }
         if (((keywordList != null) && !keywordList.isEmpty())
                     || ((keywordGroupList != null) && !keywordGroupList.isEmpty())) {
-            query.append(" join jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
-                    .append(" join tag kwt ON jtrt.tagid = kwt.id")
-                    .append(" join taggroup kwt_tg ON kwt.taggroup = kwt_tg.id");
+            query.append(" JOIN jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
+                    .append(" JOIN tag kwt ON jtrt.tagid = kwt.id")
+                    .append(" JOIN taggroup kwt_tg ON kwt.taggroup = kwt_tg.id");
         }
         if (topicCategory != null) {
-            query.append(" join tag tct ON r.topiccategory = tct.id");
+            query.append(" JOIN tag tct ON r.topiccategory = tct.id");
         }
         if (location != null) {
-            query.append(" join tag lct ON r.location = lct.id");
+            query.append(" JOIN tag lct ON r.location = lct.id");
         }
         query.append(" WHERE TRUE ");
         appendGeometry();
+        appendTopicCategory();
         appendKeywords();
         appendKeywordGroups();
-        appendKeywordCombination();
         appendTemporal();
         appendTitleDescription();
-        appendTopicCategory();
         appendLocation();
+        appendKeywordCombination();
         appendNegatedKeywords();
         appendLimit();
 
@@ -202,11 +202,11 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected void appendGeometry() {
         if (geometryToSearchFor != null) {
             final String geostring = PostGisGeometryFactory.getPostGisCompliantDbString(geometryToSearchFor);
-            query.append("and g.geo_field && st_geometryfromtext('").append(geostring).append("')");
+            query.append("AND g.geo_field && st_geometryfromtext('").append(geostring).append("')");
 
             if ((geometryToSearchFor instanceof Polygon) || (geometryToSearchFor instanceof MultiPolygon)) {
                 // with buffer for geostring
-                query.append(" and ")
+                query.append(" AND ")
                         .append(geometryFunction)
                         .append("(")
                         .append("st_transform( st_buffer( st_transform(st_geometryfromtext('")
@@ -214,17 +214,17 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                         .append("'),3857), ")
                         .append(String.valueOf(geoBuffer))
                         .append("), 4326), ")
-                        .append("st_buffer(geo_field, 0.000001))"); // <-- why ?????
+                        .append("geo_field)"); // <-- why ?????
             } else {
-                // without buffer for geostring <-- why ?????
-                query.append(" and ")
+                // without buffer for geostring
+                query.append(" AND ")
                         .append(geometryFunction)
                         .append("(")
                         .append("st_geometryfromtext('")
                         .append(geostring)
                         .append("')")
                         .append(", ")
-                        .append("st_buffer(geo_field, 0.000001)")
+                        .append("geo_field")
                         .append(")");
             }
         }
@@ -235,9 +235,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendTemporal() {
         if (fromDate != null) {
-            query.append(" and r.fromDate >= '").append(fromDate.toString()).append("'");
+            query.append(" AND r.fromDate >= '").append(fromDate.toString()).append("'");
             if (toDate != null) {
-                query.append(" and r.toDate < '").append(toDate.toString()).append("'::Timestamp + '1 day'::interval");
+                query.append(" AND r.toDate < '").append(toDate.toString()).append("'::Timestamp + '1 day'::interval");
             }
         }
     }
@@ -250,17 +250,17 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             String[] keywords = new String[keywordList.size()];
 
             keywords = keywordList.toArray(keywords);
-            query.append("AND (");
+            query.append(" AND (to_tsvector('english', kwt.name) @@ to_tsquery('");
 
             for (int i = 0; i < keywords.length; i++) {
                 if (i > 0) {
-                    query.append(" OR");
+                    query.append(" | ");
                 }
-
-                query.append(" kwt.name ilike '").append(keywords[i]).append("'");
+                query.append("''").append(keywords[i]).append("''");
             }
 
-            query.append(" AND kwt_tg.name like 'keywords%')");
+            query.append("')");
+            query.append(" AND to_tsvector('english', kwt_tg.name) @@ to_tsquery('''keywords'':*'))");
         }
     }
 
@@ -270,9 +270,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private void appendKeywordGroups() {
         if ((keywordGroupList != null) && !keywordGroupList.isEmpty()) {
             if ((keywordList != null) && !keywordList.isEmpty()) {
-                query.append(" OR (");
+                query.append(" OR (to_tsvector('english', kwt.name) @@ to_tsquery('");
             } else {
-                query.append(" AND (");
+                query.append(" AND (to_tsvector('english', kwt.name) @@ to_tsquery('");
             }
 
             String currentGroup = keywordGroupList.get(0)[0];
@@ -291,23 +291,25 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                     // start of new group: close previous group
                     if (groupCount > 0) {
                         currentGroup = keywordGroupList.get(i)[0];
-                        query.append(" AND kwt_tg.name ilike '")
-                                .append("keywords - ")
+                        query.append("')");
+                        query.append(" AND to_tsvector('english', kwt_tg.name) @@ to_tsquery('''keywords - ")
                                 .append(currentGroup)
-                                .append("'")
-                                .append(")")
-                                .append(" AND");
+                                .append("'''))");
+                        query.append(" AND (to_tsvector('english', kwt.name) @@ to_tsquery('");
                     }
                 } else {
-                    query.append(" OR");
+                    query.append(" | ");
                 }
 
-                query.append(" kwt.name ilike '").append(keywordGroupList.get(i)[1]).append("'");
+                query.append("''").append(keywordGroupList.get(i)[1]).append("''");
                 inGroupCount++;
             }
 
             // end of loop: close last group
-            query.append(" AND kwt_tg.name ilike '").append("keywords - ").append(currentGroup).append("'").append(")");
+            query.append("')");
+            query.append(" AND to_tsvector('english', kwt_tg.name) @@ to_tsquery('''keywords - ")
+                    .append(currentGroup)
+                    .append("'''))");
         }
     }
 
@@ -318,6 +320,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         int size = 0;
         size += (keywordList != null) ? keywordList.size() : 0;
         size += (keywordGroupList != null) ? keywordGroupList.size() : 0;
+
+        if (size > 0) {
+            query.append(" GROUP BY r.id HAVING COUNT(kwt.id) = ").append(size);
+        }
     }
 
     /**
@@ -326,11 +332,11 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private void appendTopicCategory() {
         if (topicCategory != null) {
             final StringBuilder topicCategoryParameter = new StringBuilder(topicCategory);
+            query.append(" AND to_tsvector('english', tct.name) @@ to_tsquery('");
             if (checkForNot(topicCategoryParameter)) {
-                query.append(" and tct.name ilike '").append(topicCategoryParameter).append("'");
-            } else {
-                query.append(" and tct.name NOT ilike '").append(topicCategoryParameter).append("'");
+                query.append("!");
             }
+            query.append("''").append(topicCategoryParameter).append("''')");
         }
     }
 
@@ -338,34 +344,46 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      * DOCUMENT ME!
      */
     private void appendTitleDescription() {
-        if ((title != null) && (description == null)) {
-            final StringBuilder titleParameter = new StringBuilder(title);
-            if (checkForNot(titleParameter)) {
-                query.append(" and r.name NOT ilike '%").append(titleParameter).append("%'");
-            } else {
-                query.append(" and r.name ilike '%").append(titleParameter).append("%'");
-            }
-        } else if ((title != null) && (description != null)) {
-            final StringBuilder titleParameter = new StringBuilder(title);
-            if (checkForNot(titleParameter)) {
-                query.append(" and (r.name NOT ilike '%").append(titleParameter).append("%'");
-            } else {
-                query.append(" and (r.name ilike '%").append(titleParameter).append("%'");
+        if ((title == null) && (description == null)) {
+            LOG.warn("cannot append title or description: both are null!");
+            return;
+        }
+
+        StringBuilder parameter;
+        query.append(" AND to_tsvector('english',");
+        if ((title != null) && (description != null)) {
+            query.append(" r.name || ' ' || r.description) @@ to_tsquery('");
+
+            parameter = new StringBuilder(title);
+            if (checkForNot(parameter)) {
+                query.append("!");
             }
 
-            final StringBuilder descriptionParameter = new StringBuilder(description);
-            if (checkForNot(descriptionParameter)) {
-                query.append(" or r.description NOT ilike '%").append(descriptionParameter).append("%')");
+            query.append("''").append(parameter).append("''");
+            if (title.equals(description)) {
+                query.append("')");
             } else {
-                query.append(" or r.description ilike '%").append(descriptionParameter).append("%')");
+                query.append(" & ");
+                parameter = new StringBuilder(description);
+                if (checkForNot(parameter)) {
+                    query.append("!");
+                }
+                query.append("''").append(parameter).append("''')");
             }
-        } else if ((title == null) && (description != null)) {
-            final StringBuilder descriptionParameter = new StringBuilder(description);
-            if (checkForNot(descriptionParameter)) {
-                query.append(" and r.description ilike '%").append(descriptionParameter).append("%'");
-            } else {
-                query.append(" and r.description ilike '%").append(descriptionParameter).append("%'");
+        } else if (title != null) {
+            parameter = new StringBuilder(title);
+            query.append(" r.name) @@ to_tsquery('");
+            if (checkForNot(parameter)) {
+                query.append("!");
             }
+            query.append("''").append(parameter).append("''')");
+        } else {
+            parameter = new StringBuilder(description);
+            query.append(" r.description) @@ to_tsquery('");
+            if (checkForNot(parameter)) {
+                query.append("!");
+            }
+            query.append("''").append(parameter).append("''')");
         }
     }
 
@@ -374,7 +392,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendLocation() {
         if (location != null) {
-            query.append(" and lct.name ilike '").append(location).append("'");
+            query.append(" AND to_tsvector('english', lct.name) @@ to_tsquery('''").append(location).append("''')");
         }
     }
 
@@ -405,8 +423,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                 if (i > 0) {
                     query.append(" OR");
                 }
-
-                query.append(" tag.name ilike '").append(negatedKeywords[i]).append("'");
+                query.append(" to_tsvector('english', tag.name) @@ to_tsquery('''")
+                        .append(negatedKeywords[i])
+                        .append("''')");
             }
             query.append(")");
         }
