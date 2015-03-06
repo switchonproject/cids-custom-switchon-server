@@ -75,6 +75,8 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     private static final String FILTER__SPATIAL__GEO = "geo";
     private static final String FILTER__SPATIAL__GEO_INTERSECTS = "geo-intersects";
     private static final String FILTER__SPATIAL__GEO_BUFFER = "geo-buffer";
+    private static final String FILTER__COLLECTION = "collection";
+    private static final String FILTER__OFFSET = "offset";
     private static final String FILTER__LIMIT = "limit";
 
     private static final String METACLASSNAME__RESOURCE = "resource";
@@ -173,6 +175,8 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             String fulltext = null;
             String topic = null;
             int limit = -1;
+            int offset = -1;
+            String collection = null;
 
             // add resource class by default
             try {
@@ -290,6 +294,28 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                         }
                         break;
                     }
+                    case FILTER__OFFSET: {
+                        try {
+                            final int offsetTemp = Integer.parseInt(value);
+                            if (offsetTemp > 0) {
+                                offset = offsetTemp;
+                            }
+                        } catch (NumberFormatException numberFormatException) {
+                            LOG.warn("could not parse: " + key + " = " + value + " to integer", numberFormatException);
+                        }
+                        break;
+                    }
+                    case FILTER__COLLECTION: {
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            value = "!" + value;
+                        }
+
+                        collection = value;
+                        break;
+                    }
                     default: {
                         if ((key.length() > 8) && key.startsWith("keyword-", 0)) {
                             if (notFilter) {
@@ -306,7 +332,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                                 keywordGroupList.add(keywordGroup);
                             }
                         } else {
-                            LOG.error("ignoring unknown key: " + key + " = " + value);
+                            LOG.warn("ignoring unknown key: " + key + " = " + value);
                         }
                     }
                 }
@@ -405,6 +431,18 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     LOG.debug("LIMIT: \"" + limit + "\"");
                 }
                 nrs.setLimit(limit);
+            }
+            if ((collection != null) && (collection.length() > 0)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("COLLECTION: \"" + collection + "\"");
+                }
+                nrs.setCollection(collection);
+            }
+            if (offset > 0) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("OFFSET: \"" + offset + "\"");
+                }
+                nrs.setOffset(offset);
             }
 
             return nrs;

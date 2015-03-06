@@ -107,6 +107,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected float geoBuffer = 0.000001f;
     protected List<String[]> keywordGroupList;
     protected List<String> negatedKeywordList;
+    protected String collection;
+    protected int offset;
     private int limit = 0;
 
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
@@ -177,11 +179,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if (topicCategory != null) {
             query.append(" JOIN tag tct ON r.topiccategory = tct.id");
         }
+        if (collection != null) {
+            query.append(" JOIN tag tc ON r.collection = tc.id");
+        }
         if (location != null) {
             query.append(" JOIN tag lct ON r.location = lct.id");
         }
         query.append(" WHERE TRUE ");
         appendGeometry();
+        appendCollection();
         appendTopicCategory();
         appendKeywords();
         appendKeywordGroups();
@@ -204,7 +210,11 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             final String geostring = PostGisGeometryFactory.getPostGisCompliantDbString(geometryToSearchFor);
             query.append("AND g.geo_field && st_geometryfromtext('").append(geostring).append("')");
 
-            if ((geometryToSearchFor instanceof Polygon) || (geometryToSearchFor instanceof MultiPolygon)) {
+            if (((geoBuffer > 0) && (geometryToSearchFor instanceof Polygon))
+                        || (geometryToSearchFor instanceof MultiPolygon)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("performing geospatial search with buffer of " + geoBuffer + "m.");
+                }
                 // with buffer for geostring
                 query.append(" AND ")
                         .append(geometryFunction)
@@ -343,9 +353,23 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     /**
      * DOCUMENT ME!
      */
+    private void appendCollection() {
+        if (collection != null) {
+            final StringBuilder parameter = new StringBuilder(collection);
+            query.append(" AND to_tsvector('english', tc.name) @@ to_tsquery('");
+            if (checkForNot(parameter)) {
+                query.append("!");
+            }
+            query.append("''").append(parameter).append("''')");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
     private void appendTitleDescription() {
         if ((title == null) && (description == null)) {
-            LOG.warn("cannot append title or description: both are null!");
+            // LOG.warn("cannot append title or description: both are null!");
             return;
         }
 
@@ -401,6 +425,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendLimit() {
         if (limit > 0) {
+            query.append(" LIMIT ").append(limit);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendOffset() {
+        if (offset > 0) {
             query.append(" LIMIT ").append(limit);
         }
     }
@@ -611,5 +644,41 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setNegatedKeywordList(final List<String> negatedKeywordList) {
         this.negatedKeywordList = negatedKeywordList;
+    }
+
+    /**
+     * Get the value of collection.
+     *
+     * @return  the value of collection
+     */
+    public String getCollection() {
+        return collection;
+    }
+
+    /**
+     * Set the value of collection.
+     *
+     * @param  collection  new value of collection
+     */
+    public void setCollection(final String collection) {
+        this.collection = collection;
+    }
+
+    /**
+     * Get the value of offset.
+     *
+     * @return  the value of offset
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    /**
+     * Set the value of offset.
+     *
+     * @param  offset  new value of offset
+     */
+    public void setOffset(final int offset) {
+        this.offset = offset;
     }
 }
