@@ -76,6 +76,8 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     private static final String FILTER__SPATIAL__GEO_INTERSECTS = "geo-intersects";
     private static final String FILTER__SPATIAL__GEO_BUFFER = "geo-buffer";
     private static final String FILTER__COLLECTION = "collection";
+    private static final String FILTER__FUNCTION = "function";
+    private static final String FILTER__ACCESS_CONDITIONS = "access-condition";
     private static final String FILTER__OFFSET = "offset";
     private static final String FILTER__LIMIT = "limit";
 
@@ -177,6 +179,8 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             int limit = -1;
             int offset = -1;
             String collection = null;
+            String function = null;
+            String accessConditions = null;
 
             // add resource class by default
             try {
@@ -316,6 +320,28 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                         collection = value;
                         break;
                     }
+                    case FILTER__FUNCTION: {
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            value = "!" + value;
+                        }
+
+                        function = value;
+                        break;
+                    }
+                    case FILTER__ACCESS_CONDITIONS: {
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            value = "!" + value;
+                        }
+
+                        accessConditions = value;
+                        break;
+                    }
                     default: {
                         if ((key.length() > 8) && key.startsWith("keyword-", 0)) {
                             if (notFilter) {
@@ -437,6 +463,18 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     LOG.debug("COLLECTION: \"" + collection + "\"");
                 }
                 nrs.setCollection(collection);
+            }
+            if ((function != null) && (function.length() > 0)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("FUNCTION: \"" + function + "\"");
+                }
+                nrs.setFunction(function);
+            }
+            if ((accessConditions != null) && (accessConditions.length() > 0)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("ACCESS_CONDITIONS: \"" + accessConditions + "\"");
+                }
+                nrs.setAccessConditions(accessConditions);
             }
             if (offset > 0) {
                 if (LOG.isDebugEnabled()) {

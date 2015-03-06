@@ -108,6 +108,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected List<String[]> keywordGroupList;
     protected List<String> negatedKeywordList;
     protected String collection;
+    protected String function;
+    protected String accessConditions;
     protected int offset;
     private int limit = 0;
 
@@ -185,10 +187,21 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if (location != null) {
             query.append(" JOIN tag lct ON r.location = lct.id");
         }
+        if (accessConditions != null) {
+            query.append(" JOIN tag acs ON r.accessconditions = acs.id");
+        }
+        if (function != null) {
+            query.append(" JOIN jt_resource_representation jtrr ON r.id = jtrr.resource_reference");
+            query.append(" JOIN representation rep ON jtrr.representationid = rep.id");
+            query.append(" JOIN tag rfc ON rep.function = rfc.id");
+        }
+
         query.append(" WHERE TRUE ");
         appendGeometry();
         appendCollection();
         appendTopicCategory();
+        appendFunction();
+        appendAccessConditions();
         appendKeywords();
         appendKeywordGroups();
         appendTemporal();
@@ -417,6 +430,34 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private void appendLocation() {
         if (location != null) {
             query.append(" AND to_tsvector('english', lct.name) @@ to_tsquery('''").append(location).append("''')");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendAccessConditions() {
+        if (accessConditions != null) {
+            final StringBuilder parameter = new StringBuilder(accessConditions);
+            query.append(" AND to_tsvector('english', acs.name) @@ to_tsquery('");
+            if (checkForNot(parameter)) {
+                query.append("!");
+            }
+            query.append("''").append(parameter).append("''')");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendFunction() {
+        if (function != null) {
+            final StringBuilder parameter = new StringBuilder(function);
+            query.append(" AND to_tsvector('english', rfc.name) @@ to_tsquery('");
+            if (checkForNot(parameter)) {
+                query.append("!");
+            }
+            query.append("''").append(parameter).append("''')");
         }
     }
 
@@ -680,5 +721,41 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setOffset(final int offset) {
         this.offset = offset;
+    }
+
+    /**
+     * Get the value of function.
+     *
+     * @return  the value of function
+     */
+    public String getFunction() {
+        return function;
+    }
+
+    /**
+     * Set the value of function.
+     *
+     * @param  function  new value of function
+     */
+    public void setFunction(final String function) {
+        this.function = function;
+    }
+
+    /**
+     * Get the value of accessConditions.
+     *
+     * @return  the value of accessConditions
+     */
+    public String getAccessConditions() {
+        return accessConditions;
+    }
+
+    /**
+     * Set the value of accessConditions.
+     *
+     * @param  accessConditions  new value of accessConditions
+     */
+    public void setAccessConditions(final String accessConditions) {
+        this.accessConditions = accessConditions;
     }
 }
