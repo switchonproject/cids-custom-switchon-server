@@ -49,6 +49,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
     private final MetaObjectUniversalSearchStatement metaObjectUniversalSearchStatement;
 
     private final String TAGGROUP_FILTER_KEYWORD = "keyword";
+    private final String TAGGROUP_FILTER_KEYWORD_CUAHSI = "keyword-cuahsi";
     private final String TAGGROUP_FILTER_ACCESS_CONDITONS = "access-condition";
     private final String TAGGROUP_FILTER_PROTOCOL = "protocol";
     private final String TAGGROUP_FILTER_FUNCTION = "function";
@@ -66,6 +67,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
         this.metaObjectUniversalSearchStatement = new MetaObjectUniversalSearchStatement();
 
         TAGGROUPS.put(TAGGROUP_FILTER_KEYWORD, "keywords%");
+        TAGGROUPS.put(TAGGROUP_FILTER_KEYWORD_CUAHSI, "keywords - cuahsi");
         TAGGROUPS.put(TAGGROUP_FILTER_ACCESS_CONDITONS, "access conditions");
         TAGGROUPS.put(TAGGROUP_FILTER_PROTOCOL, "protocol");
         TAGGROUPS.put(TAGGROUP_FILTER_FUNCTION, "function");
@@ -130,7 +132,8 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                     queryBuilder.insert(0, "SELECT DISTINCT rtag.name as name FROM (");
 
                     switch (filterParameter) {
-                        case TAGGROUP_FILTER_KEYWORD: {
+                        case TAGGROUP_FILTER_KEYWORD: 
+                        case TAGGROUP_FILTER_KEYWORD_CUAHSI: {
                             queryBuilder.append(") rrr");
                             queryBuilder.append(" JOIN jt_resource_tag rjtrt ON rrr.id = rjtrt.resource_reference");
                             queryBuilder.append(" JOIN tag rtag ON rjtrt.tagid = rtag.id");

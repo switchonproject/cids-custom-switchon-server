@@ -281,8 +281,10 @@ VALUES
 ('OGC:CSW','OGC Catalogue Service for the Web',tgid),
 ('OGC:SOS','OGC Sensor Observation Service',tgid),
 ('OGC:WCS','OGC Web Coverage Service',tgid),
-('OGC:WFS','OGC Web Feature Service',tgid),
-('OGC:WMS','OGC Web Map Service',tgid),
+('OGC:WFS-1.0.0-http-get-capabilities', 'OGC Web Feature Service, a WFS getcapabilities operation',tgid),
+('OGC:WFS-1.0.0-http-get-feature', 'OGC Web Feature Service, a WFS getFeature operation',tgid),
+('OGC:WMS-1.1.1-http-get-map', 'OGC Web Map Service, a WMS getMap operation',tgid),
+('OGC:WMS-1.1.1-http-get-capabilities', 'OGC Web Map Service',tgid),
 ('OGC:WPS','OGC Web Processing Service',tgid),
 ('ESRI:ArcIMS','ESRI ArcIMS Service',tgid),
 ('ESRI:ArcGIS','ESRI ArcGIS Service',tgid),
@@ -293,14 +295,15 @@ VALUES
 ('UNIDATA:CdmRemote','Common Data Model index subsetting',tgid),
 ('UNIDATA:CdmrFeature','Common Data Model coordinate subsetting',tgid),
 ('OGC:GML','OGC Geography Markup Language',tgid),
-('WWW:LINK','Web Address (URL)',tgid),
+('WWW:LINK-1.0-http--link', 'Web Address (URL), should be used when no further information about the resource is available',tgid),
+('WWW:DOWNLOAD-1.0-http--download', 'Web Address (URL), this is a download URL',tgid),
 ('WWW:WSDL','Web Service Description Language XML document describing service operation',tgid),
 ('OpenSearch1.1','OpenSearch template',tgid),
 ('OpenSearch1.1:Description','OpenSearch description document',tgid),
 ('ZIP:application/x-netcdf','Compressed netCDF-CF/Network Common Data Form dataset',tgid),
 ('WWW:RIA','Rich Internet Application (JavaScript/HTML5 application)',tgid),
 ('WWW:FORM','Web form',tgid),
-('WWW:TILESERVER','...',tgid);
+('WWW:TILESERVER','Tileserver',tgid);
 
 
 tgid = (SELECT id from taggroup where name = 'realtionship type');
