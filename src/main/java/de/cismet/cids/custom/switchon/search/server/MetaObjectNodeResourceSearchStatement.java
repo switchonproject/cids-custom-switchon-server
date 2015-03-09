@@ -19,6 +19,7 @@ import Sirius.server.newuser.User;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.MultiPoint;
 
 import org.apache.log4j.Logger;
 
@@ -104,7 +105,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected Timestamp fromDate;
     protected Timestamp toDate;
     protected String location;
-    protected float geoBuffer = 0.000001f;
+    protected long geoBuffer = 0;
     protected List<String[]> keywordGroupList;
     protected List<String> negatedKeywordList;
     protected String collection;
@@ -222,7 +223,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if (geometryToSearchFor != null) {
             final String geostring = PostGisGeometryFactory.getPostGisCompliantDbString(geometryToSearchFor);
             query.append("AND g.geo_field && st_geometryfromtext('").append(geostring).append("')");
-
+            
             if (((geoBuffer > 0) && (geometryToSearchFor instanceof Polygon))
                         || (geometryToSearchFor instanceof MultiPolygon)) {
                 if (LOG.isDebugEnabled()) {
@@ -616,7 +617,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @return  DOCUMENT ME!
      */
-    public float getGeoBuffer() {
+    public long getGeoBuffer() {
         return geoBuffer;
     }
 
@@ -625,11 +626,12 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @param  geoBuffer  DOCUMENT ME!
      */
-    public void setGeoBuffer(final float geoBuffer) {
+    public void setGeoBuffer(final long geoBuffer) {
         if ((geoBuffer > 0) && (geoBuffer < 10000000000L)) {
             this.geoBuffer = geoBuffer;
         } else {
             LOG.warn("invalid geo buffer: " + geoBuffer);
+            this.geoBuffer = 0;
         }
     }
 
