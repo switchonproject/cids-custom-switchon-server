@@ -109,8 +109,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected List<String[]> keywordGroupList;
     protected List<String> negatedKeywordList;
     protected String collection;
-    protected String function;
-    protected String accessConditions;
+    protected List<String> functionList;
+    protected List<String> negatedFunctionList;
+    protected List<String> accessConditions;
+    protected List<String> negatedAccessConditions;
     protected int offset;
     private int limit = 0;
 
@@ -188,10 +190,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if (location != null) {
             query.append(" JOIN tag lct ON r.location = lct.id");
         }
-        if (accessConditions != null) {
+        if ((accessConditions != null) && !accessConditions.isEmpty()) {
             query.append(" JOIN tag acs ON r.accessconditions = acs.id");
         }
-        if (function != null) {
+        if ((functionList != null) && !functionList.isEmpty()) {
             query.append(" JOIN jt_resource_representation jtrr ON r.id = jtrr.resource_reference");
             query.append(" JOIN representation rep ON jtrr.representationid = rep.id");
             query.append(" JOIN tag rfc ON rep.function = rfc.id");
@@ -201,7 +203,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         appendGeometry();
         appendCollection();
         appendTopicCategory();
-        appendFunction();
+        appendFunctions();
         appendAccessConditions();
         appendKeywords();
         appendKeywordGroups();
@@ -210,6 +212,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         appendLocation();
         appendKeywordCombination();
         appendNegatedKeywords();
+        appendNegatedFunctions();
+        appendNegatedAccessConditions();
         appendLimit();
 
         return query.toString();
@@ -430,7 +434,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendLocation() {
         if (location != null) {
-            query.append(" AND to_tsvector('simple', lct.name) @@ to_tsquery('simple', '''").append(location).append("''')");
+            query.append(" AND to_tsvector('simple', lct.name) @@ to_tsquery('simple', '''")
+                    .append(location)
+                    .append("''')");
         }
     }
 
@@ -438,27 +444,93 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      * DOCUMENT ME!
      */
     private void appendAccessConditions() {
-        if (accessConditions != null) {
-            final StringBuilder parameter = new StringBuilder(accessConditions);
+        if ((accessConditions != null) && !accessConditions.isEmpty()) {
+            String[] accessConditionsArray = new String[accessConditions.size()];
+            accessConditionsArray = accessConditions.toArray(accessConditionsArray);
             query.append(" AND to_tsvector('simple', acs.name) @@ to_tsquery('simple', '");
-            if (checkForNot(parameter)) {
-                query.append("!");
+
+            for (int i = 0; i < accessConditionsArray.length; i++) {
+                if (i > 0) {
+                    query.append(" | ");
+                }
+                query.append("''").append(accessConditionsArray[i]).append("''");
             }
-            query.append("''").append(parameter).append("''')");
+
+            query.append("')");
         }
     }
 
     /**
      * DOCUMENT ME!
      */
-    private void appendFunction() {
-        if (function != null) {
-            final StringBuilder parameter = new StringBuilder(function);
-            query.append(" AND to_tsvector('simple', rfc.name) @@ to_tsquery('simple', '");
-            if (checkForNot(parameter)) {
-                query.append("!");
+    private void appendNegatedAccessConditions() {
+        if ((negatedAccessConditions != null) && !negatedAccessConditions.isEmpty()) {
+            String[] negatedAccessConditionsArray = new String[negatedAccessConditions.size()];
+
+            negatedAccessConditionsArray = negatedAccessConditions.toArray(negatedAccessConditionsArray);
+
+            query.insert(0, "SELECT acs_resource.class_id, acs_resource.id, acs_resource.name FROM (");
+            query.append(") AS acs_resource WHERE acs_resource.id NOT IN")
+                    .append(" (SELECT acs_rr.id from resource acs_rr, tag acs_tag WHERE")
+                    .append(" acs_tag.id = acs_rr.accessconditions AND (");
+
+            for (int i = 0; i < negatedAccessConditionsArray.length; i++) {
+                if (i > 0) {
+                    query.append(" OR");
+                }
+                query.append(" to_tsvector('simple', acs_tag.name) @@ to_tsquery('simple', '''")
+                        .append(negatedAccessConditionsArray[i])
+                        .append("''')");
             }
-            query.append("''").append(parameter).append("''')");
+            query.append("))");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendFunctions() {
+        if ((functionList != null) && !functionList.isEmpty()) {
+            String[] functions = new String[functionList.size()];
+            functions = functionList.toArray(functions);
+            query.append(" AND to_tsvector('simple', rfc.name) @@ to_tsquery('simple', '");
+
+            for (int i = 0; i < functions.length; i++) {
+                if (i > 0) {
+                    query.append(" | ");
+                }
+                query.append("''").append(functions[i]).append("''");
+            }
+
+            query.append("')");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendNegatedFunctions() {
+        if ((negatedFunctionList != null) && !negatedFunctionList.isEmpty()) {
+            String[] negatedFunctions = new String[negatedFunctionList.size()];
+
+            negatedFunctions = negatedFunctionList.toArray(negatedFunctions);
+
+            query.insert(0, "SELECT fcs_resource.class_id, fcs_resource.id, fcs_resource.name FROM (");
+            query.append(") AS fcs_resource WHERE fcs_resource.id NOT IN")
+                    .append(" (SELECT fcs_rr.id from resource fcs_rr")
+                    .append(" JOIN jt_resource_representation fcs_jtrr ON fcs_rr.id = fcs_jtrr.resource_reference")
+                    .append(" JOIN representation fcs_rep ON fcs_jtrr.representationid = fcs_rep.id")
+                    .append(" JOIN tag fcs_tag ON fcs_rep.function = fcs_tag.id WHERE");
+
+            for (int i = 0; i < negatedFunctions.length; i++) {
+                if (i > 0) {
+                    query.append(" OR");
+                }
+                query.append(" to_tsvector('simple', fcs_tag.name) @@ to_tsquery('simple', '''")
+                        .append(negatedFunctions[i])
+                        .append("''')");
+            }
+            query.append(")");
         }
     }
 
@@ -492,7 +564,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             query.append(") AS rresource WHERE rresource.id NOT IN")
                     .append(
                             " (SELECT rr.id from resource rr, jt_resource_tag, tag WHERE jt_resource_tag.resource_reference = rr.id")
-                    .append(" AND tag.id = jt_resource_tag.tagid AND");
+                    .append(" AND tag.id = jt_resource_tag.tagid AND (");
 
             for (int i = 0; i < negatedKeywords.length; i++) {
                 if (i > 0) {
@@ -502,7 +574,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                         .append(negatedKeywords[i])
                         .append("''')");
             }
-            query.append(")");
+            query.append("))");
         }
     }
 
@@ -726,29 +798,11 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     }
 
     /**
-     * Get the value of function.
-     *
-     * @return  the value of function
-     */
-    public String getFunction() {
-        return function;
-    }
-
-    /**
-     * Set the value of function.
-     *
-     * @param  function  new value of function
-     */
-    public void setFunction(final String function) {
-        this.function = function;
-    }
-
-    /**
      * Get the value of accessConditions.
      *
      * @return  the value of accessConditions
      */
-    public String getAccessConditions() {
+    public List<String> getAccessConditions() {
         return accessConditions;
     }
 
@@ -757,7 +811,61 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @param  accessConditions  new value of accessConditions
      */
-    public void setAccessConditions(final String accessConditions) {
+    public void setAccessConditions(final List<String> accessConditions) {
         this.accessConditions = accessConditions;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<String> getNegatedAccessConditions() {
+        return negatedAccessConditions;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  negatedAccessConditions  DOCUMENT ME!
+     */
+    public void setNegatedAccessConditions(final List<String> negatedAccessConditions) {
+        this.negatedAccessConditions = negatedAccessConditions;
+    }
+
+    /**
+     * Get the value of functionList.
+     *
+     * @return  the value of functionList
+     */
+    public List<String> getFunctionList() {
+        return functionList;
+    }
+
+    /**
+     * Set the value of functionList.
+     *
+     * @param  functionList  new value of functionList
+     */
+    public void setFunctionList(final List<String> functionList) {
+        this.functionList = functionList;
+    }
+
+    /**
+     * Get the value of negatedFunctionList.
+     *
+     * @return  the value of negatedFunctionList
+     */
+    public List<String> getNegatedFunctionList() {
+        return negatedFunctionList;
+    }
+
+    /**
+     * Set the value of negatedFunctionList.
+     *
+     * @param  negatedFunctionList  new value of negatedFunctionList
+     */
+    public void setNegatedFunctionList(final List<String> negatedFunctionList) {
+        this.negatedFunctionList = negatedFunctionList;
     }
 }
