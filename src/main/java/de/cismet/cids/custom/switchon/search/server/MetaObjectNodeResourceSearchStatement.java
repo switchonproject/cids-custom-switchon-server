@@ -17,7 +17,6 @@ import Sirius.server.middleware.types.MetaObjectNode;
 import Sirius.server.newuser.User;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.MultiPoint;
 import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -392,9 +391,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         }
 
         StringBuilder parameter;
-        query.append(" AND to_tsvector('english',");
+        query.append(" AND to_tsvector('simple',");
         if ((title != null) && (description != null)) {
-            query.append(" r.name || ' ' || r.description) @@ to_tsquery('english', '");
+            query.append(" r.name || ' ' || r.description) @@ to_tsquery('simple', '");
 
             parameter = new StringBuilder(title);
             if (checkForNot(parameter)) {
@@ -414,14 +413,14 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             }
         } else if (title != null) {
             parameter = new StringBuilder(title);
-            query.append(" r.name) @@ to_tsquery('english', '");
+            query.append(" r.name) @@ to_tsquery('simple', '");
             if (checkForNot(parameter)) {
                 query.append("!");
             }
             query.append("''").append(parameter).append("''')");
         } else {
             parameter = new StringBuilder(description);
-            query.append(" r.description) @@ to_tsquery('english', '");
+            query.append(" r.description) @@ to_tsquery('simple', '");
             if (checkForNot(parameter)) {
                 query.append("!");
             }
