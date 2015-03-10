@@ -132,7 +132,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                     queryBuilder.insert(0, "SELECT DISTINCT rtag.name as name FROM (");
 
                     switch (filterParameter) {
-                        case TAGGROUP_FILTER_KEYWORD: 
+                        case TAGGROUP_FILTER_KEYWORD:
                         case TAGGROUP_FILTER_KEYWORD_CUAHSI: {
                             queryBuilder.append(") rrr");
                             queryBuilder.append(" JOIN jt_resource_tag rjtrt ON rrr.id = rjtrt.resource_reference");
