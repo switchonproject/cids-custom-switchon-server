@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.3.5
 -- Dumped by pg_dump version 9.3.1
--- Started on 2015-03-10 16:52:04
+-- Started on 2015-03-10 17:53:28
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -9201,7 +9201,7 @@ ALTER TABLE ONLY cs_history
     ADD CONSTRAINT cs_history_usr_id_fkey FOREIGN KEY (usr_id) REFERENCES cs_usr(id);
 
 
--- Completed on 2015-03-10 16:52:09
+-- Completed on 2015-03-10 17:53:32
 
 --
 -- PostgreSQL database dump complete
