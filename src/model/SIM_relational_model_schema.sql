@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.3.5
 -- Dumped by pg_dump version 9.3.1
--- Started on 2015-01-27 11:35:57
+-- Started on 2015-03-09 16:50:11
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -20,7 +20,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- TOC entry 249 (class 1259 OID 65382)
+-- TOC entry 250 (class 1259 OID 52012)
 -- Name: cs_all_attr_mapping; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -36,7 +36,7 @@ CREATE TABLE cs_all_attr_mapping (
 ALTER TABLE public.cs_all_attr_mapping OWNER TO postgres;
 
 --
--- TOC entry 250 (class 1259 OID 65386)
+-- TOC entry 251 (class 1259 OID 52016)
 -- Name: cs_attr; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -70,7 +70,7 @@ CREATE TABLE cs_attr (
 ALTER TABLE public.cs_attr OWNER TO postgres;
 
 --
--- TOC entry 251 (class 1259 OID 65401)
+-- TOC entry 252 (class 1259 OID 52031)
 -- Name: cs_attr_object; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -85,7 +85,7 @@ CREATE TABLE cs_attr_object (
 ALTER TABLE public.cs_attr_object OWNER TO postgres;
 
 --
--- TOC entry 252 (class 1259 OID 65404)
+-- TOC entry 253 (class 1259 OID 52034)
 -- Name: cs_attr_object_derived; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -100,7 +100,7 @@ CREATE TABLE cs_attr_object_derived (
 ALTER TABLE public.cs_attr_object_derived OWNER TO postgres;
 
 --
--- TOC entry 254 (class 1259 OID 65409)
+-- TOC entry 255 (class 1259 OID 52039)
 -- Name: cs_attr_string; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -115,7 +115,7 @@ CREATE TABLE cs_attr_string (
 ALTER TABLE public.cs_attr_string OWNER TO postgres;
 
 --
--- TOC entry 256 (class 1259 OID 65417)
+-- TOC entry 257 (class 1259 OID 52047)
 -- Name: cs_cat_link; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -131,7 +131,7 @@ CREATE TABLE cs_cat_link (
 ALTER TABLE public.cs_cat_link OWNER TO postgres;
 
 --
--- TOC entry 257 (class 1259 OID 65424)
+-- TOC entry 258 (class 1259 OID 52054)
 -- Name: cs_cat_node; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -157,7 +157,7 @@ CREATE TABLE cs_cat_node (
 ALTER TABLE public.cs_cat_node OWNER TO postgres;
 
 --
--- TOC entry 259 (class 1259 OID 65437)
+-- TOC entry 260 (class 1259 OID 52067)
 -- Name: cs_class; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -182,7 +182,7 @@ CREATE TABLE cs_class (
 ALTER TABLE public.cs_class OWNER TO postgres;
 
 --
--- TOC entry 261 (class 1259 OID 65449)
+-- TOC entry 262 (class 1259 OID 52079)
 -- Name: cs_class_attr; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -198,7 +198,7 @@ CREATE TABLE cs_class_attr (
 ALTER TABLE public.cs_class_attr OWNER TO postgres;
 
 --
--- TOC entry 265 (class 1259 OID 65464)
+-- TOC entry 266 (class 1259 OID 52094)
 -- Name: cs_config_attr_exempt; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -213,7 +213,7 @@ CREATE TABLE cs_config_attr_exempt (
 ALTER TABLE public.cs_config_attr_exempt OWNER TO postgres;
 
 --
--- TOC entry 267 (class 1259 OID 65470)
+-- TOC entry 268 (class 1259 OID 52100)
 -- Name: cs_config_attr_jt; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -231,7 +231,7 @@ CREATE TABLE cs_config_attr_jt (
 ALTER TABLE public.cs_config_attr_jt OWNER TO postgres;
 
 --
--- TOC entry 269 (class 1259 OID 65476)
+-- TOC entry 270 (class 1259 OID 52106)
 -- Name: cs_config_attr_key; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -244,7 +244,7 @@ CREATE TABLE cs_config_attr_key (
 ALTER TABLE public.cs_config_attr_key OWNER TO postgres;
 
 --
--- TOC entry 271 (class 1259 OID 65482)
+-- TOC entry 272 (class 1259 OID 52112)
 -- Name: cs_config_attr_type; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -258,7 +258,7 @@ CREATE TABLE cs_config_attr_type (
 ALTER TABLE public.cs_config_attr_type OWNER TO postgres;
 
 --
--- TOC entry 273 (class 1259 OID 65488)
+-- TOC entry 274 (class 1259 OID 52118)
 -- Name: cs_config_attr_value; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -271,7 +271,7 @@ CREATE TABLE cs_config_attr_value (
 ALTER TABLE public.cs_config_attr_value OWNER TO postgres;
 
 --
--- TOC entry 275 (class 1259 OID 65497)
+-- TOC entry 276 (class 1259 OID 52127)
 -- Name: cs_domain; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -284,7 +284,7 @@ CREATE TABLE cs_domain (
 ALTER TABLE public.cs_domain OWNER TO postgres;
 
 --
--- TOC entry 362 (class 1259 OID 80156)
+-- TOC entry 277 (class 1259 OID 52131)
 -- Name: cs_dynamic_children_helper; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -298,7 +298,7 @@ CREATE TABLE cs_dynamic_children_helper (
 ALTER TABLE public.cs_dynamic_children_helper OWNER TO postgres;
 
 --
--- TOC entry 361 (class 1259 OID 80154)
+-- TOC entry 278 (class 1259 OID 52137)
 -- Name: cs_dynamic_children_helper_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -313,8 +313,8 @@ CREATE SEQUENCE cs_dynamic_children_helper_id_seq
 ALTER TABLE public.cs_dynamic_children_helper_id_seq OWNER TO postgres;
 
 --
--- TOC entry 4064 (class 0 OID 0)
--- Dependencies: 361
+-- TOC entry 4090 (class 0 OID 0)
+-- Dependencies: 278
 -- Name: cs_dynamic_children_helper_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -322,7 +322,7 @@ ALTER SEQUENCE cs_dynamic_children_helper_id_seq OWNED BY cs_dynamic_children_he
 
 
 --
--- TOC entry 276 (class 1259 OID 65507)
+-- TOC entry 279 (class 1259 OID 52139)
 -- Name: cs_history; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -339,7 +339,7 @@ CREATE TABLE cs_history (
 ALTER TABLE public.cs_history OWNER TO postgres;
 
 --
--- TOC entry 278 (class 1259 OID 65515)
+-- TOC entry 281 (class 1259 OID 52147)
 -- Name: cs_icon; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -353,7 +353,7 @@ CREATE TABLE cs_icon (
 ALTER TABLE public.cs_icon OWNER TO postgres;
 
 --
--- TOC entry 280 (class 1259 OID 65522)
+-- TOC entry 283 (class 1259 OID 52154)
 -- Name: cs_java_class; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -368,7 +368,7 @@ CREATE TABLE cs_java_class (
 ALTER TABLE public.cs_java_class OWNER TO postgres;
 
 --
--- TOC entry 282 (class 1259 OID 65532)
+-- TOC entry 285 (class 1259 OID 52164)
 -- Name: cs_locks; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -384,7 +384,7 @@ CREATE TABLE cs_locks (
 ALTER TABLE public.cs_locks OWNER TO postgres;
 
 --
--- TOC entry 283 (class 1259 OID 65539)
+-- TOC entry 286 (class 1259 OID 52171)
 -- Name: cs_method; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -401,7 +401,7 @@ CREATE TABLE cs_method (
 ALTER TABLE public.cs_method OWNER TO postgres;
 
 --
--- TOC entry 285 (class 1259 OID 65552)
+-- TOC entry 288 (class 1259 OID 52184)
 -- Name: cs_method_class_assoc; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -415,7 +415,7 @@ CREATE TABLE cs_method_class_assoc (
 ALTER TABLE public.cs_method_class_assoc OWNER TO postgres;
 
 --
--- TOC entry 288 (class 1259 OID 65560)
+-- TOC entry 291 (class 1259 OID 52192)
 -- Name: cs_permission; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -429,7 +429,7 @@ CREATE TABLE cs_permission (
 ALTER TABLE public.cs_permission OWNER TO postgres;
 
 --
--- TOC entry 290 (class 1259 OID 65566)
+-- TOC entry 293 (class 1259 OID 52198)
 -- Name: cs_policy; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -442,7 +442,7 @@ CREATE TABLE cs_policy (
 ALTER TABLE public.cs_policy OWNER TO postgres;
 
 --
--- TOC entry 292 (class 1259 OID 65572)
+-- TOC entry 295 (class 1259 OID 52204)
 -- Name: cs_policy_rule; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -457,7 +457,7 @@ CREATE TABLE cs_policy_rule (
 ALTER TABLE public.cs_policy_rule OWNER TO postgres;
 
 --
--- TOC entry 293 (class 1259 OID 65576)
+-- TOC entry 296 (class 1259 OID 52208)
 -- Name: cs_query; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -479,7 +479,7 @@ CREATE TABLE cs_query (
 ALTER TABLE public.cs_query OWNER TO postgres;
 
 --
--- TOC entry 295 (class 1259 OID 65591)
+-- TOC entry 298 (class 1259 OID 52223)
 -- Name: cs_query_class_assoc; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -493,7 +493,7 @@ CREATE TABLE cs_query_class_assoc (
 ALTER TABLE public.cs_query_class_assoc OWNER TO postgres;
 
 --
--- TOC entry 297 (class 1259 OID 65597)
+-- TOC entry 300 (class 1259 OID 52229)
 -- Name: cs_query_link; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -508,7 +508,7 @@ CREATE TABLE cs_query_link (
 ALTER TABLE public.cs_query_link OWNER TO postgres;
 
 --
--- TOC entry 298 (class 1259 OID 65601)
+-- TOC entry 301 (class 1259 OID 52233)
 -- Name: cs_query_parameter; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -526,7 +526,7 @@ CREATE TABLE cs_query_parameter (
 ALTER TABLE public.cs_query_parameter OWNER TO postgres;
 
 --
--- TOC entry 302 (class 1259 OID 65616)
+-- TOC entry 305 (class 1259 OID 52248)
 -- Name: cs_query_store; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -541,7 +541,7 @@ CREATE TABLE cs_query_store (
 ALTER TABLE public.cs_query_store OWNER TO postgres;
 
 --
--- TOC entry 304 (class 1259 OID 65622)
+-- TOC entry 307 (class 1259 OID 52254)
 -- Name: cs_query_store_ug_assoc; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -557,7 +557,7 @@ CREATE TABLE cs_query_store_ug_assoc (
 ALTER TABLE public.cs_query_store_ug_assoc OWNER TO postgres;
 
 --
--- TOC entry 306 (class 1259 OID 65628)
+-- TOC entry 309 (class 1259 OID 52260)
 -- Name: cs_query_ug_assoc; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -573,7 +573,7 @@ CREATE TABLE cs_query_ug_assoc (
 ALTER TABLE public.cs_query_ug_assoc OWNER TO postgres;
 
 --
--- TOC entry 307 (class 1259 OID 65632)
+-- TOC entry 310 (class 1259 OID 52264)
 -- Name: cs_stringrepcache; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -587,7 +587,7 @@ CREATE TABLE cs_stringrepcache (
 ALTER TABLE public.cs_stringrepcache OWNER TO postgres;
 
 --
--- TOC entry 308 (class 1259 OID 65638)
+-- TOC entry 311 (class 1259 OID 52270)
 -- Name: cs_type; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -605,7 +605,7 @@ CREATE TABLE cs_type (
 ALTER TABLE public.cs_type OWNER TO postgres;
 
 --
--- TOC entry 311 (class 1259 OID 65650)
+-- TOC entry 314 (class 1259 OID 52282)
 -- Name: cs_ug; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -621,7 +621,7 @@ CREATE TABLE cs_ug (
 ALTER TABLE public.cs_ug OWNER TO postgres;
 
 --
--- TOC entry 312 (class 1259 OID 65657)
+-- TOC entry 315 (class 1259 OID 52289)
 -- Name: cs_ug_attr_perm; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -637,7 +637,7 @@ CREATE TABLE cs_ug_attr_perm (
 ALTER TABLE public.cs_ug_attr_perm OWNER TO postgres;
 
 --
--- TOC entry 314 (class 1259 OID 65663)
+-- TOC entry 317 (class 1259 OID 52295)
 -- Name: cs_ug_cat_node_perm; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -653,7 +653,7 @@ CREATE TABLE cs_ug_cat_node_perm (
 ALTER TABLE public.cs_ug_cat_node_perm OWNER TO postgres;
 
 --
--- TOC entry 317 (class 1259 OID 65671)
+-- TOC entry 320 (class 1259 OID 52303)
 -- Name: cs_ug_class_perm; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -669,7 +669,7 @@ CREATE TABLE cs_ug_class_perm (
 ALTER TABLE public.cs_ug_class_perm OWNER TO postgres;
 
 --
--- TOC entry 319 (class 1259 OID 65677)
+-- TOC entry 322 (class 1259 OID 52309)
 -- Name: cs_ug_membership; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -684,7 +684,7 @@ CREATE TABLE cs_ug_membership (
 ALTER TABLE public.cs_ug_membership OWNER TO postgres;
 
 --
--- TOC entry 320 (class 1259 OID 65681)
+-- TOC entry 323 (class 1259 OID 52313)
 -- Name: cs_ug_method_perm; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -700,7 +700,7 @@ CREATE TABLE cs_ug_method_perm (
 ALTER TABLE public.cs_ug_method_perm OWNER TO postgres;
 
 --
--- TOC entry 322 (class 1259 OID 65687)
+-- TOC entry 325 (class 1259 OID 52319)
 -- Name: cs_usr; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -716,7 +716,7 @@ CREATE TABLE cs_usr (
 ALTER TABLE public.cs_usr OWNER TO postgres;
 
 --
--- TOC entry 3782 (class 2604 OID 80159)
+-- TOC entry 3769 (class 2604 OID 52473)
 -- Name: id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -724,16 +724,16 @@ ALTER TABLE ONLY cs_dynamic_children_helper ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
--- TOC entry 4018 (class 0 OID 65382)
--- Dependencies: 249
+-- TOC entry 4044 (class 0 OID 52012)
+-- Dependencies: 250
 -- Data for Name: cs_all_attr_mapping; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4019 (class 0 OID 65386)
--- Dependencies: 250
+-- TOC entry 4045 (class 0 OID 52016)
+-- Dependencies: 251
 -- Data for Name: cs_attr; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -850,8 +850,8 @@ INSERT INTO cs_attr VALUES (110, 15, 14, 'creationdate', 'creationdate', false, 
 
 
 --
--- TOC entry 4020 (class 0 OID 65401)
--- Dependencies: 251
+-- TOC entry 4046 (class 0 OID 52031)
+-- Dependencies: 252
 -- Data for Name: cs_attr_object; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -865,16 +865,16 @@ INSERT INTO cs_attr_object VALUES (13, 7208, 1, 7236);
 
 
 --
--- TOC entry 4021 (class 0 OID 65404)
--- Dependencies: 252
+-- TOC entry 4047 (class 0 OID 52034)
+-- Dependencies: 253
 -- Data for Name: cs_attr_object_derived; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4022 (class 0 OID 65409)
--- Dependencies: 254
+-- TOC entry 4048 (class 0 OID 52039)
+-- Dependencies: 255
 -- Data for Name: cs_attr_string; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -900,8 +900,8 @@ INSERT INTO cs_attr_string VALUES (13, 66, 7208, 'Corrected temperature');
 
 
 --
--- TOC entry 4023 (class 0 OID 65417)
--- Dependencies: 256
+-- TOC entry 4049 (class 0 OID 52047)
+-- Dependencies: 257
 -- Data for Name: cs_cat_link; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -912,8 +912,8 @@ INSERT INTO cs_cat_link VALUES (7, 9, NULL, 1, 7);
 
 
 --
--- TOC entry 4024 (class 0 OID 65424)
--- Dependencies: 257
+-- TOC entry 4050 (class 0 OID 52054)
+-- Dependencies: 258
 -- Data for Name: cs_cat_node; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1023,8 +1023,8 @@ INSERT INTO cs_cat_node VALUES (5, 'Entities', NULL, NULL, NULL, 'N', false, NUL
 
 
 --
--- TOC entry 4025 (class 0 OID 65437)
--- Dependencies: 259
+-- TOC entry 4051 (class 0 OID 52067)
+-- Dependencies: 260
 -- Data for Name: cs_class; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1049,8 +1049,8 @@ INSERT INTO cs_class VALUES (13, 'resource', '', 2, 2, 'RESOURCE', 'ID', true, N
 
 
 --
--- TOC entry 4026 (class 0 OID 65449)
--- Dependencies: 261
+-- TOC entry 4052 (class 0 OID 52079)
+-- Dependencies: 262
 -- Data for Name: cs_class_attr; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1058,32 +1058,32 @@ INSERT INTO cs_class_attr VALUES (1, 13, 7, 'tostringcache', 'id, name from reso
 
 
 --
--- TOC entry 4027 (class 0 OID 65464)
--- Dependencies: 265
+-- TOC entry 4053 (class 0 OID 52094)
+-- Dependencies: 266
 -- Data for Name: cs_config_attr_exempt; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4028 (class 0 OID 65470)
--- Dependencies: 267
+-- TOC entry 4054 (class 0 OID 52100)
+-- Dependencies: 268
 -- Data for Name: cs_config_attr_jt; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4029 (class 0 OID 65476)
--- Dependencies: 269
+-- TOC entry 4055 (class 0 OID 52106)
+-- Dependencies: 270
 -- Data for Name: cs_config_attr_key; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4030 (class 0 OID 65482)
--- Dependencies: 271
+-- TOC entry 4056 (class 0 OID 52112)
+-- Dependencies: 272
 -- Data for Name: cs_config_attr_type; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1093,16 +1093,16 @@ INSERT INTO cs_config_attr_type VALUES (3, 'X', 'XML configuration attribute, XM
 
 
 --
--- TOC entry 4031 (class 0 OID 65488)
--- Dependencies: 273
+-- TOC entry 4057 (class 0 OID 52118)
+-- Dependencies: 274
 -- Data for Name: cs_config_attr_value; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4032 (class 0 OID 65497)
--- Dependencies: 275
+-- TOC entry 4058 (class 0 OID 52127)
+-- Dependencies: 276
 -- Data for Name: cs_domain; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1110,8 +1110,8 @@ INSERT INTO cs_domain VALUES (1, 'LOCAL');
 
 
 --
--- TOC entry 4059 (class 0 OID 80156)
--- Dependencies: 362
+-- TOC entry 4059 (class 0 OID 52131)
+-- Dependencies: 277
 -- Data for Name: cs_dynamic_children_helper; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1225,8 +1225,8 @@ ORDER BY tag.name ASC;');
 
 
 --
--- TOC entry 4065 (class 0 OID 0)
--- Dependencies: 361
+-- TOC entry 4091 (class 0 OID 0)
+-- Dependencies: 278
 -- Name: cs_dynamic_children_helper_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
@@ -1234,16 +1234,16 @@ SELECT pg_catalog.setval('cs_dynamic_children_helper_id_seq', 10, true);
 
 
 --
--- TOC entry 4033 (class 0 OID 65507)
--- Dependencies: 276
+-- TOC entry 4061 (class 0 OID 52139)
+-- Dependencies: 279
 -- Data for Name: cs_history; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4034 (class 0 OID 65515)
--- Dependencies: 278
+-- TOC entry 4062 (class 0 OID 52147)
+-- Dependencies: 281
 -- Data for Name: cs_icon; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1252,40 +1252,40 @@ INSERT INTO cs_icon VALUES (2, 'Erde', 'erde.gif');
 
 
 --
--- TOC entry 4035 (class 0 OID 65522)
--- Dependencies: 280
+-- TOC entry 4063 (class 0 OID 52154)
+-- Dependencies: 283
 -- Data for Name: cs_java_class; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4036 (class 0 OID 65532)
--- Dependencies: 282
+-- TOC entry 4064 (class 0 OID 52164)
+-- Dependencies: 285
 -- Data for Name: cs_locks; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4037 (class 0 OID 65539)
--- Dependencies: 283
+-- TOC entry 4065 (class 0 OID 52171)
+-- Dependencies: 286
 -- Data for Name: cs_method; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4038 (class 0 OID 65552)
--- Dependencies: 285
+-- TOC entry 4066 (class 0 OID 52184)
+-- Dependencies: 288
 -- Data for Name: cs_method_class_assoc; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4039 (class 0 OID 65560)
--- Dependencies: 288
+-- TOC entry 4067 (class 0 OID 52192)
+-- Dependencies: 291
 -- Data for Name: cs_permission; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1294,8 +1294,8 @@ INSERT INTO cs_permission VALUES (1, 'write', 'Schreibrecht');
 
 
 --
--- TOC entry 4040 (class 0 OID 65566)
--- Dependencies: 290
+-- TOC entry 4068 (class 0 OID 52198)
+-- Dependencies: 293
 -- Data for Name: cs_policy; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1305,8 +1305,8 @@ INSERT INTO cs_policy VALUES (2, 'SECURE');
 
 
 --
--- TOC entry 4041 (class 0 OID 65572)
--- Dependencies: 292
+-- TOC entry 4069 (class 0 OID 52204)
+-- Dependencies: 295
 -- Data for Name: cs_policy_rule; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -1319,64 +1319,64 @@ INSERT INTO cs_policy_rule VALUES (6, 2, 1, false);
 
 
 --
--- TOC entry 4042 (class 0 OID 65576)
--- Dependencies: 293
+-- TOC entry 4070 (class 0 OID 52208)
+-- Dependencies: 296
 -- Data for Name: cs_query; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4043 (class 0 OID 65591)
--- Dependencies: 295
+-- TOC entry 4071 (class 0 OID 52223)
+-- Dependencies: 298
 -- Data for Name: cs_query_class_assoc; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4044 (class 0 OID 65597)
--- Dependencies: 297
+-- TOC entry 4072 (class 0 OID 52229)
+-- Dependencies: 300
 -- Data for Name: cs_query_link; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4045 (class 0 OID 65601)
--- Dependencies: 298
+-- TOC entry 4073 (class 0 OID 52233)
+-- Dependencies: 301
 -- Data for Name: cs_query_parameter; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4046 (class 0 OID 65616)
--- Dependencies: 302
+-- TOC entry 4074 (class 0 OID 52248)
+-- Dependencies: 305
 -- Data for Name: cs_query_store; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4047 (class 0 OID 65622)
--- Dependencies: 304
+-- TOC entry 4075 (class 0 OID 52254)
+-- Dependencies: 307
 -- Data for Name: cs_query_store_ug_assoc; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4048 (class 0 OID 65628)
--- Dependencies: 306
+-- TOC entry 4076 (class 0 OID 52260)
+-- Dependencies: 309
 -- Data for Name: cs_query_ug_assoc; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4049 (class 0 OID 65632)
--- Dependencies: 307
+-- TOC entry 4077 (class 0 OID 52264)
+-- Dependencies: 310
 -- Data for Name: cs_stringrepcache; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8446,8 +8446,8 @@ INSERT INTO cs_stringrepcache VALUES (13, 7209, 'Land use by NUTS 2 regions');
 
 
 --
--- TOC entry 4050 (class 0 OID 65638)
--- Dependencies: 308
+-- TOC entry 4078 (class 0 OID 52270)
+-- Dependencies: 311
 -- Data for Name: cs_type; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8488,8 +8488,8 @@ INSERT INTO cs_type VALUES (20, 'contact', 4, true, NULL, NULL, NULL);
 
 
 --
--- TOC entry 4051 (class 0 OID 65650)
--- Dependencies: 311
+-- TOC entry 4079 (class 0 OID 52282)
+-- Dependencies: 314
 -- Data for Name: cs_ug; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8498,24 +8498,24 @@ INSERT INTO cs_ug VALUES (2, 'Gäste', NULL, 1, 1);
 
 
 --
--- TOC entry 4052 (class 0 OID 65657)
--- Dependencies: 312
+-- TOC entry 4080 (class 0 OID 52289)
+-- Dependencies: 315
 -- Data for Name: cs_ug_attr_perm; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4053 (class 0 OID 65663)
--- Dependencies: 314
+-- TOC entry 4081 (class 0 OID 52295)
+-- Dependencies: 317
 -- Data for Name: cs_ug_cat_node_perm; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4054 (class 0 OID 65671)
--- Dependencies: 317
+-- TOC entry 4082 (class 0 OID 52303)
+-- Dependencies: 320
 -- Data for Name: cs_ug_class_perm; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8540,8 +8540,8 @@ INSERT INTO cs_ug_class_perm VALUES (24, 1, 7, 1, NULL);
 
 
 --
--- TOC entry 4055 (class 0 OID 65677)
--- Dependencies: 319
+-- TOC entry 4083 (class 0 OID 52309)
+-- Dependencies: 322
 -- Data for Name: cs_ug_membership; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8550,16 +8550,16 @@ INSERT INTO cs_ug_membership VALUES (2, 2, NULL, 2);
 
 
 --
--- TOC entry 4056 (class 0 OID 65681)
--- Dependencies: 320
+-- TOC entry 4084 (class 0 OID 52313)
+-- Dependencies: 323
 -- Data for Name: cs_ug_method_perm; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 
 
 --
--- TOC entry 4057 (class 0 OID 65687)
--- Dependencies: 322
+-- TOC entry 4085 (class 0 OID 52319)
+-- Dependencies: 325
 -- Data for Name: cs_usr; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -8568,7 +8568,7 @@ INSERT INTO cs_usr VALUES (2, 'gast', 'cismet', '2014-08-21 22:10:06.114849', fa
 
 
 --
--- TOC entry 3714 (class 0 OID 63763)
+-- TOC entry 3740 (class 0 OID 50381)
 -- Dependencies: 178
 -- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: postgres
 --
@@ -8576,7 +8576,7 @@ INSERT INTO cs_usr VALUES (2, 'gast', 'cismet', '2014-08-21 22:10:06.114849', fa
 
 
 --
--- TOC entry 3873 (class 2606 OID 79738)
+-- TOC entry 3901 (class 2606 OID 66381)
 -- Name: attr_perm_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8585,7 +8585,7 @@ ALTER TABLE ONLY cs_ug_attr_perm
 
 
 --
--- TOC entry 3875 (class 2606 OID 79740)
+-- TOC entry 3903 (class 2606 OID 66383)
 -- Name: cat_node_perm_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8594,7 +8594,7 @@ ALTER TABLE ONLY cs_ug_cat_node_perm
 
 
 --
--- TOC entry 3863 (class 2606 OID 79742)
+-- TOC entry 3891 (class 2606 OID 66385)
 -- Name: cid_oid; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8603,7 +8603,7 @@ ALTER TABLE ONLY cs_stringrepcache
 
 
 --
--- TOC entry 3877 (class 2606 OID 79744)
+-- TOC entry 3905 (class 2606 OID 66387)
 -- Name: class_perm_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8612,7 +8612,7 @@ ALTER TABLE ONLY cs_ug_class_perm
 
 
 --
--- TOC entry 3787 (class 2606 OID 79748)
+-- TOC entry 3813 (class 2606 OID 66391)
 -- Name: cs_all_attr_mapping_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8621,7 +8621,7 @@ ALTER TABLE ONLY cs_all_attr_mapping
 
 
 --
--- TOC entry 3798 (class 2606 OID 79750)
+-- TOC entry 3824 (class 2606 OID 66393)
 -- Name: cs_cat_link_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8630,7 +8630,7 @@ ALTER TABLE ONLY cs_cat_link
 
 
 --
--- TOC entry 3809 (class 2606 OID 79752)
+-- TOC entry 3835 (class 2606 OID 66395)
 -- Name: cs_class_attr_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8639,7 +8639,7 @@ ALTER TABLE ONLY cs_class_attr
 
 
 --
--- TOC entry 3811 (class 2606 OID 79754)
+-- TOC entry 3837 (class 2606 OID 66397)
 -- Name: cs_config_attr_exempt_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8648,7 +8648,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3813 (class 2606 OID 79756)
+-- TOC entry 3839 (class 2606 OID 66399)
 -- Name: cs_config_attr_exempt_usr_id_key_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8657,7 +8657,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3815 (class 2606 OID 79758)
+-- TOC entry 3841 (class 2606 OID 66401)
 -- Name: cs_config_attr_jt_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8666,7 +8666,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3817 (class 2606 OID 79760)
+-- TOC entry 3843 (class 2606 OID 66403)
 -- Name: cs_config_attr_jt_usr_id_ug_id_dom_id_key_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8675,7 +8675,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3819 (class 2606 OID 79762)
+-- TOC entry 3845 (class 2606 OID 66405)
 -- Name: cs_config_attr_key_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8684,7 +8684,7 @@ ALTER TABLE ONLY cs_config_attr_key
 
 
 --
--- TOC entry 3821 (class 2606 OID 79764)
+-- TOC entry 3847 (class 2606 OID 66407)
 -- Name: cs_config_attr_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8693,7 +8693,7 @@ ALTER TABLE ONLY cs_config_attr_type
 
 
 --
--- TOC entry 3823 (class 2606 OID 79766)
+-- TOC entry 3849 (class 2606 OID 66409)
 -- Name: cs_config_attr_value_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8702,7 +8702,7 @@ ALTER TABLE ONLY cs_config_attr_value
 
 
 --
--- TOC entry 3825 (class 2606 OID 79768)
+-- TOC entry 3851 (class 2606 OID 66411)
 -- Name: cs_domain_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8711,7 +8711,7 @@ ALTER TABLE ONLY cs_domain
 
 
 --
--- TOC entry 3887 (class 2606 OID 80164)
+-- TOC entry 3853 (class 2606 OID 66413)
 -- Name: cs_dynamic_children_helper_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8720,7 +8720,7 @@ ALTER TABLE ONLY cs_dynamic_children_helper
 
 
 --
--- TOC entry 3827 (class 2606 OID 79772)
+-- TOC entry 3855 (class 2606 OID 66415)
 -- Name: cs_history_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8729,7 +8729,7 @@ ALTER TABLE ONLY cs_history
 
 
 --
--- TOC entry 3829 (class 2606 OID 79774)
+-- TOC entry 3857 (class 2606 OID 66417)
 -- Name: cs_icon_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8738,7 +8738,7 @@ ALTER TABLE ONLY cs_icon
 
 
 --
--- TOC entry 3831 (class 2606 OID 79776)
+-- TOC entry 3859 (class 2606 OID 66419)
 -- Name: cs_java_class_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8747,7 +8747,7 @@ ALTER TABLE ONLY cs_java_class
 
 
 --
--- TOC entry 3833 (class 2606 OID 79778)
+-- TOC entry 3861 (class 2606 OID 66421)
 -- Name: cs_locks_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8756,7 +8756,7 @@ ALTER TABLE ONLY cs_locks
 
 
 --
--- TOC entry 3837 (class 2606 OID 79780)
+-- TOC entry 3865 (class 2606 OID 66423)
 -- Name: cs_method_class_assoc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8765,7 +8765,7 @@ ALTER TABLE ONLY cs_method_class_assoc
 
 
 --
--- TOC entry 3839 (class 2606 OID 79782)
+-- TOC entry 3867 (class 2606 OID 66425)
 -- Name: cs_permission_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8774,7 +8774,7 @@ ALTER TABLE ONLY cs_permission
 
 
 --
--- TOC entry 3841 (class 2606 OID 79784)
+-- TOC entry 3869 (class 2606 OID 66427)
 -- Name: cs_policy_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8783,7 +8783,7 @@ ALTER TABLE ONLY cs_policy
 
 
 --
--- TOC entry 3843 (class 2606 OID 79786)
+-- TOC entry 3871 (class 2606 OID 66429)
 -- Name: cs_policy_rule_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8792,7 +8792,7 @@ ALTER TABLE ONLY cs_policy_rule
 
 
 --
--- TOC entry 3845 (class 2606 OID 79788)
+-- TOC entry 3873 (class 2606 OID 66431)
 -- Name: cs_policy_rule_policy_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8801,7 +8801,7 @@ ALTER TABLE ONLY cs_policy_rule
 
 
 --
--- TOC entry 3851 (class 2606 OID 79790)
+-- TOC entry 3879 (class 2606 OID 66433)
 -- Name: cs_query_class_assoc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8810,7 +8810,7 @@ ALTER TABLE ONLY cs_query_class_assoc
 
 
 --
--- TOC entry 3853 (class 2606 OID 79792)
+-- TOC entry 3881 (class 2606 OID 66435)
 -- Name: cs_query_link_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8819,7 +8819,7 @@ ALTER TABLE ONLY cs_query_link
 
 
 --
--- TOC entry 3857 (class 2606 OID 79794)
+-- TOC entry 3885 (class 2606 OID 66437)
 -- Name: cs_query_store_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8828,7 +8828,7 @@ ALTER TABLE ONLY cs_query_store
 
 
 --
--- TOC entry 3859 (class 2606 OID 79796)
+-- TOC entry 3887 (class 2606 OID 66439)
 -- Name: cs_query_store_ug_assoc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8837,7 +8837,7 @@ ALTER TABLE ONLY cs_query_store_ug_assoc
 
 
 --
--- TOC entry 3861 (class 2606 OID 79798)
+-- TOC entry 3889 (class 2606 OID 66441)
 -- Name: cs_query_ug_assoc_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8846,7 +8846,7 @@ ALTER TABLE ONLY cs_query_ug_assoc
 
 
 --
--- TOC entry 3879 (class 2606 OID 79800)
+-- TOC entry 3907 (class 2606 OID 66443)
 -- Name: cs_ug_membership_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8855,7 +8855,7 @@ ALTER TABLE ONLY cs_ug_membership
 
 
 --
--- TOC entry 3869 (class 2606 OID 79802)
+-- TOC entry 3897 (class 2606 OID 66445)
 -- Name: cs_ug_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8864,7 +8864,7 @@ ALTER TABLE ONLY cs_ug
 
 
 --
--- TOC entry 3871 (class 2606 OID 79804)
+-- TOC entry 3899 (class 2606 OID 66447)
 -- Name: cs_ug_prio_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8873,7 +8873,7 @@ ALTER TABLE ONLY cs_ug
 
 
 --
--- TOC entry 3881 (class 2606 OID 79826)
+-- TOC entry 3909 (class 2606 OID 66469)
 -- Name: method_perm_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8882,7 +8882,7 @@ ALTER TABLE ONLY cs_ug_method_perm
 
 
 --
--- TOC entry 3789 (class 2606 OID 79842)
+-- TOC entry 3815 (class 2606 OID 66485)
 -- Name: x_cs_attr_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8891,7 +8891,7 @@ ALTER TABLE ONLY cs_attr
 
 
 --
--- TOC entry 3803 (class 2606 OID 79844)
+-- TOC entry 3829 (class 2606 OID 66487)
 -- Name: x_cs_cat_node_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8900,7 +8900,7 @@ ALTER TABLE ONLY cs_cat_node
 
 
 --
--- TOC entry 3805 (class 2606 OID 79846)
+-- TOC entry 3831 (class 2606 OID 66489)
 -- Name: x_cs_class_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8909,7 +8909,7 @@ ALTER TABLE ONLY cs_class
 
 
 --
--- TOC entry 3807 (class 2606 OID 79848)
+-- TOC entry 3833 (class 2606 OID 66491)
 -- Name: x_cs_class_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8918,7 +8918,7 @@ ALTER TABLE ONLY cs_class
 
 
 --
--- TOC entry 3835 (class 2606 OID 79850)
+-- TOC entry 3863 (class 2606 OID 66493)
 -- Name: x_cs_method_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8927,7 +8927,7 @@ ALTER TABLE ONLY cs_method
 
 
 --
--- TOC entry 3847 (class 2606 OID 79852)
+-- TOC entry 3875 (class 2606 OID 66495)
 -- Name: x_cs_query_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8936,7 +8936,7 @@ ALTER TABLE ONLY cs_query
 
 
 --
--- TOC entry 3855 (class 2606 OID 79854)
+-- TOC entry 3883 (class 2606 OID 66497)
 -- Name: x_cs_query_parameter_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8945,7 +8945,7 @@ ALTER TABLE ONLY cs_query_parameter
 
 
 --
--- TOC entry 3849 (class 2606 OID 79856)
+-- TOC entry 3877 (class 2606 OID 66499)
 -- Name: x_cs_query_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8954,7 +8954,7 @@ ALTER TABLE ONLY cs_query
 
 
 --
--- TOC entry 3865 (class 2606 OID 79858)
+-- TOC entry 3893 (class 2606 OID 66501)
 -- Name: x_cs_type_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8963,7 +8963,7 @@ ALTER TABLE ONLY cs_type
 
 
 --
--- TOC entry 3867 (class 2606 OID 79860)
+-- TOC entry 3895 (class 2606 OID 66503)
 -- Name: x_cs_type_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8972,7 +8972,7 @@ ALTER TABLE ONLY cs_type
 
 
 --
--- TOC entry 3883 (class 2606 OID 79862)
+-- TOC entry 3911 (class 2606 OID 66505)
 -- Name: x_cs_usr_login_name_key; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8981,7 +8981,7 @@ ALTER TABLE ONLY cs_usr
 
 
 --
--- TOC entry 3885 (class 2606 OID 79864)
+-- TOC entry 3913 (class 2606 OID 66507)
 -- Name: x_cs_usr_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8990,7 +8990,7 @@ ALTER TABLE ONLY cs_usr
 
 
 --
--- TOC entry 3791 (class 1259 OID 79867)
+-- TOC entry 3817 (class 1259 OID 66510)
 -- Name: attr_object_derived_index; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -8998,7 +8998,7 @@ CREATE INDEX attr_object_derived_index ON cs_attr_object_derived USING btree (cl
 
 
 --
--- TOC entry 3792 (class 1259 OID 79868)
+-- TOC entry 3818 (class 1259 OID 66511)
 -- Name: attr_object_derived_index_acid_aoid; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9006,7 +9006,7 @@ CREATE INDEX attr_object_derived_index_acid_aoid ON cs_attr_object_derived USING
 
 
 --
--- TOC entry 3793 (class 1259 OID 79869)
+-- TOC entry 3819 (class 1259 OID 66512)
 -- Name: attr_object_derived_index_cid_oid; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9014,7 +9014,7 @@ CREATE INDEX attr_object_derived_index_cid_oid ON cs_attr_object_derived USING b
 
 
 --
--- TOC entry 3790 (class 1259 OID 79870)
+-- TOC entry 3816 (class 1259 OID 66513)
 -- Name: attr_object_index; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9022,7 +9022,7 @@ CREATE INDEX attr_object_index ON cs_attr_object USING btree (class_id, object_i
 
 
 --
--- TOC entry 3799 (class 1259 OID 79871)
+-- TOC entry 3825 (class 1259 OID 66514)
 -- Name: cl_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9030,7 +9030,7 @@ CREATE INDEX cl_idx ON cs_cat_node USING btree (class_id);
 
 
 --
--- TOC entry 3783 (class 1259 OID 79873)
+-- TOC entry 3809 (class 1259 OID 66516)
 -- Name: cs_all_attr_mapping_index1; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9038,7 +9038,7 @@ CREATE INDEX cs_all_attr_mapping_index1 ON cs_all_attr_mapping USING btree (clas
 
 
 --
--- TOC entry 3784 (class 1259 OID 79874)
+-- TOC entry 3810 (class 1259 OID 66517)
 -- Name: cs_all_attr_mapping_index2; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9046,7 +9046,7 @@ CREATE INDEX cs_all_attr_mapping_index2 ON cs_all_attr_mapping USING btree (attr
 
 
 --
--- TOC entry 3785 (class 1259 OID 79875)
+-- TOC entry 3811 (class 1259 OID 66518)
 -- Name: cs_all_attr_mapping_index3; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9054,7 +9054,7 @@ CREATE INDEX cs_all_attr_mapping_index3 ON cs_all_attr_mapping USING btree (attr
 
 
 --
--- TOC entry 3794 (class 1259 OID 79876)
+-- TOC entry 3820 (class 1259 OID 66519)
 -- Name: cs_attr_string_class_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9062,7 +9062,7 @@ CREATE INDEX cs_attr_string_class_idx ON cs_attr_string USING btree (class_id);
 
 
 --
--- TOC entry 3795 (class 1259 OID 79877)
+-- TOC entry 3821 (class 1259 OID 66520)
 -- Name: cs_attr_string_object_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9070,7 +9070,7 @@ CREATE INDEX cs_attr_string_object_idx ON cs_attr_string USING btree (object_id)
 
 
 --
--- TOC entry 3796 (class 1259 OID 79879)
+-- TOC entry 3822 (class 1259 OID 66522)
 -- Name: i_cs_attr_string_aco_id; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9078,7 +9078,7 @@ CREATE INDEX i_cs_attr_string_aco_id ON cs_attr_string USING btree (attr_id, cla
 
 
 --
--- TOC entry 3800 (class 1259 OID 79906)
+-- TOC entry 3826 (class 1259 OID 66549)
 -- Name: ob_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9086,7 +9086,7 @@ CREATE INDEX ob_idx ON cs_cat_node USING btree (object_id);
 
 
 --
--- TOC entry 3801 (class 1259 OID 79907)
+-- TOC entry 3827 (class 1259 OID 66550)
 -- Name: obj_cl_idx; Type: INDEX; Schema: public; Owner: postgres; Tablespace: 
 --
 
@@ -9094,7 +9094,7 @@ CREATE INDEX obj_cl_idx ON cs_cat_node USING btree (class_id, object_id);
 
 
 --
--- TOC entry 3888 (class 2606 OID 79930)
+-- TOC entry 3914 (class 2606 OID 66587)
 -- Name: cs_config_attr_exempt_key_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9103,7 +9103,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3889 (class 2606 OID 79935)
+-- TOC entry 3915 (class 2606 OID 66592)
 -- Name: cs_config_attr_exempt_ug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9112,7 +9112,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3890 (class 2606 OID 79940)
+-- TOC entry 3916 (class 2606 OID 66597)
 -- Name: cs_config_attr_exempt_usr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9121,7 +9121,7 @@ ALTER TABLE ONLY cs_config_attr_exempt
 
 
 --
--- TOC entry 3891 (class 2606 OID 79945)
+-- TOC entry 3917 (class 2606 OID 66602)
 -- Name: cs_config_attr_jt_dom_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9130,7 +9130,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3892 (class 2606 OID 79950)
+-- TOC entry 3918 (class 2606 OID 66607)
 -- Name: cs_config_attr_jt_key_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9139,7 +9139,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3893 (class 2606 OID 79955)
+-- TOC entry 3919 (class 2606 OID 66612)
 -- Name: cs_config_attr_jt_type_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9148,7 +9148,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3894 (class 2606 OID 79960)
+-- TOC entry 3920 (class 2606 OID 66617)
 -- Name: cs_config_attr_jt_ug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9157,7 +9157,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3895 (class 2606 OID 79965)
+-- TOC entry 3921 (class 2606 OID 66622)
 -- Name: cs_config_attr_jt_usr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9166,7 +9166,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3896 (class 2606 OID 79970)
+-- TOC entry 3922 (class 2606 OID 66627)
 -- Name: cs_config_attr_jt_val_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9175,7 +9175,7 @@ ALTER TABLE ONLY cs_config_attr_jt
 
 
 --
--- TOC entry 3897 (class 2606 OID 79975)
+-- TOC entry 3925 (class 2606 OID 66632)
 -- Name: cs_history_class_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9184,7 +9184,7 @@ ALTER TABLE ONLY cs_history
 
 
 --
--- TOC entry 3898 (class 2606 OID 79980)
+-- TOC entry 3924 (class 2606 OID 66637)
 -- Name: cs_history_ug_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9193,7 +9193,7 @@ ALTER TABLE ONLY cs_history
 
 
 --
--- TOC entry 3899 (class 2606 OID 79985)
+-- TOC entry 3923 (class 2606 OID 66642)
 -- Name: cs_history_usr_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -9201,7 +9201,7 @@ ALTER TABLE ONLY cs_history
     ADD CONSTRAINT cs_history_usr_id_fkey FOREIGN KEY (usr_id) REFERENCES cs_usr(id);
 
 
--- Completed on 2015-01-27 11:36:00
+-- Completed on 2015-03-09 16:50:15
 
 --
 -- PostgreSQL database dump complete

@@ -75,6 +75,10 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     private static final String FILTER__SPATIAL__GEO = "geo";
     private static final String FILTER__SPATIAL__GEO_INTERSECTS = "geo-intersects";
     private static final String FILTER__SPATIAL__GEO_BUFFER = "geo-buffer";
+    private static final String FILTER__COLLECTION = "collection";
+    private static final String FILTER__FUNCTION = "function";
+    private static final String FILTER__ACCESS_CONDITIONS = "access-condition";
+    private static final String FILTER__OFFSET = "offset";
     private static final String FILTER__LIMIT = "limit";
 
     private static final String METACLASSNAME__RESOURCE = "resource";
@@ -173,6 +177,12 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             String fulltext = null;
             String topic = null;
             int limit = -1;
+            int offset = -1;
+            String collection = null;
+            final List<String> functionList = new LinkedList<String>();
+            final List<String> negatedFunctionList = new LinkedList<String>();
+            final List<String> accessConditions = new LinkedList<String>();
+            final List<String> negatedAccessConditions = new LinkedList<String>();
 
             // add resource class by default
             try {
@@ -290,6 +300,50 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                         }
                         break;
                     }
+                    case FILTER__OFFSET: {
+                        try {
+                            final int offsetTemp = Integer.parseInt(value);
+                            if (offsetTemp > 0) {
+                                offset = offsetTemp;
+                            }
+                        } catch (NumberFormatException numberFormatException) {
+                            LOG.warn("could not parse: " + key + " = " + value + " to integer", numberFormatException);
+                        }
+                        break;
+                    }
+                    case FILTER__COLLECTION: {
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            value = "!" + value;
+                        }
+
+                        collection = value;
+                        break;
+                    }
+                    case FILTER__FUNCTION: {
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            negatedFunctionList.add(value);
+                        } else {
+                            functionList.add(value);
+                        }
+                        break;
+                    }
+                    case FILTER__ACCESS_CONDITIONS: {
+                        if (notFilter) {
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("applying not filter to '" + key + ": '" + value + "'");
+                            }
+                            negatedAccessConditions.add(value);
+                        } else {
+                            accessConditions.add(value);
+                        }
+                        break;
+                    }
                     default: {
                         if ((key.length() > 8) && key.startsWith("keyword-", 0)) {
                             if (notFilter) {
@@ -306,7 +360,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                                 keywordGroupList.add(keywordGroup);
                             }
                         } else {
-                            LOG.error("ignoring unknown key: " + key + " = " + value);
+                            LOG.warn("ignoring unknown key: " + key + " = " + value);
                         }
                     }
                 }
@@ -356,18 +410,21 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                     LOG.debug("fromDate set to: \"" + fromDate + "\"");
                 }
             }
+
             if (toDate != null) {
                 nrs.setToDate(new Timestamp(toDate.getTime()));
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("toDate set to: \"" + toDate + "\"");
                 }
             }
+
             if (geometryToSearchFor != null) {
                 nrs.setGeometryToSearchFor(geometryToSearchFor);
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("geometryToSearchFor set to: \"" + geometryToSearchFor.toText() + "\"");
                 }
             }
+
             if (isGeoIntersectsEnabled) {
                 nrs.setGeometryFunction(MetaObjectNodeResourceSearchStatement.GeometryFunction.INTERSECT);
                 if (LOG.isDebugEnabled()) {
@@ -381,12 +438,14 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                                 + MetaObjectNodeResourceSearchStatement.GeometryFunction.CONTAINS.toString() + "\"");
                 }
             }
+
             if (geoBuffer > 0) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("searching with geo buffer: \"" + geoBuffer + "\"");
                 }
                 nrs.setGeoBuffer(geoBuffer);
             }
+
             if (fulltext != null) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("fulltext search in title and description for: \"" + fulltext + "\"");
@@ -394,17 +453,77 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                 nrs.setTitle(fulltext);
                 nrs.setDescription(fulltext);
             }
+
             if ((topic != null) && (topic.length() > 0)) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("INSIRE topic category search for: \"" + topic + "\"");
                 }
                 nrs.setTopicCategory(topic);
             }
+
             if (limit > 0) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("LIMIT: \"" + limit + "\"");
                 }
                 nrs.setLimit(limit);
+            }
+
+            if ((collection != null) && (collection.length() > 0)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("COLLECTION: \"" + collection + "\"");
+                }
+                nrs.setCollection(collection);
+            }
+
+            if (!functionList.isEmpty()) {
+                nrs.setFunctionList(functionList);
+                if (LOG.isDebugEnabled()) {
+                    for (final String function : functionList) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("FUNCTION \"" + function + "\" added");
+                        }
+                    }
+                }
+            }
+
+            if (!negatedFunctionList.isEmpty()) {
+                nrs.setNegatedFunctionList(negatedFunctionList);
+                if (LOG.isDebugEnabled()) {
+                    for (final String function : negatedFunctionList) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("FUNCTION \"" + function + "\" added");
+                        }
+                    }
+                }
+            }
+
+            if (!accessConditions.isEmpty()) {
+                nrs.setAccessConditions(accessConditions);
+                if (LOG.isDebugEnabled()) {
+                    for (final String accessCondition : accessConditions) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("ACCESS CONDITION \"" + accessCondition + "\" added");
+                        }
+                    }
+                }
+            }
+
+            if (!negatedAccessConditions.isEmpty()) {
+                nrs.setNegatedAccessConditions(negatedAccessConditions);
+                if (LOG.isDebugEnabled()) {
+                    for (final String accessCondition : negatedAccessConditions) {
+                        if (LOG.isDebugEnabled()) {
+                            LOG.debug("negated access condition \"" + accessCondition + "\" added");
+                        }
+                    }
+                }
+            }
+
+            if (offset > 0) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("OFFSET: \"" + offset + "\"");
+                }
+                nrs.setOffset(offset);
             }
 
             return nrs;
