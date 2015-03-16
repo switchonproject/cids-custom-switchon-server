@@ -112,7 +112,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected List<String> negatedFunctionList;
     protected List<String> accessConditions;
     protected List<String> negatedAccessConditions;
-    protected int offset;
+    protected int offset = 0;
     private int limit = 0;
 
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
@@ -214,6 +214,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         appendNegatedFunctions();
         appendNegatedAccessConditions();
         appendLimit();
+        appendOffset();
 
         return query.toString();
     }
@@ -547,7 +548,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendOffset() {
         if (offset > 0) {
-            query.append(" LIMIT ").append(limit);
+            if (limit > 0) {
+                if ((offset % limit) == 0) {
+                    query.append(" OFFSET ").append(offset);
+                } else {
+                    LOG.warn("offset '" + offset + "' does not match limit '" + limit + "'");
+                }
+            } else {
+                LOG.warn("offset '" + offset + "' cannot be applied without limit");
+            }
         }
     }
 

@@ -120,6 +120,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
         final MetaObjectNodeResourceSearchStatement metaObjectNodeResourceSearchStatement = this
                     .metaObjectUniversalSearchStatement.interpretQuery(query);
         metaObjectNodeResourceSearchStatement.setLimit(0);
+        metaObjectNodeResourceSearchStatement.setOffset(0);
         final String baseSqlQuery = metaObjectNodeResourceSearchStatement.generateQuery();
         if (LOG.isDebugEnabled()) {
             LOG.debug("The generated base SQL query is \n" + baseSqlQuery);
