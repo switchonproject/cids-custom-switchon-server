@@ -54,6 +54,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
     private final String TAGGROUP_FILTER_PROTOCOL = "protocol";
     private final String TAGGROUP_FILTER_FUNCTION = "function";
     private final String TAGGROUP_FILTER_RESOURCE_TYPE = "resource-type";
+    private final String TAGGROUP_FILTER_TOTAL_RESOURCES = "$total";
 
     private String query;
     private String filterTagGroups;
@@ -72,6 +73,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
         TAGGROUPS.put(TAGGROUP_FILTER_PROTOCOL, "protocol");
         TAGGROUPS.put(TAGGROUP_FILTER_FUNCTION, "function");
         TAGGROUPS.put(TAGGROUP_FILTER_RESOURCE_TYPE, "resource type");
+        TAGGROUPS.put(TAGGROUP_FILTER_TOTAL_RESOURCES, "$total");
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -118,6 +120,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
         final MetaObjectNodeResourceSearchStatement metaObjectNodeResourceSearchStatement = this
                     .metaObjectUniversalSearchStatement.interpretQuery(query);
         metaObjectNodeResourceSearchStatement.setLimit(0);
+        metaObjectNodeResourceSearchStatement.setOffset(0);
         final String baseSqlQuery = metaObjectNodeResourceSearchStatement.generateQuery();
         if (LOG.isDebugEnabled()) {
             LOG.debug("The generated base SQL query is \n" + baseSqlQuery);
@@ -129,11 +132,13 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                 if (TAGGROUPS.containsKey(filterParameter)) {
                     final String tagGroup = TAGGROUPS.get(filterParameter);
                     final StringBuilder queryBuilder = new StringBuilder(baseSqlQuery);
-                    queryBuilder.insert(0, "SELECT DISTINCT rtag.name as name FROM (");
+                    final String baseQuery = "SELECT DISTINCT rtag.name as name FROM (";
 
+                    // build the query ....
                     switch (filterParameter) {
                         case TAGGROUP_FILTER_KEYWORD:
                         case TAGGROUP_FILTER_KEYWORD_CUAHSI: {
+                            queryBuilder.insert(0, baseQuery);
                             queryBuilder.append(") rrr");
                             queryBuilder.append(" JOIN jt_resource_tag rjtrt ON rrr.id = rjtrt.resource_reference");
                             queryBuilder.append(" JOIN tag rtag ON rjtrt.tagid = rtag.id");
@@ -146,12 +151,14 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             break;
                         }
                         case TAGGROUP_FILTER_ACCESS_CONDITONS: {
+                            queryBuilder.insert(0, baseQuery);
                             queryBuilder.append(") rrr,");
                             queryBuilder.append(
                                 " resource, tag rtag WHERE rrr.id = resource.id and resource.accessconditions = rtag.id");
                             break;
                         }
                         case TAGGROUP_FILTER_RESOURCE_TYPE: {
+                            queryBuilder.insert(0, baseQuery);
                             queryBuilder.append(") rrr");
                             queryBuilder.append(" JOIN jt_resource_representation ON rrr.id = resource_reference");
                             queryBuilder.append(
@@ -160,6 +167,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             break;
                         }
                         case TAGGROUP_FILTER_PROTOCOL: {
+                            queryBuilder.insert(0, baseQuery);
                             queryBuilder.append(") rrr");
                             queryBuilder.append(" JOIN jt_resource_representation ON rrr.id = resource_reference");
                             queryBuilder.append(
@@ -168,11 +176,17 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             break;
                         }
                         case TAGGROUP_FILTER_FUNCTION: {
+                            queryBuilder.insert(0, baseQuery);
                             queryBuilder.append(") rrr");
                             queryBuilder.append(" JOIN jt_resource_representation ON rrr.id = resource_reference");
                             queryBuilder.append(
                                 " JOIN representation ON jt_resource_representation.representationid = representation.id");
                             queryBuilder.append(" JOIN tag rtag ON representation.function = rtag.id");
+                            break;
+                        }
+                        case TAGGROUP_FILTER_TOTAL_RESOURCES: {
+                            queryBuilder.insert(0, "SELECT COUNT(DISTINCT rrr.id) as total FROM (");
+                            queryBuilder.append(") rrr");
                             break;
                         }
                         default: {
@@ -182,6 +196,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             break;
                         }
                     }
+
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("performing search for tags of group '" + filterParameter + "' with query: \n"
                                     + queryBuilder);
@@ -195,7 +210,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                     final String[] tagNames = new String[resultset.size()];
                     int i = 0;
                     for (final ArrayList row : resultset) {
-                        final String tagName = (String)row.get(0);
+                        final String tagName = String.valueOf(row.get(0));
                         tagNames[i] = tagName;
                         i++;
                     }
