@@ -137,6 +137,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                     final String tagGroup = TAGGROUPS.get(filterParameter);
                     final StringBuilder queryBuilder = new StringBuilder(baseSqlQuery);
                     final String baseQuery = "SELECT rtag.name as name, count(rtag.name) AS count FROM (";
+                    final String groupByQuery = " GROUP BY rtag.name ORDER BY rtag.name";
 
                     // build the query ....
                     switch (filterParameter) {
@@ -151,7 +152,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(" to_tsvector('english', rtag_tg.name) @@ to_tsquery('''")
                                     .append(tagGroup)
                                     .append("''')");
-                            queryBuilder.append(" GROUP BY rtag.name;");
+                            queryBuilder.append(groupByQuery);
                             break;
                         }
                         case TAGGROUP_FILTER_ACCESS_CONDITONS: {
@@ -159,7 +160,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(") rrr,");
                             queryBuilder.append(
                                 " resource, tag rtag WHERE rrr.id = resource.id and resource.accessconditions = rtag.id");
-                            queryBuilder.append(" GROUP BY rtag.name;");
+                            queryBuilder.append(" GROUP BY rtag.name ORDER BY rtag.name");
                             break;
                         }
                         case TAGGROUP_FILTER_RESOURCE_TYPE: {
@@ -169,7 +170,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(
                                 " JOIN representation ON jt_resource_representation.representationid = representation.id");
                             queryBuilder.append(" JOIN tag rtag ON representation.\"function\" = rtag.id");
-                            queryBuilder.append(" GROUP BY rtag.name;");
+                            queryBuilder.append(groupByQuery);
                             break;
                         }
                         case TAGGROUP_FILTER_PROTOCOL: {
@@ -179,7 +180,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(
                                 " JOIN representation ON jt_resource_representation.representationid = representation.id");
                             queryBuilder.append(" JOIN tag rtag ON representation.protocol = rtag.id");
-                            queryBuilder.append(" GROUP BY rtag.name;");
+                            queryBuilder.append(groupByQuery);
                             break;
                         }
                         case TAGGROUP_FILTER_FUNCTION: {
@@ -189,7 +190,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(
                                 " JOIN representation ON jt_resource_representation.representationid = representation.id");
                             queryBuilder.append(" JOIN tag rtag ON representation.function = rtag.id");
-                            queryBuilder.append(" GROUP BY rtag.name;");
+                            queryBuilder.append(groupByQuery);
                             break;
                         }
                         case TAGGROUP_FILTER_TOTAL_RESOURCES: {
