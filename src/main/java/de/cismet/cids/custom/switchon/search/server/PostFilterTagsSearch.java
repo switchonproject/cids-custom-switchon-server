@@ -23,6 +23,7 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
@@ -107,8 +108,11 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
             this.metaObjectUniversalSearchStatement.setActiveLocalServers(this.getActiveLocalServers());
         }
 
-        final ArrayList<Map.Entry<String, String[]>> result = new ArrayList<Map.Entry<String, String[]>>();
+        final List<Map.Entry<String, List<Map.Entry<String, String>>>> result =
+            new ArrayList<Map.Entry<String, List<Map.Entry<String, String>>>>();
+
         final MetaService ms = (MetaService)getActiveLocalServers().get(DOMAIN);
+
         if (ms == null) {
             final String msg = "no metaservice for domain '" + DOMAIN + "' found!";
             LOG.error(msg);
@@ -132,7 +136,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                 if (TAGGROUPS.containsKey(filterParameter)) {
                     final String tagGroup = TAGGROUPS.get(filterParameter);
                     final StringBuilder queryBuilder = new StringBuilder(baseSqlQuery);
-                    final String baseQuery = "SELECT DISTINCT rtag.name as name FROM (";
+                    final String baseQuery = "SELECT rtag.name as name, count(rtag.name) AS count FROM (";
 
                     // build the query ....
                     switch (filterParameter) {
@@ -147,7 +151,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(" to_tsvector('english', rtag_tg.name) @@ to_tsquery('''")
                                     .append(tagGroup)
                                     .append("''')");
-
+                            queryBuilder.append(" GROUP BY rtag.name;");
                             break;
                         }
                         case TAGGROUP_FILTER_ACCESS_CONDITONS: {
@@ -155,6 +159,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(") rrr,");
                             queryBuilder.append(
                                 " resource, tag rtag WHERE rrr.id = resource.id and resource.accessconditions = rtag.id");
+                            queryBuilder.append(" GROUP BY rtag.name;");
                             break;
                         }
                         case TAGGROUP_FILTER_RESOURCE_TYPE: {
@@ -164,6 +169,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(
                                 " JOIN representation ON jt_resource_representation.representationid = representation.id");
                             queryBuilder.append(" JOIN tag rtag ON representation.\"function\" = rtag.id");
+                            queryBuilder.append(" GROUP BY rtag.name;");
                             break;
                         }
                         case TAGGROUP_FILTER_PROTOCOL: {
@@ -173,6 +179,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(
                                 " JOIN representation ON jt_resource_representation.representationid = representation.id");
                             queryBuilder.append(" JOIN tag rtag ON representation.protocol = rtag.id");
+                            queryBuilder.append(" GROUP BY rtag.name;");
                             break;
                         }
                         case TAGGROUP_FILTER_FUNCTION: {
@@ -182,10 +189,13 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             queryBuilder.append(
                                 " JOIN representation ON jt_resource_representation.representationid = representation.id");
                             queryBuilder.append(" JOIN tag rtag ON representation.function = rtag.id");
+                            queryBuilder.append(" GROUP BY rtag.name;");
                             break;
                         }
                         case TAGGROUP_FILTER_TOTAL_RESOURCES: {
-                            queryBuilder.insert(0, "SELECT COUNT(DISTINCT rrr.id) as total FROM (");
+                            // add to colums to satify compatibility with tag lists (tag name, results count)
+                            // FIXME: This ia  workaround for missing generic $total search results functionality
+                            queryBuilder.insert(0, "SELECT '$total' as total, COUNT(DISTINCT rrr.id) as count FROM (");
                             queryBuilder.append(") rrr");
                             break;
                         }
@@ -193,7 +203,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                             final String msg = "the tag filter parameter '" + filterParameter
                                         + "' is currently not supported";
                             LOG.warn(msg);
-                            break;
+                            throw new SearchException(msg);
                         }
                     }
 
@@ -207,18 +217,27 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
                                     + "' in query result found");
                     }
 
-                    final String[] tagNames = new String[resultset.size()];
+                    final List<Map.Entry<String, String>> tagList = new ArrayList<Map.Entry<String, String>>(
+                            resultset.size());
                     int i = 0;
+
+                    // add tag name + tag results count to the tag group list
                     for (final ArrayList row : resultset) {
                         final String tagName = String.valueOf(row.get(0));
-                        tagNames[i] = tagName;
+                        final String tagCount = String.valueOf(row.get(1));
+
+                        final Map.Entry<String, String> tagListEntry = new AbstractMap.SimpleEntry<String, String>(
+                                tagName,
+                                tagCount);
+                        tagList.add(tagListEntry);
                         i++;
                     }
 
-                    final Map.Entry<String, String[]> resultEntry = new AbstractMap.SimpleEntry<String, String[]>(
+                    // add the tag group list to the overall results list
+                    final Map.Entry<String, List<Map.Entry<String, String>>> resultEntry =
+                        new AbstractMap.SimpleEntry<String, List<Map.Entry<String, String>>>(
                             filterParameter,
-                            tagNames);
-
+                            tagList);
                     result.add(resultEntry);
                 } else {
                     final String msg = "the tag filter parameter '" + filterParameter
