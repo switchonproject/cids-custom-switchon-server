@@ -210,10 +210,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         appendTitleDescription();
         appendLocation();
         appendKeywordCombination();
+        appendOrderBy();
         appendNegatedKeywords();
         appendNegatedFunctions();
         appendNegatedAccessConditions();
-        appendOrderBy();
         appendLimit();
         appendOffset();
 
