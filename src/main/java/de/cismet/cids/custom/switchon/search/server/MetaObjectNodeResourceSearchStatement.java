@@ -213,6 +213,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         appendNegatedKeywords();
         appendNegatedFunctions();
         appendNegatedAccessConditions();
+        appendOrderBy();
         appendLimit();
         appendOffset();
 
@@ -532,6 +533,13 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             }
             query.append(")");
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendOrderBy() {
+        query.append(" ORDER BY r.name");
     }
 
     /**
