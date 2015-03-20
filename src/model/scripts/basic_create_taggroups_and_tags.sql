@@ -26,7 +26,7 @@ VALUES
 ('topic category','High-level classification of resources in accordance with ISO 19115 for grouping and topic-based search (fixed group).'),
 ('publish type','The publish type is used to determine how an imported file has to be postprocessed in order to publish it to an Andvanced Data Repository.'),
 ('upload status','The upload status represents a transient property that temporarily stores the status of the upload process to an Advanced Data Repository.'),
-('CUASHI', 'CUASHI Hydrologic Ontology for Discovery');
+('keywords - CUAHSI', 'CUAHSI Hydrologic Ontology for Discovery');
 DO $$
 DECLARE tgid integer;
 BEGIN
@@ -281,8 +281,10 @@ VALUES
 ('OGC:CSW','OGC Catalogue Service for the Web',tgid),
 ('OGC:SOS','OGC Sensor Observation Service',tgid),
 ('OGC:WCS','OGC Web Coverage Service',tgid),
-('OGC:WFS','OGC Web Feature Service',tgid),
-('OGC:WMS','OGC Web Map Service',tgid),
+('OGC:WFS-1.0.0-http-get-capabilities', 'OGC Web Feature Service, a WFS getcapabilities operation',tgid),
+('OGC:WFS-1.0.0-http-get-feature', 'OGC Web Feature Service, a WFS getFeature operation',tgid),
+('OGC:WMS-1.1.1-http-get-map', 'OGC Web Map Service, a WMS getMap operation',tgid),
+('OGC:WMS-1.1.1-http-get-capabilities', 'OGC Web Map Service',tgid),
 ('OGC:WPS','OGC Web Processing Service',tgid),
 ('ESRI:ArcIMS','ESRI ArcIMS Service',tgid),
 ('ESRI:ArcGIS','ESRI ArcGIS Service',tgid),
@@ -293,14 +295,15 @@ VALUES
 ('UNIDATA:CdmRemote','Common Data Model index subsetting',tgid),
 ('UNIDATA:CdmrFeature','Common Data Model coordinate subsetting',tgid),
 ('OGC:GML','OGC Geography Markup Language',tgid),
-('WWW:LINK','Web Address (URL)',tgid),
+('WWW:LINK-1.0-http--link', 'Web Address (URL), should be used when no further information about the resource is available',tgid),
+('WWW:DOWNLOAD-1.0-http--download', 'Web Address (URL), this is a download URL',tgid),
 ('WWW:WSDL','Web Service Description Language XML document describing service operation',tgid),
 ('OpenSearch1.1','OpenSearch template',tgid),
 ('OpenSearch1.1:Description','OpenSearch description document',tgid),
 ('ZIP:application/x-netcdf','Compressed netCDF-CF/Network Common Data Form dataset',tgid),
 ('WWW:RIA','Rich Internet Application (JavaScript/HTML5 application)',tgid),
 ('WWW:FORM','Web form',tgid),
-('WWW:TILESERVER','...',tgid);
+('WWW:TILESERVER','Tileserver',tgid);
 
 
 tgid = (SELECT id from taggroup where name = 'realtionship type');
@@ -417,7 +420,7 @@ VALUES
 ('finished','The upload of the newly imported representation to an Advanced Data Repository like Geoserver or THREDDS has been completed successfully.',tgid),
 ('failed','The upload of the newly imported representation to an Advanced Data Repository like Geoserver or THREDDS has failed.',tgid);
 
-tgid = (SELECT id from taggroup where name = 'CUASHI');
+tgid = (SELECT id from taggroup where name = 'CUAHSI');
 INSERT INTO tag (name, description, taggroup)
 VALUES
 ('Area','Area',tgid),

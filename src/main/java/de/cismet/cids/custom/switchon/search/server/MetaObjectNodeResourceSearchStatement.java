@@ -104,7 +104,15 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected Timestamp fromDate;
     protected Timestamp toDate;
     protected String location;
-    protected float geoBuffer = 0.000001f;
+    protected long geoBuffer = 0;
+    protected List<String[]> keywordGroupList;
+    protected List<String> negatedKeywordList;
+    protected String collection;
+    protected List<String> functionList;
+    protected List<String> negatedFunctionList;
+    protected List<String> accessConditions;
+    protected List<String> negatedAccessConditions;
+    protected int offset = 0;
     private int limit = 0;
 
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
@@ -159,53 +167,75 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @return  DOCUMENT ME!
      */
-
     protected String generateQuery() {
         query = new StringBuilder();
-        query.append("SELECT DISTINCT " + "(SELECT id "
-                    + "FROM cs_class "
-                    + "WHERE name ilike 'resource' "
-                    + "), r.id, r.name ");
-        query.append("FROM resource r");
+        query.append("SELECT DISTINCT (SELECT id FROM cs_class WHERE name = 'resource')");
+        query.append(" AS class_id, r.id, r.name FROM resource r");
         if (geometryToSearchFor != null) {
-            query.append(" join geom g ON r.spatialcoverage = g.id ");
+            query.append(" JOIN geom g ON r.spatialcoverage = g.id ");
         }
-        if ((keywordList != null) && !keywordList.isEmpty()) {
-            query.append(" join jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
-                    .append(" join tag kwt ON jtrt.tagid = kwt.id")
-                    .append(" join taggroup kwt_tg ON kwt.taggroup = kwt_tg.id");
+        if (((keywordList != null) && !keywordList.isEmpty())
+                    || ((keywordGroupList != null) && !keywordGroupList.isEmpty())) {
+            query.append(" JOIN jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
+                    .append(" JOIN tag kwt ON jtrt.tagid = kwt.id")
+                    .append(" JOIN taggroup kwt_tg ON kwt.taggroup = kwt_tg.id");
         }
         if (topicCategory != null) {
-            query.append(" join tag tct ON r.topiccategory = tct.id");
+            query.append(" JOIN tag tct ON r.topiccategory = tct.id");
+        }
+        if (collection != null) {
+            query.append(" JOIN tag tc ON r.collection = tc.id");
         }
         if (location != null) {
-            query.append(" join tag lct ON r.location = lct.id");
+            query.append(" JOIN tag lct ON r.location = lct.id");
         }
+        if ((accessConditions != null) && !accessConditions.isEmpty()) {
+            query.append(" JOIN tag acs ON r.accessconditions = acs.id");
+        }
+        if ((functionList != null) && !functionList.isEmpty()) {
+            query.append(" JOIN jt_resource_representation jtrr ON r.id = jtrr.resource_reference");
+            query.append(" JOIN representation rep ON jtrr.representationid = rep.id");
+            query.append(" JOIN tag rfc ON rep.function = rfc.id");
+        }
+
         query.append(" WHERE TRUE ");
         appendGeometry();
+        appendCollection();
+        appendTopicCategory();
+        appendFunctions();
+        appendAccessConditions();
         appendKeywords();
+        appendKeywordGroups();
         appendTemporal();
         appendTitleDescription();
-        appendtopic();
         appendLocation();
+        appendKeywordCombination();
+        appendOrderBy();
+        appendNegatedKeywords();
+        appendNegatedFunctions();
+        appendNegatedAccessConditions();
         appendLimit();
+        appendOffset();
 
         return query.toString();
     }
 
     // - Append queryables and setter ------------------------------------------
-
     /**
      * DOCUMENT ME!
      */
     protected void appendGeometry() {
         if (geometryToSearchFor != null) {
             final String geostring = PostGisGeometryFactory.getPostGisCompliantDbString(geometryToSearchFor);
-            query.append("and g.geo_field && st_geometryfromtext('").append(geostring).append("')");
+            query.append("AND g.geo_field && st_geometryfromtext('").append(geostring).append("')");
 
-            if ((geometryToSearchFor instanceof Polygon) || (geometryToSearchFor instanceof MultiPolygon)) {
+            if (((geoBuffer > 0) && (geometryToSearchFor instanceof Polygon))
+                        || (geometryToSearchFor instanceof MultiPolygon)) {
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("performing geospatial search with buffer of " + geoBuffer + "m.");
+                }
                 // with buffer for geostring
-                query.append(" and ")
+                query.append(" AND ")
                         .append(geometryFunction)
                         .append("(")
                         .append("st_transform( st_buffer( st_transform(st_geometryfromtext('")
@@ -213,17 +243,17 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                         .append("'),3857), ")
                         .append(String.valueOf(geoBuffer))
                         .append("), 4326), ")
-                        .append("st_buffer(geo_field, 0.000001))"); // <-- why ?????
+                        .append("geo_field)"); // <-- why ?????
             } else {
-                // without buffer for geostring <-- why ?????
-                query.append(" and ")
+                // without buffer for geostring
+                query.append(" AND ")
                         .append(geometryFunction)
                         .append("(")
                         .append("st_geometryfromtext('")
                         .append(geostring)
                         .append("')")
                         .append(", ")
-                        .append("st_buffer(geo_field, 0.000001)")
+                        .append("geo_field")
                         .append(")");
             }
         }
@@ -234,9 +264,9 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendTemporal() {
         if (fromDate != null) {
-            query.append(" and r.fromDate >= '").append(fromDate.toString()).append("'");
+            query.append(" AND r.fromDate >= '").append(fromDate.toString()).append("'");
             if (toDate != null) {
-                query.append(" and r.toDate < '").append(toDate.toString()).append("'::Timestamp + '1 day'::interval");
+                query.append(" AND r.toDate < '").append(toDate.toString()).append("'::Timestamp + '1 day'::interval");
             }
         }
     }
@@ -247,27 +277,109 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     private void appendKeywords() {
         if ((keywordList != null) && !keywordList.isEmpty()) {
             String[] keywords = new String[keywordList.size()];
+
             keywords = keywordList.toArray(keywords);
-            query.append(" and ( kwt.name ilike '").append(keywords[0]).append("' and kwt_tg.name like 'keywords%'");
-            if (keywords.length > 1) {
-                for (int i = 1; i < keywords.length; i++) {
-                    query.append(" OR kwt.name ilike '").append(keywords[i]).append("'");
+            query.append(" AND (to_tsvector('simple', kwt.name) @@ to_tsquery('simple', '");
+
+            for (int i = 0; i < keywords.length; i++) {
+                if (i > 0) {
+                    query.append(" | ");
                 }
-                query.append(") GROUP by r.id HAVING COUNT(kwt.id) = ").append(keywords.length);
+                query.append("''").append(keywords[i]).append("''");
             }
-            else
-            {
-                query.append(")");
-            }
+
+            query.append("')");
+            query.append(" AND to_tsvector('simple', kwt_tg.name) @@ to_tsquery('simple', '''keywords'':*'))");
         }
     }
 
     /**
      * DOCUMENT ME!
      */
-    private void appendtopic() {
+    private void appendKeywordGroups() {
+        if ((keywordGroupList != null) && !keywordGroupList.isEmpty()) {
+            if ((keywordList != null) && !keywordList.isEmpty()) {
+                query.append(" OR (to_tsvector('simple', kwt.name) @@ to_tsquery('simple', '");
+            } else {
+                query.append(" AND (to_tsvector('simple', kwt.name) @@ to_tsquery('simple', '");
+            }
+
+            String currentGroup = keywordGroupList.get(0)[0];
+            int inGroupCount = 0;
+            int groupCount = 0;
+
+            for (int i = 0; i < keywordGroupList.size(); i++) {
+                // check for new group
+                if (!keywordGroupList.get(i)[0].equals(currentGroup)) {
+                    groupCount++;
+                    inGroupCount = 0;
+                }
+
+                // start of first or new group
+                if (inGroupCount == 0) {
+                    // start of new group: close previous group
+                    if (groupCount > 0) {
+                        currentGroup = keywordGroupList.get(i)[0];
+                        query.append("')");
+                        query.append(" AND to_tsvector('simple', kwt_tg.name) @@ to_tsquery('simple', '''keywords - ")
+                                .append(currentGroup)
+                                .append("'''))");
+                        query.append(" AND (to_tsvector('simple', kwt.name) @@ to_tsquery('simple', '");
+                    }
+                } else {
+                    query.append(" | ");
+                }
+
+                query.append("''").append(keywordGroupList.get(i)[1]).append("''");
+                inGroupCount++;
+            }
+
+            // end of loop: close last group
+            query.append("')");
+            query.append(" AND to_tsvector('simple', kwt_tg.name) @@ to_tsquery('simple', '''keywords - ")
+                    .append(currentGroup)
+                    .append("'''))");
+        }
+    }
+
+    /**
+     * FAKE AND Statement for keywords. Filter by groups, e.g.
+     */
+    private void appendKeywordCombination() {
+        int size = 0;
+        size += (keywordList != null) ? keywordList.size() : 0;
+        size += (keywordGroupList != null) ? keywordGroupList.size() : 0;
+
+        if (size > 0) {
+            query.append(" GROUP BY r.id HAVING COUNT(kwt.id) = ").append(size);
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendTopicCategory() {
         if (topicCategory != null) {
-            query.append(" and tct.name ilike '").append(topicCategory).append("'");
+            final StringBuilder topicCategoryParameter = new StringBuilder(topicCategory);
+            query.append(" AND to_tsvector('simple', tct.name) @@ to_tsquery('simple', '");
+            if (checkForNot(topicCategoryParameter)) {
+                query.append("!");
+            }
+            query.append("''").append(topicCategoryParameter).append("''')");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendCollection() {
+        if (collection != null) {
+            final StringBuilder parameter = new StringBuilder(collection);
+            query.append(" AND to_tsvector('simple', tc.name) @@ to_tsquery('simple', '");
+            if (checkForNot(parameter)) {
+                query.append("!");
+            }
+            query.append("''").append(parameter).append("''')");
         }
     }
 
@@ -275,13 +387,46 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      * DOCUMENT ME!
      */
     private void appendTitleDescription() {
-        if ((title != null) && (description == null)) {
-            query.append(" and r.name ilike '%").append(title).append("%'");
-        } else if ((title != null) && (description != null)) {
-            query.append(" and (r.name ilike '%").append(title).append("%'");
-            query.append(" or r.description ilike '%").append(description).append("%')");
-        } else if ((title == null) && (description != null)) {
-            query.append(" and r.description ilike '%").append(description).append("%'");
+        if ((title == null) && (description == null)) {
+            // LOG.warn("cannot append title or description: both are null!");
+            return;
+        }
+
+        StringBuilder parameter;
+        query.append(" AND to_tsvector('simple',");
+        if ((title != null) && (description != null)) {
+            query.append(" r.name || ' ' || r.description) @@ to_tsquery('simple', '");
+
+            parameter = new StringBuilder(title);
+            if (checkForNot(parameter)) {
+                query.append("!");
+            }
+
+            query.append("''").append(parameter).append("''");
+            if (title.equals(description)) {
+                query.append("')");
+            } else {
+                query.append(" & ");
+                parameter = new StringBuilder(description);
+                if (checkForNot(parameter)) {
+                    query.append("!");
+                }
+                query.append("''").append(parameter).append("''')");
+            }
+        } else if (title != null) {
+            parameter = new StringBuilder(title);
+            query.append(" r.name) @@ to_tsquery('simple', '");
+            if (checkForNot(parameter)) {
+                query.append("!");
+            }
+            query.append("''").append(parameter).append("''')");
+        } else {
+            parameter = new StringBuilder(description);
+            query.append(" r.description) @@ to_tsquery('simple', '");
+            if (checkForNot(parameter)) {
+                query.append("!");
+            }
+            query.append("''").append(parameter).append("''')");
         }
     }
 
@@ -290,8 +435,111 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     private void appendLocation() {
         if (location != null) {
-            query.append(" and lct.name ilike '").append(location).append("'");
+            query.append(" AND to_tsvector('simple', lct.name) @@ to_tsquery('simple', '''")
+                    .append(location)
+                    .append("''')");
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendAccessConditions() {
+        if ((accessConditions != null) && !accessConditions.isEmpty()) {
+            String[] accessConditionsArray = new String[accessConditions.size()];
+            accessConditionsArray = accessConditions.toArray(accessConditionsArray);
+            query.append(" AND to_tsvector('simple', acs.name) @@ to_tsquery('simple', '");
+
+            for (int i = 0; i < accessConditionsArray.length; i++) {
+                if (i > 0) {
+                    query.append(" | ");
+                }
+                query.append("''").append(accessConditionsArray[i]).append("''");
+            }
+
+            query.append("')");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendNegatedAccessConditions() {
+        if ((negatedAccessConditions != null) && !negatedAccessConditions.isEmpty()) {
+            String[] negatedAccessConditionsArray = new String[negatedAccessConditions.size()];
+
+            negatedAccessConditionsArray = negatedAccessConditions.toArray(negatedAccessConditionsArray);
+
+            query.insert(0, "SELECT acs_resource.class_id, acs_resource.id, acs_resource.name FROM (");
+            query.append(") AS acs_resource WHERE acs_resource.id NOT IN")
+                    .append(" (SELECT acs_rr.id from resource acs_rr, tag acs_tag WHERE")
+                    .append(" acs_tag.id = acs_rr.accessconditions AND (");
+
+            for (int i = 0; i < negatedAccessConditionsArray.length; i++) {
+                if (i > 0) {
+                    query.append(" OR");
+                }
+                query.append(" to_tsvector('simple', acs_tag.name) @@ to_tsquery('simple', '''")
+                        .append(negatedAccessConditionsArray[i])
+                        .append("''')");
+            }
+            query.append("))");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendFunctions() {
+        if ((functionList != null) && !functionList.isEmpty()) {
+            String[] functions = new String[functionList.size()];
+            functions = functionList.toArray(functions);
+            query.append(" AND to_tsvector('simple', rfc.name) @@ to_tsquery('simple', '");
+
+            for (int i = 0; i < functions.length; i++) {
+                if (i > 0) {
+                    query.append(" | ");
+                }
+                query.append("''").append(functions[i]).append("''");
+            }
+
+            query.append("')");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendNegatedFunctions() {
+        if ((negatedFunctionList != null) && !negatedFunctionList.isEmpty()) {
+            String[] negatedFunctions = new String[negatedFunctionList.size()];
+
+            negatedFunctions = negatedFunctionList.toArray(negatedFunctions);
+
+            query.insert(0, "SELECT fcs_resource.class_id, fcs_resource.id, fcs_resource.name FROM (");
+            query.append(") AS fcs_resource WHERE fcs_resource.id NOT IN")
+                    .append(" (SELECT fcs_rr.id from resource fcs_rr")
+                    .append(" JOIN jt_resource_representation fcs_jtrr ON fcs_rr.id = fcs_jtrr.resource_reference")
+                    .append(" JOIN representation fcs_rep ON fcs_jtrr.representationid = fcs_rep.id")
+                    .append(" JOIN tag fcs_tag ON fcs_rep.function = fcs_tag.id WHERE");
+
+            for (int i = 0; i < negatedFunctions.length; i++) {
+                if (i > 0) {
+                    query.append(" OR");
+                }
+                query.append(" to_tsvector('simple', fcs_tag.name) @@ to_tsquery('simple', '''")
+                        .append(negatedFunctions[i])
+                        .append("''')");
+            }
+            query.append(")");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendOrderBy() {
+        query.append(" ORDER BY r.name");
     }
 
     /**
@@ -301,6 +549,65 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         if (limit > 0) {
             query.append(" LIMIT ").append(limit);
         }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendOffset() {
+        if (offset > 0) {
+            if (limit > 0) {
+                if ((offset % limit) == 0) {
+                    query.append(" OFFSET ").append(offset);
+                } else {
+                    LOG.warn("offset '" + offset + "' does not match limit '" + limit + "'");
+                }
+            } else {
+                LOG.warn("offset '" + offset + "' cannot be applied without limit");
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    private void appendNegatedKeywords() {
+        if ((negatedKeywordList != null) && !negatedKeywordList.isEmpty()) {
+            String[] negatedKeywords = new String[negatedKeywordList.size()];
+
+            negatedKeywords = negatedKeywordList.toArray(negatedKeywords);
+            query.insert(0, "SELECT rresource.class_id, rresource.id, rresource.name FROM (");
+            query.append(") AS rresource WHERE rresource.id NOT IN")
+                    .append(
+                            " (SELECT rr.id from resource rr, jt_resource_tag, tag WHERE jt_resource_tag.resource_reference = rr.id")
+                    .append(" AND tag.id = jt_resource_tag.tagid AND (");
+
+            for (int i = 0; i < negatedKeywords.length; i++) {
+                if (i > 0) {
+                    query.append(" OR");
+                }
+                query.append(" to_tsvector('simple', tag.name) @@ to_tsquery('simple', '''")
+                        .append(negatedKeywords[i])
+                        .append("''')");
+            }
+            query.append("))");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   parameter  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    private boolean checkForNot(final StringBuilder parameter) {
+        if (parameter.indexOf("!") == 0) {
+            parameter.deleteCharAt(0);
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -398,7 +705,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @return  DOCUMENT ME!
      */
-    public float getGeoBuffer() {
+    public long getGeoBuffer() {
         return geoBuffer;
     }
 
@@ -407,15 +714,12 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @param  geoBuffer  DOCUMENT ME!
      */
-    public void setGeoBuffer(final float geoBuffer) {
-        
-        if(geoBuffer > 0 && geoBuffer < 10000000000l)
-        {
+    public void setGeoBuffer(final long geoBuffer) {
+        if ((geoBuffer > 0) && (geoBuffer < 10000000000L)) {
             this.geoBuffer = geoBuffer;
-        }
-        else
-        {
-            LOG.warn("invalid geo buffer: "+geoBuffer);
+        } else {
+            LOG.warn("invalid geo buffer: " + geoBuffer);
+            this.geoBuffer = 0;
         }
     }
 
@@ -435,5 +739,149 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      */
     public void setLimit(final int limit) {
         this.limit = limit;
+    }
+
+    /**
+     * Get the value of keywordGroupList.
+     *
+     * @return  the value of keywordGroupList
+     */
+    public List<String[]> getKeywordGroupList() {
+        return keywordGroupList;
+    }
+
+    /**
+     * Set the value of keywordGroupList.
+     *
+     * @param  keywordGroupList  new value of keywordGroupList
+     */
+    public void setKeywordGroupList(final List<String[]> keywordGroupList) {
+        this.keywordGroupList = keywordGroupList;
+    }
+
+    /**
+     * Get the value of negatedKeywordsLis.
+     *
+     * @return  the value of negatedKeywordsLis
+     */
+    public List<String> getNegatedKeywordList() {
+        return negatedKeywordList;
+    }
+
+    /**
+     * Set the value of negatedKeywordsLis.
+     *
+     * @param  negatedKeywordList  new value of negatedKeywordsLis
+     */
+    public void setNegatedKeywordList(final List<String> negatedKeywordList) {
+        this.negatedKeywordList = negatedKeywordList;
+    }
+
+    /**
+     * Get the value of collection.
+     *
+     * @return  the value of collection
+     */
+    public String getCollection() {
+        return collection;
+    }
+
+    /**
+     * Set the value of collection.
+     *
+     * @param  collection  new value of collection
+     */
+    public void setCollection(final String collection) {
+        this.collection = collection;
+    }
+
+    /**
+     * Get the value of offset.
+     *
+     * @return  the value of offset
+     */
+    public int getOffset() {
+        return offset;
+    }
+
+    /**
+     * Set the value of offset.
+     *
+     * @param  offset  new value of offset
+     */
+    public void setOffset(final int offset) {
+        this.offset = offset;
+    }
+
+    /**
+     * Get the value of accessConditions.
+     *
+     * @return  the value of accessConditions
+     */
+    public List<String> getAccessConditions() {
+        return accessConditions;
+    }
+
+    /**
+     * Set the value of accessConditions.
+     *
+     * @param  accessConditions  new value of accessConditions
+     */
+    public void setAccessConditions(final List<String> accessConditions) {
+        this.accessConditions = accessConditions;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public List<String> getNegatedAccessConditions() {
+        return negatedAccessConditions;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  negatedAccessConditions  DOCUMENT ME!
+     */
+    public void setNegatedAccessConditions(final List<String> negatedAccessConditions) {
+        this.negatedAccessConditions = negatedAccessConditions;
+    }
+
+    /**
+     * Get the value of functionList.
+     *
+     * @return  the value of functionList
+     */
+    public List<String> getFunctionList() {
+        return functionList;
+    }
+
+    /**
+     * Set the value of functionList.
+     *
+     * @param  functionList  new value of functionList
+     */
+    public void setFunctionList(final List<String> functionList) {
+        this.functionList = functionList;
+    }
+
+    /**
+     * Get the value of negatedFunctionList.
+     *
+     * @return  the value of negatedFunctionList
+     */
+    public List<String> getNegatedFunctionList() {
+        return negatedFunctionList;
+    }
+
+    /**
+     * Set the value of negatedFunctionList.
+     *
+     * @param  negatedFunctionList  new value of negatedFunctionList
+     */
+    public void setNegatedFunctionList(final List<String> negatedFunctionList) {
+        this.negatedFunctionList = negatedFunctionList;
     }
 }
