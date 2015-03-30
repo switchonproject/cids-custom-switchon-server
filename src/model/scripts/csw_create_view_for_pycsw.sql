@@ -1,8 +1,8 @@
 -- View: pycsw.pycsw_view
 
--- DROP VIEW pycsw.pycsw_view;
+DROP VIEW pycsw.pycsw_view;
 
--- CREATE SCHEMA IF NOT EXISTS pycsw;
+CREATE SCHEMA IF NOT EXISTS pycsw;
 
 CREATE OR REPLACE VIEW pycsw.pycsw_view AS 
  WITH tag_to_group_resource AS (
@@ -218,7 +218,7 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
     fulltablewoanytext.publisher,
     fulltablewoanytext.title_alternate,
     fulltablewoanytext.typename,
-    concat(fulltablewoanytext.*) AS anytext
+    concat(fulltablewoanytext.title, ' ', fulltablewoanytext.abstract, ' ', fulltablewoanytext.keywords) AS anytext
    FROM fulltablewoanytext;
 
 ALTER TABLE pycsw.pycsw_view
