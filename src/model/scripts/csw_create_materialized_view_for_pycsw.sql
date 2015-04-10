@@ -1,7 +1,5 @@
 -- View: pycsw.pycsw_materialized_view
 
--- CREATE SCHEMA IF NOT EXISTS pycsw;
-
 CREATE SCHEMA IF NOT EXISTS pycsw;
 DROP MATERIALIZED VIEW IF EXISTS pycsw.pycsw_materialized_view;
 CREATE MATERIALIZED VIEW pycsw.pycsw_materialized_view AS 
@@ -190,18 +188,23 @@ CREATE MATERIALIZED VIEW pycsw.pycsw_materialized_view AS
     fulltablewoanytext.publisher,
     fulltablewoanytext.title_alternate,
     fulltablewoanytext.typename,
-    concat(fulltablewoanytext.*) AS anytext
+    concat(fulltablewoanytext.title, ' ', fulltablewoanytext.abstract, ' ', fulltablewoanytext.keywords) AS anytext
    FROM fulltablewoanytext;
 
 ALTER TABLE pycsw.pycsw_materialized_view
-  OWNER TO switchon;
-GRANT ALL ON TABLE pycswpycswpycsw.pycsw_materialized_view TO switchon;
-GRANT ALL ON TABLE pycswpycsw.pycsw_materialized_view TO postgres;
+  OWNER TO postgres;
+--GRANT ALL ON TABLE pycsw.pycsw_materialized_view TO switchon;
+GRANT ALL ON TABLE pycsw.pycsw_materialized_view TO postgres;
 GRANT ALL ON TABLE pycsw.pycsw_materialized_view TO public;
 
-CREATE UNIQUE INDEX index_identifier ON pycsw.pycsw_materialized_view (identifier);
-CREATE INDEX index_geometry ON pycsw.pycsw_materialized_view USING GIST (wkb_geometry);
-CREATE INDEX index_anytext ON pycsw.pycsw_materialized_view USING gin(to_tsvector('english', anytext));
-CREATE INDEX index_keywords ON pycsw.pycsw_materialized_view USING gin(to_tsvector('english', keywords));
+DROP INDEX IF EXISTS pycsw_materialized_view_index_identifier;
+DROP INDEX IF EXISTS pycsw_materialized_view_index_geometry;
+DROP INDEX IF EXISTS pycsw_materialized_view_index_anytext;
+DROP INDEX IF EXISTS pycsw_materialized_view_index_keywords;
+
+CREATE UNIQUE INDEX pycsw_materialized_view_index_identifier ON pycsw.pycsw_materialized_view (identifier);
+CREATE INDEX pycsw_materialized_view_index_geometry ON pycsw.pycsw_materialized_view USING GIST (wkb_geometry);
+CREATE INDEX pycsw_materialized_view_index_anytext ON pycsw.pycsw_materialized_view USING gin(to_tsvector('english', anytext));
+CREATE INDEX pycsw_materialized_view_index_keywords ON pycsw.pycsw_materialized_view USING gin(to_tsvector('english', keywords));
 
 -- REFRESH MATERIALIZED VIEW pycsw.pycsw_materialized_view WITH DATA;
