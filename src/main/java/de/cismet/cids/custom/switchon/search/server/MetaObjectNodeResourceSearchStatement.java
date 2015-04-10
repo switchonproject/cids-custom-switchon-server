@@ -171,44 +171,18 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         query = new StringBuilder();
         query.append("SELECT DISTINCT (SELECT id FROM cs_class WHERE name = 'resource')");
         query.append(" AS class_id, r.id, r.name FROM resource r");
-        if (geometryToSearchFor != null) {
-            query.append(" JOIN geom g ON r.spatialcoverage = g.id ");
-        }
-        if (((keywordList != null) && !keywordList.isEmpty())
-                    || ((keywordGroupList != null) && !keywordGroupList.isEmpty())) {
-            query.append(" JOIN jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
-                    .append(" JOIN tag kwt ON jtrt.tagid = kwt.id")
-                    .append(" JOIN taggroup kwt_tg ON kwt.taggroup = kwt_tg.id");
-        }
-        if (topicCategory != null) {
-            query.append(" JOIN tag tct ON r.topiccategory = tct.id");
-        }
-        if (collection != null) {
-            query.append(" JOIN tag tc ON r.collection = tc.id");
-        }
-        if (location != null) {
-            query.append(" JOIN tag lct ON r.location = lct.id");
-        }
-        if ((accessConditions != null) && !accessConditions.isEmpty()) {
-            query.append(" JOIN tag acs ON r.accessconditions = acs.id");
-        }
-        if ((functionList != null) && !functionList.isEmpty()) {
-            query.append(" JOIN jt_resource_representation jtrr ON r.id = jtrr.resource_reference");
-            query.append(" JOIN representation rep ON jtrr.representationid = rep.id");
-            query.append(" JOIN tag rfc ON rep.function = rfc.id");
-        }
 
-        query.append(" WHERE TRUE ");
-        appendGeometry();
-        appendCollection();
-        appendTopicCategory();
-        appendFunctions();
-        appendAccessConditions();
-        appendKeywords();
-        appendKeywordGroups();
+        this.joinKeywords();
+        this.joinTopicCategory();
+        this.joinCollection();
+        this.joinAccessConditions();
+        this.joinFunctions();
+        this.joinGeometry();
+
+        query.append(" WHERE r.id IS NOT NULL ");
+
         appendTemporal();
         appendTitleDescription();
-        appendLocation();
         appendKeywordCombination();
         appendOrderBy();
         appendNegatedKeywords();
@@ -220,6 +194,97 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
         return query.toString();
     }
 
+    /**
+     * - Append JOIN statements.
+     */
+    protected void joinKeywords() {
+        if (((keywordList != null) && !keywordList.isEmpty())
+                    || ((keywordGroupList != null) && !keywordGroupList.isEmpty())) {
+            query.append(" INNER JOIN jt_resource_tag jtrt ON r.id = jtrt.resource_reference")
+                    .append(" INNER JOIN tag kwt ON jtrt.tagid = kwt.id")
+                    .append(" INNER JOIN taggroup kwt_tg ON kwt.taggroup = kwt_tg.id");
+
+            this.appendKeywords();
+            this.appendKeywordGroups();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    protected void joinTopicCategory() {
+        if (topicCategory != null) {
+            query.append(" INNER JOIN tag tct ON r.topiccategory = tct.id");
+            this.appendTopicCategory();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    protected void joinCollection() {
+        if (collection != null) {
+            query.append(" INNER JOIN tag tc ON r.collection = tc.id");
+        }
+
+        this.appendCollection();
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    protected void joinGeometry() {
+        if (geometryToSearchFor != null) {
+            // need to create a RIGHT join when keyword tags are joined in
+            // probaby a problem with the query optimizer.
+            if (((keywordList != null) && !keywordList.isEmpty())
+                        || ((keywordGroupList != null) && !keywordGroupList.isEmpty())) {
+                query.append(" RIGHT");
+            } else {
+                query.append(" INNER");
+            }
+
+            query.append(" JOIN geom g ON r.spatialcoverage = g.id ");
+
+            this.appendGeometry();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    protected void joinLocation() {
+        if (location != null) {
+            query.append(" INNER JOIN tag lct ON r.location = lct.id");
+
+            this.appendLocation();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    protected void joinAccessConditions() {
+        if ((accessConditions != null) && !accessConditions.isEmpty()) {
+            query.append(" INNER JOIN tag acs ON r.accessconditions = acs.id");
+
+            this.appendAccessConditions();
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     */
+    protected void joinFunctions() {
+        if ((functionList != null) && !functionList.isEmpty()) {
+            query.append(" INNER JOIN jt_resource_representation jtrr ON r.id = jtrr.resource_reference");
+            query.append(" INNER JOIN representation rep ON jtrr.representationid = rep.id");
+            query.append(" INNER JOIN tag rfc ON rep.function = rfc.id");
+
+            this.appendFunctions();
+        }
+    }
+
     // - Append queryables and setter ------------------------------------------
     /**
      * DOCUMENT ME!
@@ -227,7 +292,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected void appendGeometry() {
         if (geometryToSearchFor != null) {
             final String geostring = PostGisGeometryFactory.getPostGisCompliantDbString(geometryToSearchFor);
-            query.append("AND g.geo_field && st_geometryfromtext('").append(geostring).append("')");
+            query.append("AND g.geo_field && st_GeomFromEWKT('").append(geostring).append("')");
 
             if (((geoBuffer > 0) && (geometryToSearchFor instanceof Polygon))
                         || (geometryToSearchFor instanceof MultiPolygon)) {
@@ -238,18 +303,18 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                 query.append(" AND ")
                         .append(geometryFunction)
                         .append("(")
-                        .append("st_transform( st_buffer( st_transform(st_geometryfromtext('")
+                        .append("st_transform( st_buffer( st_transform(st_GeomFromEWKT('")
                         .append(geostring)
                         .append("'),3857), ")
                         .append(String.valueOf(geoBuffer))
                         .append("), 4326), ")
-                        .append("geo_field)"); // <-- why ?????
+                        .append("geo_field)");
             } else {
                 // without buffer for geostring
                 query.append(" AND ")
                         .append(geometryFunction)
                         .append("(")
-                        .append("st_geometryfromtext('")
+                        .append("st_GeomFromEWKT('")
                         .append(geostring)
                         .append("')")
                         .append(", ")
@@ -519,9 +584,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             query.insert(0, "SELECT fcs_resource.class_id, fcs_resource.id, fcs_resource.name FROM (");
             query.append(") AS fcs_resource WHERE fcs_resource.id NOT IN")
                     .append(" (SELECT fcs_rr.id from resource fcs_rr")
-                    .append(" JOIN jt_resource_representation fcs_jtrr ON fcs_rr.id = fcs_jtrr.resource_reference")
-                    .append(" JOIN representation fcs_rep ON fcs_jtrr.representationid = fcs_rep.id")
-                    .append(" JOIN tag fcs_tag ON fcs_rep.function = fcs_tag.id WHERE");
+                    .append(
+                            " INNER JOIN jt_resource_representation fcs_jtrr ON fcs_rr.id = fcs_jtrr.resource_reference")
+                    .append(" INNER JOIN representation fcs_rep ON fcs_jtrr.representationid = fcs_rep.id")
+                    .append(" INNER JOIN tag fcs_tag ON fcs_rep.function = fcs_tag.id AND");
 
             for (int i = 0; i < negatedFunctions.length; i++) {
                 if (i > 0) {
