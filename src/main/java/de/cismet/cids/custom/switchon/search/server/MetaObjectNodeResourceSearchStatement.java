@@ -373,18 +373,17 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             int inGroupCount = 0;
             int groupCount = 0;
 
-            for (int i = 0; i < keywordGroupList.size(); i++) {
+            for (String[] keywordGroupArray : keywordGroupList) {
                 // check for new group
-                if (!keywordGroupList.get(i)[0].equals(currentGroup)) {
+                if (!keywordGroupArray[0].equals(currentGroup)) {
                     groupCount++;
                     inGroupCount = 0;
                 }
-
                 // start of first or new group
                 if (inGroupCount == 0) {
                     // start of new group: close previous group
                     if (groupCount > 0) {
-                        currentGroup = keywordGroupList.get(i)[0];
+                        currentGroup = keywordGroupArray[0];
                         query.append("')");
                         query.append(" AND to_tsvector('simple', kwt_tg.name) @@ to_tsquery('simple', '''keywords - ")
                                 .append(currentGroup)
@@ -394,8 +393,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                 } else {
                     query.append(" | ");
                 }
-
-                query.append("''").append(keywordGroupList.get(i)[1]).append("''");
+                query.append("''").append(keywordGroupArray[1]).append("''");
                 inGroupCount++;
             }
 
@@ -587,7 +585,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                     .append(
                             " INNER JOIN jt_resource_representation fcs_jtrr ON fcs_rr.id = fcs_jtrr.resource_reference")
                     .append(" INNER JOIN representation fcs_rep ON fcs_jtrr.representationid = fcs_rep.id")
-                    .append(" INNER JOIN tag fcs_tag ON fcs_rep.function = fcs_tag.id AND");
+                    .append(" INNER JOIN tag fcs_tag ON fcs_rep.function = fcs_tag.id AND (");
 
             for (int i = 0; i < negatedFunctions.length; i++) {
                 if (i > 0) {
@@ -597,7 +595,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                         .append(negatedFunctions[i])
                         .append("''')");
             }
-            query.append(")");
+            query.append("))");
         }
     }
 
