@@ -61,7 +61,7 @@ import de.cismet.tools.PropertyReader;
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
  */
-@ServiceProvider(service = CidsTrigger.class)
+//@ServiceProvider(service = CidsTrigger.class)
 public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
     //~ Static fields/initializers ---------------------------------------------
