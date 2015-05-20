@@ -20,7 +20,7 @@ BEGIN
     LOOP
             tag_trimmed = trim(tag_raw);
             IF (tag_trimmed IS NOT NULL) THEN
-                    IF (EXISTS (SELECT 1 FROM tag, taggroup as tgroup WHERE tag.name ilike tag_trimmed AND taggroup = tgroup.id AND tgroup.name ilike 'keyword%')) THEN
+                    IF (EXISTS (SELECT 1 FROM tag, taggroup as tgroup WHERE tag.name ilike tag_trimmed AND taggroup = taggroupID)) THEN
                             raise notice 'Tag % exists. not inserted',tag_trimmed;
                     ELSE
                             raise notice 'Tag % does not exist. insert into taggroup %',tag_trimmed,taggroupID;
