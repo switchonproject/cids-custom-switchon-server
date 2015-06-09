@@ -69,11 +69,11 @@ CREATE MATERIALIZED VIEW pycsw.pycsw_materialized_view AS
           GROUP BY resource.id
         ), temptabtopic AS (
          SELECT resource.id,
-            accumulatedtags_resource.value AS topiccategory
-           FROM accumulatedtags_resource,
-            resource,
-            taggroup
-          WHERE accumulatedtags_resource.taggroup = taggroup.id AND taggroup.name::text = 'topic category'::text AND resource.id = accumulatedtags_resource.resid
+            tag.name AS topiccategory
+           FROM resource,
+            taggroup,
+            tag
+          WHERE tag.taggroup = taggroup.id AND taggroup.name::text = 'topic category'::text AND resource.topiccategory = tag.id
         ), temptabotherconst AS (
          SELECT resource.id,
             accumulatedtags_resource.value AS otherconstraints
@@ -127,7 +127,7 @@ CREATE MATERIALIZED VIEW pycsw.pycsw_materialized_view AS
             NULL::text AS relation,
             NULL::text AS contributor,
             NULL::text AS mdsource,
-            scope.scope AS type,
+            'dataset' AS type,
             NULL::text AS schema,
             NULL::text AS format,
             NULL::text AS publisher,
