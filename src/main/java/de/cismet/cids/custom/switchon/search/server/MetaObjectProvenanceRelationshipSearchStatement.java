@@ -79,7 +79,7 @@ implements LookupableServerSearch{
     public MetaObjectProvenanceRelationshipSearchStatement() {
         searchInfo = new SearchInfo();
         searchInfo.setKey(this.getClass().getName());
-        searchInfo.setKey(this.getClass().getSimpleName());
+        searchInfo.setName(this.getClass().getSimpleName());
         searchInfo.setDescription("Finds the provenance relationship of a resource r. This is the relationship, whose toresource is the id of r.");
         
         final List<SearchParameterInfo> parameterDescription = 
@@ -94,6 +94,7 @@ implements LookupableServerSearch{
         resultParameterInfo.setKey("return");
         resultParameterInfo.setArray(true);
         resultParameterInfo.setType(Type.ENTITY_REFERENCE);
+        searchInfo.setResultDescription(resultParameterInfo);
     }
 
     //~ Methods ----------------------------------------------------------------
