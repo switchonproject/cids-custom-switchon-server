@@ -181,6 +181,11 @@
             <artifactId>batik-awt-util</artifactId>
             <version>1.6-1</version>
         </dependency>
+        <dependency>
+            <groupId>de.cismet.cids</groupId>
+            <artifactId>cids-server-rest-types</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>
