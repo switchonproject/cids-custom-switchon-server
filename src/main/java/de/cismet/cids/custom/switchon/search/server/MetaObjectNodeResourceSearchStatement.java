@@ -31,10 +31,12 @@ import java.util.Collection;
 import java.util.List;
 
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
+import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
 import de.cismet.cids.server.search.SearchException;
 
 import de.cismet.cismap.commons.jtsgeometryfactories.PostGisGeometryFactory;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  * DOCUMENT ME!
@@ -42,6 +44,7 @@ import de.cismet.cismap.commons.jtsgeometryfactories.PostGisGeometryFactory;
  * @author   FabHewer
  * @version  $Revision$, $Date$
  */
+@ServiceProvider(service = CidsServerSearch.class)
 public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSearch
         implements MetaObjectNodeServerSearch {
 
@@ -52,6 +55,10 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
 
     //~ Enums ------------------------------------------------------------------
 
+    public MetaObjectNodeResourceSearchStatement() {
+        
+    }
+    
     /**
      * The postgis functions which can be used to search by geometries.
      *
@@ -373,7 +380,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             int inGroupCount = 0;
             int groupCount = 0;
 
-            for (String[] keywordGroupArray : keywordGroupList) {
+            for (final String[] keywordGroupArray : keywordGroupList) {
                 // check for new group
                 if (!keywordGroupArray[0].equals(currentGroup)) {
                     groupCount++;
@@ -751,8 +758,12 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      *
      * @return  DOCUMENT ME!
      */
-    public GeometryFunction getGeometryFunction() {
-        return geometryFunction;
+    public String getGeometryFunction() {
+        return geometryFunction.name();
+    }
+    
+    public void setGeometryFunction(final String geometryFunction) {
+        this.geometryFunction = GeometryFunction.valueOf(geometryFunction);
     }
 
     /**
@@ -763,6 +774,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     public void setGeometryFunction(final GeometryFunction geometryFunction) {
         this.geometryFunction = geometryFunction;
     }
+    
+   
 
     /**
      * DOCUMENT ME!
@@ -948,4 +961,38 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     public void setNegatedFunctionList(final List<String> negatedFunctionList) {
         this.negatedFunctionList = negatedFunctionList;
     }
+
+    public Geometry getGeometryToSearchFor() {
+        return geometryToSearchFor;
+    }
+
+    public List<String> getKeywordList() {
+        return keywordList;
+    }
+
+    public String getTopicCategory() {
+        return topicCategory;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Timestamp getFromDate() {
+        return fromDate;
+    }
+
+    public Timestamp getToDate() {
+        return toDate;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+    
+    
 }

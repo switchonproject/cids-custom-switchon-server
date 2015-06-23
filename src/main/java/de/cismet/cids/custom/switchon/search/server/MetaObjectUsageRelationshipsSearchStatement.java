@@ -20,7 +20,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
+import de.cismet.cids.server.search.CidsServerSearch;
 import de.cismet.cids.server.search.SearchException;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  * Finds the usage relationships of a resource r. This means that r is used in this relationships as source, to create
@@ -29,6 +31,7 @@ import de.cismet.cids.server.search.SearchException;
  * @author   Gilles Baatz
  * @version  $Revision$, $Date$
  */
+@ServiceProvider(service = CidsServerSearch.class)
 public class MetaObjectUsageRelationshipsSearchStatement extends AbstractCidsServerSearch {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -39,6 +42,7 @@ public class MetaObjectUsageRelationshipsSearchStatement extends AbstractCidsSer
     //~ Instance fields --------------------------------------------------------
 
     private User user;
+    private int resourceId = -1;
 
     private String query = " select (SELECT id "
                 + " FROM    cs_class "
@@ -59,6 +63,10 @@ public class MetaObjectUsageRelationshipsSearchStatement extends AbstractCidsSer
         this.query += resourceId;
         this.user = user;
     }
+    
+    public MetaObjectUsageRelationshipsSearchStatement() {
+        
+    }
 
     //~ Methods ----------------------------------------------------------------
 
@@ -78,5 +86,24 @@ public class MetaObjectUsageRelationshipsSearchStatement extends AbstractCidsSer
             LOG.error("active local server not found"); // NOI18N
         }
         return null;
+    }
+    
+     /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public int getResourceId() {
+        return resourceId;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  resourceId  DOCUMENT ME!
+     */
+    public void setResourceId(final int resourceId) {
+        this.resourceId = resourceId;
+        this.query += resourceId;
     }
 }
