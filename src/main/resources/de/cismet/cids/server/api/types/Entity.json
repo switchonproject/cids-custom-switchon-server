@@ -1,0 +1,430 @@
+{
+    "$self": "/SWITCHON.RESOURCE/8315",
+    "id": 8315,
+    "fromdate": -1073005200000,
+    "accessconditions": {
+        "$self": "/SWITCHON.TAG/159",
+        "id": 159,
+        "name": "CC BY-SA",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/145",
+            "id": 145,
+            "name": "access conditions",
+            "description": "License regulating the conditions for access and use of the data (open group with some predefined tags)."
+        },
+        "description": "Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0) http://creativecommons.org/licenses/by-sa/4.0/legalcode"
+    },
+    "spatialcoverage": {
+        "$self": "/SWITCHON.GEOM/8344",
+        "id": 8344,
+        "geo_field": "SRID=4326;POINT (8.49 56.89)"
+    },
+    "todate": 1009839600000,
+    "srid": {
+        "$self": "/SWITCHON.TAG/226",
+        "id": 226,
+        "name": "EPSG:4326",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/167",
+            "id": 167,
+            "name": "srid",
+            "description": "The Spatial Reference System Identifier (SRID) of the spatial coverage of the resource EPSG format (open group with some predefined tags)."
+        },
+        "description": "WGS 84 / World Geodetic System 1984"
+    },
+    "conformity": {
+        "$self": "/SWITCHON.TAG/253",
+        "id": 253,
+        "name": "Not evaluated",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/150",
+            "id": 150,
+            "name": "conformity",
+            "description": "This is a citation of the implementing rules adopted under Article 7(1) of Directive 2007/2/EC or other specification to which a particular resource conforms. (fixed group)"
+        },
+        "description": "Not evaluated"
+    },
+    "language": {
+        "$self": "/SWITCHON.TAG/145",
+        "id": 145,
+        "name": "eng",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/157",
+            "id": 157,
+            "name": "language",
+            "description": "The language(s) used within the resource or in which the metadata elements are expressed.  The value domain of this tag is limited to the languages defined in ISO 639-2."
+        },
+        "description": "English"
+    },
+    "description": "GRDC Station AARUP (6934050)  at river AARUP in country DK covering 105km² catchment area.",
+    "type": {
+        "$self": "/SWITCHON.TAG/255",
+        "id": 255,
+        "name": "repurposed data",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/164",
+            "id": 164,
+            "name": "resource type",
+            "description": "SIP internal type of the resource (fixed group)."
+        },
+        "description": "This is any data which has been adjusted or recalculated to be used in hydrological modelling or in a hydrological experiment."
+    },
+    "location": {
+        "$self": "/SWITCHON.TAG/865",
+        "id": 865,
+        "name": "World",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/158",
+            "id": 158,
+            "name": "location",
+            "description": "Geographic Location of the resource (covered by the data). E.g. Continent, Country, Region, City, etc. Open Group. (open group with some predefined tags)."
+        },
+        "description": "n/a"
+    },
+    "topiccategory": {
+        "$self": "/SWITCHON.TAG/238",
+        "id": 238,
+        "name": "inlandWaters",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/168",
+            "id": 168,
+            "name": "topic category",
+            "description": "High-level classification of resources in accordance with ISO 19115 for grouping and topic-based search (fixed group)."
+        },
+        "description": "inland water features, drainage systems and their characteristics Examples: rivers and glaciers, salt lakes, water utilization plans, dams, currents, floods, water quality, hydrographic charts"
+    },
+    "creationdate": 1433773490983,
+    "name": "AARUP (6934050)",
+    "licensestatement": "Open Data produced in the context of the SWITCH-ON (Sharing Water-related Information to Tackle Changes in the Hydrosphere - for Operational Needs) EU FP7 project. This project has received funding from the European Union's Seventh Programme for research, technological development and demonstration under grant agreement No 603587.",
+    "tags": [
+        {
+            "$self": "/SWITCHON.TAG/1417",
+            "id": 1417,
+            "name": "Level, stream",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/169",
+                "id": 169,
+                "name": "keywords - CUAHSI",
+                "description": "CUAHSI Hydrologic Ontology for Discovery"
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/1424",
+            "id": 1424,
+            "name": "Optical, water",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/169",
+                "id": 169,
+                "name": "keywords - CUAHSI",
+                "description": "CUAHSI Hydrologic Ontology for Discovery"
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/1437",
+            "id": 1437,
+            "name": "Volume",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/169",
+                "id": 169,
+                "name": "keywords - CUAHSI",
+                "description": "CUAHSI Hydrologic Ontology for Discovery"
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/1472",
+            "id": 1472,
+            "name": "Water body",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/169",
+                "id": 169,
+                "name": "keywords - CUAHSI",
+                "description": "CUAHSI Hydrologic Ontology for Discovery"
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/1473",
+            "id": 1473,
+            "name": "Water body, aquifer",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/169",
+                "id": 169,
+                "name": "keywords - CUAHSI",
+                "description": "CUAHSI Hydrologic Ontology for Discovery"
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/1475",
+            "id": 1475,
+            "name": "Water body, river",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/169",
+                "id": 169,
+                "name": "keywords - CUAHSI",
+                "description": "CUAHSI Hydrologic Ontology for Discovery"
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/105",
+            "id": 105,
+            "name": "Hydrography",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/155",
+                "id": 155,
+                "name": "keywords - INSPIRE themes 1.0",
+                "description": "Keywords from  Gemet – INSPIREthemes, version 1.0, publication, 2008-06-01 Hydrography (fixed group)."
+            },
+            "description": "Hydrographic elements, including marine areas and all other water bodies and items related to them, including river basins and sub-basins. Where appropriate, according to the definitions set out in Directive 2000/60/EC of the European Parliament and of the Council of 23 October 2000 establishing a framework for Community action in the field of water policy (2) and in the form of networks."
+        },
+        {
+            "$self": "/SWITCHON.TAG/872",
+            "id": 872,
+            "name": "water",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/156",
+                "id": 156,
+                "name": "keywords - open",
+                "description": "User defined to describe the subject (open group with several predefined tags)."
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/1148",
+            "id": 1148,
+            "name": "stations",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/156",
+                "id": 156,
+                "name": "keywords - open",
+                "description": "User defined to describe the subject (open group with several predefined tags)."
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/128",
+            "id": 128,
+            "name": "rivers",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/156",
+                "id": 156,
+                "name": "keywords - open",
+                "description": "User defined to describe the subject (open group with several predefined tags)."
+            },
+            "description": "n/a"
+        },
+        {
+            "$self": "/SWITCHON.TAG/896",
+            "id": 896,
+            "name": "runoff",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/156",
+                "id": 156,
+                "name": "keywords - open",
+                "description": "User defined to describe the subject (open group with several predefined tags)."
+            },
+            "description": "n/a"
+        }
+    ],
+    "contact": {
+        "$self": "/SWITCHON.CONTACT/90",
+        "id": 90,
+        "organisation": "Institute of Hydraulic Engineering and Water Resources Management",
+        "name": "Prof. Juraj Parajka",
+        "description": "The institute of hydraulic engineering and water resources management (research center of hydraulic engineering) is located in the main building of the Technical University of Vienna at Karlsplatz. Besides there is the hydraulic laboratory in A-1030, Vienna, Adolf Blamauergasse 1-3.",
+        "email": "parajka@hydro.tuwien.ac.at",
+        "url": "http://www.hydro.tuwien.ac.at",
+        "role": {
+            "$self": "/SWITCHON.TAG/221",
+            "id": 221,
+            "name": "pointOfContact",
+            "taggroup": {
+                "$self": "/SWITCHON.TAGGROUP/165",
+                "id": 165,
+                "name": "role",
+                "description": "Function performed by the responsible party (fixed group, standard codelist)."
+            },
+            "description": "Party that can be contacted for acquiring knowledge about or acquisition of the data resource. Person or organization that can be contacted to acquire data on the resource."
+        }
+    },
+    "representation": [
+        {
+            "$self": "/SWITCHON.REPRESENTATION/8316",
+            "id": 8316,
+            "name": "Flood Peak Data (6934050)",
+            "description": "The data in the .peak file shows the date of the start of a flood event, the end of the event, the date of maximum flood discharge, maximum discharge and some index representing the volume of water.",
+            "type": {
+                "$self": "/SWITCHON.TAG/212",
+                "id": 212,
+                "name": "original data",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/163",
+                    "id": 163,
+                    "name": "representation type",
+                    "description": "SIP internal type of the representation of the resource (fixed group)."
+                },
+                "description": "The representation holds the original data of the resource"
+            },
+            "function": {
+                "$self": "/SWITCHON.TAG/71",
+                "id": 71,
+                "name": "download",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/152",
+                    "id": 152,
+                    "name": "function",
+                    "description": "Function that can be perfomred following the contentLocation link to the resource representation (fixed group, standard codelist)."
+                },
+                "description": "link will get resource. The function of the link is to get a representation of the resource"
+            },
+            "protocol": {
+                "$self": "/SWITCHON.TAG/197",
+                "id": 197,
+                "name": "WWW:LINK-1.0-http--link",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/161",
+                    "id": 161,
+                    "name": "protocol",
+                    "description": "Protocol of the service that can be accessed at the contentLocation of the resource representation (open group with several predefined tags from standard codelists)."
+                },
+                "description": "Web Address (URL), should be used when no further information about the resource is available"
+            },
+            "applicationprofile": {
+                "$self": "/SWITCHON.TAG/1359",
+                "id": 1359,
+                "name": "Web Browser",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/147",
+                    "id": 147,
+                    "name": "application profile",
+                    "description": "Application that can be used to open or process the resource representation (open group with some predefined tags)."
+                }
+            },
+            "uuid": "13c39b6d-f7f3-492c-bca6-9d0e5d3174a8",
+            "temporalresolution": "daily",
+            "contentlocation": "https://repos.deltares.nl/repos/SWITCH-ON/Data/WP3/Repurposed/Flood_Experiment1_PeakFiles/6934050.peak",
+            "tags": [],
+            "contenttype": {
+                "$self": "/SWITCHON.TAG/66",
+                "id": 66,
+                "name": "text/plain",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/151",
+                    "id": 151,
+                    "name": "content type",
+                    "description": "MIME Type of the representation (open group which several predefined tags)."
+                },
+                "description": "raw, ascii text"
+            }
+        }
+    ],
+    "lastmodificationdate": 1433773490983,
+    "metadata": [
+        {
+            "$self": "/SWITCHON.METADATA/14433",
+            "id": 14433,
+            "name": "Autogenerated SWITCH-ON Basic Meta-Data",
+            "tags": [],
+            "description": "Basic Meta-Data record created, derived or imported by the SWITCH-ON project according to the SWITCH-ON Standard Information Model (SIM) for Meta-Data for the SWITCH-ON Spatial Information Platform (SIP).",
+            "contact": {
+                "$self": "/SWITCHON.CONTACT/37",
+                "id": 37,
+                "organisation": "SWITCH-ON",
+                "name": "SWITCH-ON",
+                "description": "Sharing Water-related Information to Tackle Changes in the Hydrosphere – for Operational Needs (SWITCH-ON).",
+                "email": "switchon.wm@gmail.com",
+                "url": "http://www.water-switch-on.eu/",
+                "role": {
+                    "$self": "/SWITCHON.TAG/221",
+                    "id": 221,
+                    "name": "pointOfContact",
+                    "taggroup": {
+                        "$self": "/SWITCHON.TAGGROUP/165",
+                        "id": 165,
+                        "name": "role",
+                        "description": "Function performed by the responsible party (fixed group, standard codelist)."
+                    },
+                    "description": "Party that can be contacted for acquiring knowledge about or acquisition of the data resource. Person or organization that can be contacted to acquire data on the resource."
+                }
+            },
+            "type": {
+                "$self": "/SWITCHON.TAG/177",
+                "id": 177,
+                "name": "basic meta-data",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/160",
+                    "id": 160,
+                    "name": "meta-data type",
+                    "description": "SIP internal type of the Meta-Data Record (fixed group)."
+                },
+                "description": "Type of the Meta-Data Record. \"basic meta-data\" refers to meta-data collected by switch-on according to the SIM meta-data schema. In fact, this meta-meta-data record refers to enclosing resource meta-data record."
+            },
+            "language": {
+                "$self": "/SWITCHON.TAG/145",
+                "id": 145,
+                "name": "eng",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/157",
+                    "id": 157,
+                    "name": "language",
+                    "description": "The language(s) used within the resource or in which the metadata elements are expressed.  The value domain of this tag is limited to the languages defined in ISO 639-2."
+                },
+                "description": "English"
+            },
+            "standard": {
+                "$self": "/SWITCHON.TAG/1387",
+                "id": 1387,
+                "name": "SWITCH-ON SIM",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/159",
+                    "id": 159,
+                    "name": "meta-data standard",
+                    "description": "Official standard on which the meta-data record is based (open group with some predefined tags)."
+                },
+                "description": "Meta-Data Record compliant to the Standard Information Model (SIM) of the Spatial Information Platform (SIP) of the EU FP7 project SWITCH-ON."
+            },
+            "contenttype": {
+                "$self": "/SWITCHON.TAG/43",
+                "id": 43,
+                "name": "application/octet-stream",
+                "taggroup": {
+                    "$self": "/SWITCHON.TAGGROUP/151",
+                    "id": 151,
+                    "name": "content type",
+                    "description": "MIME Type of the representation (open group which several predefined tags)."
+                },
+                "description": "General Binary Data"
+            }
+        }
+    ],
+    "accesslimitations": {
+        "$self": "/SWITCHON.TAG/1",
+        "id": 1,
+        "name": "no limitation",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/146",
+            "id": 146,
+            "name": "access limitations",
+            "description": "Limitations on public access in accordance to Article 13 of Directive 2007/2/EC (fixed group with tags from a standard codelist)."
+        },
+        "description": "no limitation"
+    },
+    "uuid": "31826217-29fa-43b5-9e3b-6ef7189e8fec",
+    "collection": {
+        "$self": "/SWITCHON.TAG/1486",
+        "id": 1486,
+        "name": "TUWIEN - Flood Experiments",
+        "taggroup": {
+            "$self": "/SWITCHON.TAGGROUP/149",
+            "id": 149,
+            "name": "collection",
+            "description": "Assigns the resource to a collection of resources for cataloguing purposes, e.g. SWITCH-ON Experiment Results, etc. (open group with some predefined tags)."
+        },
+        "description": "Flood Experiment Data has been derived from the Global Runoff Data Centre's Global Runoff Data Base (GRDB) by the institute of hydraulic engineering and water resources management of the technical university of vienna."
+    },
+    "publicationdate": 1433773490983
+}

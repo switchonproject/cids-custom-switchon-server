@@ -1,0 +1,304 @@
+{
+    "$self": "/SWITCHON.RESOURCE",
+    "configuration": {
+        "ATTRIBUTE_POLICY": {
+            "dbID": 0,
+            "name": "STANDARD"
+        },
+        "CLASS_ICON": {
+            "imageData": "R0lGODlhEAAQAPcAAP///7q6upWanm6AmVl2n1h0nm1+lJaZnLi4uJqfon+nyYSv7Iyt7KjC8aPA8bbZ+anW9m6Ttpmbnb6+vo2WnpTF8MTp/tjz/+r4//b8/+z5/9v0/8js/q3Z+3mt4o6Slqaoqkp/25jE9sHo/dbz/+X3/+76/+f4/tjz/sXq/qXR+ZHD92Wb16eoqHGRuA1C0Im49LTe/Mnt/9Xy/9r0/8zp/Ex94ZvG9Yq581yN6BpQ1GuAl7W2t0R62h1b2jV35Iq79bbg/MTq/o/E+DR86Dp24oe69EZ64x5W2FCHzLa2tq2xsz9+4jmA6EiY8HnF+8nt/s3w/87w/4PG/1Kp/06k/Fqj91eR7Ctl3kSH4q6vr7C1uE+S6lGf8ozU/tTy/7/o/5/Y/37E/2m4/1is/1es/lig9iBb3C1t2LCxsbe4uGqn6JXH+NPy/9n0/9nz/6bf/6Dd/5TV/4PJ/226/1+x/1Gn/hta2z92xZ62yH/C/Nby/+D1/972/8Px/7np/67g/4bK/2O0/1Go/yxy5XOFmri6upC/76DZ/9Hx/+r5//L7/+j8/8Xz/6Xg/5DQ/2u5/1Gm/UiE0LKzs6irrLDZ8LPo/s/5/+r9/+f9/8Hy/6Xf/4jN/2+6/VCR2qOlqKyurp+7ybne9sTn/cfp/s7r/prS/Hq49G6Psq+wsa2zt4qerXmgw3adwYGTpKaoqQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAAAALAAAAAAQABAABwjJAAEIHEiwYMEAW1a1arWKkkGBlEKJivIniqlTqBwSpFTpzyVMmP7A4TTGk0YAAQ7FiQISU5SRY8pIUiUwVKcNGzBt+COSZBlChVCuMRUFJ5w4cUjWKXMGD8IuXThFoQinU8wyXc5g0UKpRxMnT6ZG4VSmSpkrWLJQCtDjzA8cQSoCIdIDSNskAQC0egG36IYoNirgyHFmR96uFaZiwIRhp4pDLE5SqPAnJ8i/cDxQKJhAAQMGDRoEaRDhQN6DB3YUKLDD9MPXBQMCADs=",
+            "name": "erde.gif",
+            "description": "nn"
+        },
+        "NAME": "resource",
+        "PK_FIELD": "ID",
+        "POLICY": {
+            "dbID": 0,
+            "name": "STANDARD"
+        },
+        "OBJECT_ICON": {
+            "imageData": "R0lGODlhEAAQAPcAAP///7q6upWanm6AmVl2n1h0nm1+lJaZnLi4uJqfon+nyYSv7Iyt7KjC8aPA8bbZ+anW9m6Ttpmbnb6+vo2WnpTF8MTp/tjz/+r4//b8/+z5/9v0/8js/q3Z+3mt4o6Slqaoqkp/25jE9sHo/dbz/+X3/+76/+f4/tjz/sXq/qXR+ZHD92Wb16eoqHGRuA1C0Im49LTe/Mnt/9Xy/9r0/8zp/Ex94ZvG9Yq581yN6BpQ1GuAl7W2t0R62h1b2jV35Iq79bbg/MTq/o/E+DR86Dp24oe69EZ64x5W2FCHzLa2tq2xsz9+4jmA6EiY8HnF+8nt/s3w/87w/4PG/1Kp/06k/Fqj91eR7Ctl3kSH4q6vr7C1uE+S6lGf8ozU/tTy/7/o/5/Y/37E/2m4/1is/1es/lig9iBb3C1t2LCxsbe4uGqn6JXH+NPy/9n0/9nz/6bf/6Dd/5TV/4PJ/226/1+x/1Gn/hta2z92xZ62yH/C/Nby/+D1/972/8Px/7np/67g/4bK/2O0/1Go/yxy5XOFmri6upC/76DZ/9Hx/+r5//L7/+j8/8Xz/6Xg/5DQ/2u5/1Gm/UiE0LKzs6irrLDZ8LPo/s/5/+r9/+f9/8Hy/6Xf/4jN/2+6/VCR2qOlqKyurp+7ybne9sTn/cfp/s7r/prS/Hq49G6Psq+wsa2zt4qerXmgw3adwYGTpKaoqQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAAAALAAAAAAQABAABwjJAAEIHEiwYMEAW1a1arWKkkGBlEKJivIniqlTqBwSpFTpzyVMmP7A4TTGk0YAAQ7FiQISU5SRY8pIUiUwVKcNGzBt+COSZBlChVCuMRUFJ5w4cUjWKXMGD8IuXThFoQinU8wyXc5g0UKpRxMnT6ZG4VSmSpkrWLJQCtDjzA8cQSoCIdIDSNskAQC0egG36IYoNirgyHFmR96uFaZiwIRhp4pDLE5SqPAnJ8i/cDxQKJhAAQMGDRoEaRDhQN6DB3YUKLDD9MPXBQMCADs=",
+            "name": "erde.gif",
+            "description": "nn"
+        },
+        "INDEXED": true,
+        "tostringcache": {
+            "id": "1",
+            "name": "tostringcache",
+            "description": "",
+            "visible": true,
+            "permissions": {
+                "policy": {
+                    "dbID": 0,
+                    "name": "STANDARD"
+                }
+            },
+            "substitute": false,
+            "value": "id, name from resource",
+            "classKey": null,
+            "typeId": 0,
+            "changed": false,
+            "javaType": null,
+            "optional": false,
+            "classID": 13,
+            "typeID": 7,
+            "options": {
+                "id": "",
+                "name from resource": ""
+            },
+            "primaryKey": false,
+            "toStringConverter": null,
+            "array": false,
+            "key": "1"
+        }
+    },
+    "attributes": {
+        "ID": {
+            "$self": "RESOURCE/ID",
+            "NAME": "id",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 0,
+            "REFERENCE_TYPE": 2
+        },
+        "fromdate": {
+            "$self": "RESOURCE/fromdate",
+            "NAME": "fromDate",
+            "JAVACLASS_NAME": "java.sql.Timestamp",
+            "POSITION": 1,
+            "REFERENCE_TYPE": 14,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "accessconditions": {
+            "$self": "RESOURCE/accessconditions",
+            "NAME": "accessconditions",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 2,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "spatialcoverage": {
+            "$self": "RESOURCE/spatialcoverage",
+            "NAME": "spatialCoverage",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 3,
+            "REFERENCE_TYPE": 19,
+            "FOREIGN_KEY": true,
+            "INDEXED": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "todate": {
+            "$self": "RESOURCE/todate",
+            "NAME": "toDate",
+            "JAVACLASS_NAME": "java.sql.Timestamp",
+            "POSITION": 4,
+            "REFERENCE_TYPE": 14,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "srid": {
+            "$self": "RESOURCE/srid",
+            "NAME": "srid",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 5,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "conformity": {
+            "$self": "RESOURCE/conformity",
+            "NAME": "conformity",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 6,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "language": {
+            "$self": "RESOURCE/language",
+            "NAME": "language",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 7,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "description": {
+            "$self": "RESOURCE/description",
+            "NAME": "description",
+            "JAVACLASS_NAME": "java.lang.String",
+            "POSITION": 8,
+            "REFERENCE_TYPE": 9,
+            "INDEXED": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "type": {
+            "$self": "RESOURCE/type",
+            "NAME": "type",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 9,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "location": {
+            "$self": "RESOURCE/location",
+            "NAME": "location",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 10,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "topiccategory": {
+            "$self": "RESOURCE/topiccategory",
+            "NAME": "topiccategory",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 11,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "creationdate": {
+            "$self": "RESOURCE/creationdate",
+            "NAME": "creationdate",
+            "JAVACLASS_NAME": "java.sql.Timestamp",
+            "POSITION": 12,
+            "REFERENCE_TYPE": 14,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "name": {
+            "$self": "RESOURCE/name",
+            "NAME": "name",
+            "JAVACLASS_NAME": "java.lang.String",
+            "POSITION": 13,
+            "REFERENCE_TYPE": 8,
+            "INDEXED": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "licensestatement": {
+            "$self": "RESOURCE/licensestatement",
+            "NAME": "licensestatement",
+            "JAVACLASS_NAME": "java.lang.String",
+            "POSITION": 14,
+            "REFERENCE_TYPE": 9,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "tags": {
+            "$self": "RESOURCE/tags",
+            "NAME": "tags",
+            "ARRAY_KEY_FIELD_NAME": "resource_reference",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 15,
+            "REFERENCE_TYPE": 25,
+            "ARRAY": true,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "contact": {
+            "$self": "RESOURCE/contact",
+            "NAME": "contact",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 16,
+            "REFERENCE_TYPE": 20,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "geography": {
+            "$self": "RESOURCE/geography",
+            "NAME": "geography",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 17,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "representation": {
+            "$self": "RESOURCE/representation",
+            "NAME": "representation",
+            "ARRAY_KEY_FIELD_NAME": "resource_reference",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 18,
+            "REFERENCE_TYPE": 28,
+            "ARRAY": true,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "lastmodificationdate": {
+            "$self": "RESOURCE/lastmodificationdate",
+            "NAME": "lastModificationDate",
+            "JAVACLASS_NAME": "java.sql.Timestamp",
+            "POSITION": 19,
+            "REFERENCE_TYPE": 14,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "metadata": {
+            "$self": "RESOURCE/metadata",
+            "NAME": "metadata",
+            "ARRAY_KEY_FIELD_NAME": "resource_reference",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 20,
+            "REFERENCE_TYPE": 30,
+            "ARRAY": true,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "accesslimitations": {
+            "$self": "RESOURCE/accesslimitations",
+            "NAME": "accesslimitations",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 22,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "uuid": {
+            "$self": "RESOURCE/uuid",
+            "NAME": "uuid",
+            "JAVACLASS_NAME": "java.lang.String",
+            "POSITION": 23,
+            "REFERENCE_TYPE": 8,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "collection": {
+            "$self": "RESOURCE/collection",
+            "NAME": "collection",
+            "JAVACLASS_NAME": "java.lang.Integer",
+            "POSITION": 24,
+            "REFERENCE_TYPE": 22,
+            "FOREIGN_KEY": true,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        },
+        "publicationdate": {
+            "$self": "RESOURCE/publicationdate",
+            "NAME": "publicationdate",
+            "JAVACLASS_NAME": "java.sql.Timestamp",
+            "POSITION": 25,
+            "REFERENCE_TYPE": 14,
+            "OPTIONAL": true,
+            "VISIBLE": true
+        }
+    }
+}

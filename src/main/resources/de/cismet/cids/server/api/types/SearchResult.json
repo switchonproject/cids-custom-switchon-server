@@ -1,0 +1,58 @@
+{
+    "$self": "http://switchon.cismet.de:8890/searches/SWITCHON.de.cismet.cids.custom.switchon.search.server.MetaObjectUniversalSearchStatement/results",
+    "$offset": 0,
+    "$limit": 100,
+    "$first": "http://switchon.cismet.de:8890/searches/SWITCHON.de.cismet.cids.custom.switchon.search.server.MetaObjectUniversalSearchStatement/results",
+    "$previous": null,
+    "$next": "not available",
+    "$last": "not available",
+    "$collection": [{
+            "id": -1,
+            "domain": "SWITCHON",
+            "leaf": true,
+            "name": "AMSRE_36V_AM_FT_2002_day170.h5",
+            "description": null,
+            "dynamic": false,
+            "dynamicChildrenStatement": null,
+            "sqlSort": false,
+            "classId": 13,
+            "iconFactory": -1,
+            "derivePermissionsFromClass": true,
+            "iconString": null,
+            "artificialId": null,
+            "permissions": {
+                "policy": {
+                    "dbID": -1,
+                    "name": null
+                }
+            },
+            "objectId": 407,
+            "object": null,
+            "valid": true,
+            "group": "SWITCHON"
+        }, {
+            "id": -1,
+            "domain": "SWITCHON",
+            "leaf": true,
+            "name": "AMSRE_36V_AM_FT_2002_day171.h5",
+            "description": null,
+            "dynamic": false,
+            "dynamicChildrenStatement": null,
+            "sqlSort": false,
+            "classId": 13,
+            "iconFactory": -1,
+            "derivePermissionsFromClass": true,
+            "iconString": null,
+            "artificialId": null,
+            "permissions": {
+                "policy": {
+                    "dbID": -1,
+                    "name": null
+                }
+            },
+            "objectId": 408,
+            "object": null,
+            "valid": true,
+            "group": "SWITCHON"
+        }]
+}
