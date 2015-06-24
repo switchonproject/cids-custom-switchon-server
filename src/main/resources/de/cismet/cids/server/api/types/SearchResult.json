@@ -6,53 +6,42 @@
     "$previous": null,
     "$next": "not available",
     "$last": "not available",
-    "$collection": [{
-            "id": -1,
-            "domain": "SWITCHON",
-            "leaf": true,
+    "$collection": [
+        {
             "name": "AMSRE_36V_AM_FT_2002_day170.h5",
             "description": null,
-            "dynamic": false,
-            "dynamicChildrenStatement": null,
-            "sqlSort": false,
-            "classId": 13,
-            "iconFactory": -1,
+            "classKey": "/SWITCHON.RESOURCE",
+            "objectKey": "/SWITCHON.RESOURCE/407",
+            "dynamicChildren": null,
+            "clientSort": false,
             "derivePermissionsFromClass": true,
-            "iconString": null,
-            "artificialId": null,
-            "permissions": {
-                "policy": {
-                    "dbID": -1,
-                    "name": null
-                }
-            },
-            "objectId": 407,
-            "object": null,
-            "valid": true,
-            "group": "SWITCHON"
-        }, {
-            "id": -1,
-            "domain": "SWITCHON",
             "leaf": true,
+            "dynamic": false,
+            "icon": null,
+            "policy": null,
+            "LEGACY_ICON_FACTORY": -1,
+            "LEGACY_ARTIFICIAL_ID": null,
+            "LEGACY_CLASS_ID": 13,
+            "LEGACY_OBJECT_ID": -1,
+            "$self": "/SWITCHON.-1"
+        },
+        {
             "name": "AMSRE_36V_AM_FT_2002_day171.h5",
             "description": null,
-            "dynamic": false,
-            "dynamicChildrenStatement": null,
-            "sqlSort": false,
-            "classId": 13,
-            "iconFactory": -1,
+            "classKey": "/SWITCHON.RESOURCE",
+            "objectKey": "/SWITCHON.RESOURCE/408",
+            "dynamicChildren": null,
+            "clientSort": false,
             "derivePermissionsFromClass": true,
-            "iconString": null,
-            "artificialId": null,
-            "permissions": {
-                "policy": {
-                    "dbID": -1,
-                    "name": null
-                }
-            },
-            "objectId": 408,
-            "object": null,
-            "valid": true,
-            "group": "SWITCHON"
-        }]
+            "leaf": true,
+            "dynamic": false,
+            "icon": null,
+            "policy": null,
+            "LEGACY_ICON_FACTORY": -1,
+            "LEGACY_ARTIFICIAL_ID": null,
+            "LEGACY_CLASS_ID": 13,
+            "LEGACY_OBJECT_ID": -1,
+            "$self": "/SWITCHON.-1"
+        }
+    ]
 }

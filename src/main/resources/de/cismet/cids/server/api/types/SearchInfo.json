@@ -1,8 +1,16 @@
 {
     "key": "de.cismet.cids.custom.switchon.search.server.MetaObjectUniversalSearchStatement",
     "name": "MetaObjectUniversalSearchStatement",
-    "description": "legacy cidsServerSearch",
-    "parameterDescription": {
-        "Query": "java.lang.String"
+    "description": "CIDS Server Search",
+    "parameterDescription": [
+        {
+            "key": "query",
+            "type": "STRING"
+        }
+    ],
+    "resultDescription": {
+        "key": "return",
+        "type": "NODE",
+        "array": true
     }
 }

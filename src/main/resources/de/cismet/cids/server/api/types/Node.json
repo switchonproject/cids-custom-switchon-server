@@ -8,28 +8,40 @@
     "$last": "not available",
     "$collection": [
         {
-            "key": "8",
             "name": "Entities",
-            "objectKey": "-1",
+            "description": null,
+            "classKey": null,
+            "objectKey": null,
             "dynamicChildren": "SELECT \r\n \t-1 as id, \r\n \tcs_class.name, \r\n \tcs_class.id as class_id, \r\n \tnull as object_id, \r\n \t'N' as node_type, \r\n \tnull as url, \r\n \tcsdc.cidsobjects(cs_class.id::varchar , cs_class.table_name) as dynamic_children, \r\n \ttrue as sql_sort,\r\n        true AS derive_permissions_from_class   \r\n     FROM \r\n \tcs_class,\r\n \tcs_attr\r\n     WHERE cs_class.id = cs_attr.class_id\r\n \tAND cs_attr.field_name ilike 'name'\r\n     ORDER BY cs_class.name;",
             "clientSort": true,
             "derivePermissionsFromClass": false,
+            "leaf": false,
+            "dynamic": false,
             "icon": null,
-            "iconFactory": null,
             "policy": "STANDARD",
-            "leaf": false
+            "LEGACY_ICON_FACTORY": -1,
+            "LEGACY_ARTIFICIAL_ID": null,
+            "LEGACY_CLASS_ID": -1,
+            "LEGACY_OBJECT_ID": -1,
+            "$self": "/SWITCHON.8"
         },
         {
-            "key": "9",
             "name": "Taggroups and Tags",
-            "objectKey": "-1",
+            "description": null,
+            "classKey": null,
+            "objectKey": null,
             "dynamicChildren": "SELECT \r\n \t-1 as id, \r\n \ttaggroup.name, \r\n \tcs_class.id as class_id, \r\n \tnull as object_id, \r\n \t'N' as node_type, \r\n \tnull as url, \r\n \tcsdc.tags(taggroup.id) as dynamic_children,\r\n \tfalse as sql_sort \r\n     FROM \r\n \ttaggroup,\r\n        cs_class\r\n     WHERE\r\n         cs_class.name = 'taggroup'\r\n     ORDER BY taggroup.name;",
             "clientSort": false,
             "derivePermissionsFromClass": false,
+            "leaf": false,
+            "dynamic": false,
             "icon": null,
-            "iconFactory": null,
             "policy": "STANDARD",
-            "leaf": false
+            "LEGACY_ICON_FACTORY": -1,
+            "LEGACY_ARTIFICIAL_ID": null,
+            "LEGACY_CLASS_ID": -1,
+            "LEGACY_OBJECT_ID": -1,
+            "$self": "/SWITCHON.9"
         }
     ]
 }
