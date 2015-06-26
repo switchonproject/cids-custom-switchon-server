@@ -14,10 +14,16 @@ import org.openide.util.lookup.ServiceProvider;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 
+import de.cismet.cids.base.types.Type;
+
+import de.cismet.cids.server.api.types.SearchInfo;
+import de.cismet.cids.server.api.types.SearchParameterInfo;
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
-import de.cismet.cids.server.search.CidsServerSearch;
+import de.cismet.cids.server.search.RestApiCidsServerSearch;
 import de.cismet.cids.server.search.SearchException;
 
 /**
@@ -27,8 +33,38 @@ import de.cismet.cids.server.search.SearchException;
  * @author   martin.scholl@cismet.de
  * @version  1.0
  */
-@ServiceProvider(service = CidsServerSearch.class)
-public final class ClassNameSearch extends AbstractCidsServerSearch {
+@ServiceProvider(service = RestApiCidsServerSearch.class)
+public final class ClassNameSearch extends AbstractCidsServerSearch implements RestApiCidsServerSearch {
+
+    //~ Static fields/initializers ---------------------------------------------
+
+    public static final SearchInfo SEARCH_INFO;
+
+    static {
+        SEARCH_INFO = new SearchInfo();
+        SEARCH_INFO.setKey(ClassNameSearch.class.getName());
+        SEARCH_INFO.setName(ClassNameSearch.class.getSimpleName());
+        SEARCH_INFO.setDescription(
+            "Class Name Search Search for SWITCH-ON pure REST clients");
+
+        final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
+        final SearchParameterInfo searchParameterInfo;
+
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("domain");
+        searchParameterInfo.setType(Type.STRING);
+        parameterDescription.add(searchParameterInfo);
+
+        SEARCH_INFO.setParameterDescription(parameterDescription);
+
+        final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
+        resultParameterInfo.setKey("return");
+        resultParameterInfo.setDescription("<Entry<Integer, String>> Collection");
+        resultParameterInfo.setArray(true);
+        resultParameterInfo.setType(Type.JAVA_CLASS);
+        resultParameterInfo.setAdditionalTypeInfo("com.fasterxml.jackson.databind.node.ObjectNode");
+        SEARCH_INFO.setResultDescription(resultParameterInfo);
+    }
 
     //~ Instance fields --------------------------------------------------------
 
@@ -89,5 +125,10 @@ public final class ClassNameSearch extends AbstractCidsServerSearch {
         if (domain != null) {
             this.domain = domain;
         }
+    }
+
+    @Override
+    public SearchInfo getSearchInfo() {
+        return SEARCH_INFO;
     }
 }

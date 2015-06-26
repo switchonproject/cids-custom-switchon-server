@@ -23,11 +23,16 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import de.cismet.cids.base.types.Type;
+
+import de.cismet.cids.server.api.types.SearchInfo;
+import de.cismet.cids.server.api.types.SearchParameterInfo;
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
-import de.cismet.cids.server.search.CidsServerSearch;
+import de.cismet.cids.server.search.RestApiCidsServerSearch;
 import de.cismet.cids.server.search.SearchException;
 
 /**
@@ -36,13 +41,49 @@ import de.cismet.cids.server.search.SearchException;
  * @author   Pascal Dihé <pascal.dihe@cismet.de>
  * @version  $Revision$, $Date$
  */
-@ServiceProvider(service = CidsServerSearch.class)
-public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
+@ServiceProvider(service = RestApiCidsServerSearch.class)
+public final class PostFilterTagsSearch extends AbstractCidsServerSearch implements RestApiCidsServerSearch {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(PostFilterTagsSearch.class);
     private static final String DOMAIN = "SWITCHON";
+
+    public static final SearchInfo SEARCH_INFO;
+
+    static {
+        SEARCH_INFO = new SearchInfo();
+        SEARCH_INFO.setKey(PostFilterTagsSearch.class.getName());
+        SEARCH_INFO.setName(PostFilterTagsSearch.class.getSimpleName());
+        SEARCH_INFO.setDescription(
+            "Post Filter Tags Search for SWITCH-ON pure REST clients");
+
+        final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
+        SearchParameterInfo searchParameterInfo;
+
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("query");
+        searchParameterInfo.setType(Type.STRING);
+        searchParameterInfo.setDescription("The Universal Query Format is parameter:\"value:\", "
+                    + "e.g. keyword:\"water\"");
+        parameterDescription.add(searchParameterInfo);
+
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("filterTagGroups");
+        searchParameterInfo.setType(Type.STRING);
+        searchParameterInfo.setDescription("comma separated list of tag groups used for post search filtering");
+        parameterDescription.add(searchParameterInfo);
+
+        SEARCH_INFO.setParameterDescription(parameterDescription);
+
+        final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
+        resultParameterInfo.setKey("return");
+        resultParameterInfo.setDescription("<Map.Entry<String, List<Map.Entry<String, String>>>> Collection");
+        resultParameterInfo.setArray(true);
+        resultParameterInfo.setType(Type.JAVA_CLASS);
+        resultParameterInfo.setAdditionalTypeInfo("com.fasterxml.jackson.databind.node.ObjectNode");
+        SEARCH_INFO.setResultDescription(resultParameterInfo);
+    }
 
     //~ Instance fields --------------------------------------------------------
 
@@ -297,5 +338,10 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch {
      */
     public void setFilterTagGroups(final String filterTagGroups) {
         this.filterTagGroups = filterTagGroups;
+    }
+
+    @Override
+    public SearchInfo getSearchInfo() {
+        return SEARCH_INFO;
     }
 }

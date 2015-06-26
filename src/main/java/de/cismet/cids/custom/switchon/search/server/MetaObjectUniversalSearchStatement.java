@@ -5,11 +5,6 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cismet.cids.custom.switchon.search.server;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
@@ -40,9 +35,12 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.cismet.cids.base.types.Type;
+
+import de.cismet.cids.server.api.types.SearchInfo;
+import de.cismet.cids.server.api.types.SearchParameterInfo;
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
-import de.cismet.cids.server.search.CidsServerSearch;
-import de.cismet.cids.server.search.MetaObjectNodeServerSearch;
+import de.cismet.cids.server.search.RestApiCidsServerSearch;
 import de.cismet.cids.server.search.SearchException;
 
 /**
@@ -51,8 +49,8 @@ import de.cismet.cids.server.search.SearchException;
  * @author   jruiz
  * @version  $Revision$, $Date$
  */
-@ServiceProvider(service = CidsServerSearch.class)
-public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch implements MetaObjectNodeServerSearch {
+@ServiceProvider(service = RestApiCidsServerSearch.class)
+public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch implements RestApiCidsServerSearch {
 
     //~ Static fields/initializers ---------------------------------------------
 
@@ -84,6 +82,35 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     private static final String METACLASSNAME__RESOURCE = "resource";
 
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+
+    public static final SearchInfo SEARCH_INFO;
+
+    static {
+        SEARCH_INFO = new SearchInfo();
+        SEARCH_INFO.setKey(MetaObjectUniversalSearchStatement.class.getName());
+        SEARCH_INFO.setName(MetaObjectUniversalSearchStatement.class.getSimpleName());
+        SEARCH_INFO.setDescription(
+            "Meta Object Node Universal Search for SWITCH-ON pure REST clients");
+
+        final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
+        final SearchParameterInfo searchParameterInfo;
+
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("query");
+        searchParameterInfo.setType(Type.STRING);
+        searchParameterInfo.setDescription("The Universal Query Format is parameter:\"value:\", "
+                    + "e.g. keyword:\"water\"");
+        parameterDescription.add(searchParameterInfo);
+
+        SEARCH_INFO.setParameterDescription(parameterDescription);
+
+        final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
+        resultParameterInfo.setKey("return");
+        resultParameterInfo.setDescription("Collection of Object Nodes");
+        resultParameterInfo.setArray(true);
+        resultParameterInfo.setType(Type.NODE);
+        SEARCH_INFO.setResultDescription(resultParameterInfo);
+    }
 
     //~ Instance fields --------------------------------------------------------
 
@@ -537,5 +564,10 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
     public Collection<MetaObjectNode> performServerSearch() throws SearchException {
         final MetaObjectNodeResourceSearchStatement nrs = interpretQuery(this.query);
         return nrs.performServerSearch();
+    }
+
+    @Override
+    public SearchInfo getSearchInfo() {
+        return SEARCH_INFO;
     }
 }
