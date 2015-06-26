@@ -373,7 +373,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             int inGroupCount = 0;
             int groupCount = 0;
 
-            for (String[] keywordGroupArray : keywordGroupList) {
+            for (final String[] keywordGroupArray : keywordGroupList) {
                 // check for new group
                 if (!keywordGroupArray[0].equals(currentGroup)) {
                     groupCount++;
