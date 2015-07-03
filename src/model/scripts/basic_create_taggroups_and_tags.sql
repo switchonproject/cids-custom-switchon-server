@@ -26,7 +26,7 @@ VALUES
 ('topic category','High-level classification of resources in accordance with ISO 19115 for grouping and topic-based search (fixed group).'),
 ('publish type','The publish type is used to determine how an imported file has to be postprocessed in order to publish it to an Andvanced Data Repository.'),
 ('upload status','The upload status represents a transient property that temporarily stores the status of the upload process to an Advanced Data Repository.'),
-('keywords - CUAHSI', 'CUAHSI Hydrologic Ontology for Discovery');
+('keywords - X-CUAHSI', 'X-CUAHSI Hydrologic Ontology for Discovery');
 DO $$
 DECLARE tgid integer;
 BEGIN
@@ -420,7 +420,7 @@ VALUES
 ('finished','The upload of the newly imported representation to an Advanced Data Repository like Geoserver or THREDDS has been completed successfully.',tgid),
 ('failed','The upload of the newly imported representation to an Advanced Data Repository like Geoserver or THREDDS has failed.',tgid);
 
-tgid = (SELECT id from taggroup where name = 'CUAHSI');
+tgid = (SELECT id from taggroup where name ilike '%X-CUAHSI%');
 INSERT INTO tag (name, description, taggroup)
 VALUES
 ('Area','Area',tgid),
