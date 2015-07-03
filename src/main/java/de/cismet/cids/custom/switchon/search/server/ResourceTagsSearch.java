@@ -159,6 +159,8 @@ public class ResourceTagsSearch extends AbstractCidsServerSearch implements Rest
         } else {
             LOG.warn("taggroup is empty, cannot search for tags. return empty tag list!");
         }
+
+        LOG.info(resourceTags.size() + " used tags for tag group '" + taggroup + "' found");
         return resourceTags;
     }
 

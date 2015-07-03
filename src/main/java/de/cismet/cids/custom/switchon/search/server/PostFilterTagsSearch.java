@@ -91,7 +91,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch impleme
     private final MetaObjectUniversalSearchStatement metaObjectUniversalSearchStatement;
 
     private final String TAGGROUP_FILTER_KEYWORD = "keyword";
-    private final String TAGGROUP_FILTER_KEYWORD_CUAHSI = "keyword-cuahsi";
+    private final String TAGGROUP_FILTER_KEYWORD_XCUAHSI = "keyword-xcuahsi";
     private final String TAGGROUP_FILTER_ACCESS_CONDITONS = "access-condition";
     private final String TAGGROUP_FILTER_PROTOCOL = "protocol";
     private final String TAGGROUP_FILTER_FUNCTION = "function";
@@ -110,7 +110,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch impleme
         this.metaObjectUniversalSearchStatement = new MetaObjectUniversalSearchStatement();
 
         TAGGROUPS.put(TAGGROUP_FILTER_KEYWORD, "keywords%");
-        TAGGROUPS.put(TAGGROUP_FILTER_KEYWORD_CUAHSI, "keywords - cuahsi");
+        TAGGROUPS.put(TAGGROUP_FILTER_KEYWORD_XCUAHSI, "keywords - X-CUAHSI");
         TAGGROUPS.put(TAGGROUP_FILTER_ACCESS_CONDITONS, "access conditions");
         TAGGROUPS.put(TAGGROUP_FILTER_PROTOCOL, "protocol");
         TAGGROUPS.put(TAGGROUP_FILTER_FUNCTION, "function");
@@ -183,7 +183,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch impleme
                     // build the query ....
                     switch (filterParameter) {
                         case TAGGROUP_FILTER_KEYWORD:
-                        case TAGGROUP_FILTER_KEYWORD_CUAHSI: {
+                        case TAGGROUP_FILTER_KEYWORD_XCUAHSI: {
                             queryBuilder.insert(0, baseQuery);
                             queryBuilder.append(") rrr");
                             queryBuilder.append(
