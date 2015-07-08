@@ -18,13 +18,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import de.cismet.cids.base.types.Type;
-
-import de.cismet.cids.server.api.types.SearchInfo;
-import de.cismet.cids.server.api.types.SearchParameterInfo;
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
-import de.cismet.cids.server.search.RestApiCidsServerSearch;
 import de.cismet.cids.server.search.SearchException;
+
+import de.cismet.cidsx.base.types.Type;
+
+import de.cismet.cidsx.server.api.types.SearchInfo;
+import de.cismet.cidsx.server.api.types.SearchParameterInfo;
+import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
 
 /**
  * Simple search for [classid, className] entries. The result is indeed a <code>Collection</code> of <code>
