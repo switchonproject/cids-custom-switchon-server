@@ -200,7 +200,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             Date fromDate = null;
             Date toDate = null;
             Geometry geometryToSearchFor = null;
-            boolean isGeoIntersectsEnabled = false;
+            // boolean isGeoIntersectsEnabled = false;
             long geoBuffer = 0;
             String fulltext = null;
             String topic = null;
@@ -261,7 +261,9 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                         break;
                     }
                     case FILTER__SPATIAL__GEO_INTERSECTS: {
-                        isGeoIntersectsEnabled = value.trim().toLowerCase().equals("true");
+                        LOG.warn(FILTER__SPATIAL__GEO_INTERSECTS + " with value '"
+                                    + value.trim() + "' is ignored, default spatial search uses always intersects!");
+                        // isGeoIntersectsEnabled = value.trim().toLowerCase().equals("true");
                         break;
                     }
                     case FILTER__SPATIAL__GEO_BUFFER: {
@@ -453,19 +455,19 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                 }
             }
 
-            if (isGeoIntersectsEnabled) {
-                nrs.setGeometryFunction(MetaObjectNodeResourceSearchStatement.GeometryFunction.INTERSECT);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("geometryFunction set to: \""
-                                + MetaObjectNodeResourceSearchStatement.GeometryFunction.INTERSECT.toString() + "\"");
-                }
-            } else {
-                nrs.setGeometryFunction(MetaObjectNodeResourceSearchStatement.GeometryFunction.CONTAINS);
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("geometryFunction set to: \""
-                                + MetaObjectNodeResourceSearchStatement.GeometryFunction.CONTAINS.toString() + "\"");
-                }
-            }
+//            if (isGeoIntersectsEnabled) {
+//                nrs.setGeometryFunction(MetaObjectNodeResourceSearchStatement.GeometryFunction.INTERSECT);
+//                if (LOG.isDebugEnabled()) {
+//                    LOG.debug("geometryFunction set to: \""
+//                                + MetaObjectNodeResourceSearchStatement.GeometryFunction.INTERSECT.toString() + "\"");
+//                }
+//            } else {
+//                nrs.setGeometryFunction(MetaObjectNodeResourceSearchStatement.GeometryFunction.CONTAINS);
+//                if (LOG.isDebugEnabled()) {
+//                    LOG.debug("geometryFunction set to: \""
+//                                + MetaObjectNodeResourceSearchStatement.GeometryFunction.CONTAINS.toString() + "\"");
+//                }
+//            }
 
             if (geoBuffer > 0) {
                 if (LOG.isDebugEnabled()) {

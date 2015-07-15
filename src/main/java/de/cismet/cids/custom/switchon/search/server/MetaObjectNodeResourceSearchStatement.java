@@ -244,7 +244,8 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                 query.append(" INNER");
             }
 
-            query.append(" JOIN geom g ON r.spatialcoverage = g.id ");
+            // query.append(" JOIN geom g ON r.spatialcoverage = g.id ");
+            query.append(" JOIN geom_search g ON r.id = g.resource ");
 
             this.appendGeometry();
         }
