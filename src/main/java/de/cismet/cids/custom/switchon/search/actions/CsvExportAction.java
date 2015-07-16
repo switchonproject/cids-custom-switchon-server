@@ -18,10 +18,6 @@ import Sirius.server.sql.DBConnectionPool;
 import org.apache.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
-import java.io.StringWriter;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -135,8 +131,6 @@ public class CsvExportAction implements ServerAction {
                 zipStream.write(csvBuilder.toString().getBytes("UTF-8"));
                 zipStream.closeEntry();
                 zipStream.close();
-
-                Files.write(Paths.get("C:\\switchon.zip"), output.toByteArray());
 
                 return output.toByteArray();
             } else {
