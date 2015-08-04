@@ -14,27 +14,30 @@ import org.apache.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 
+import java.nio.file.attribute.FileTime;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import de.cismet.cids.server.actions.ServerActionParameter;
-import de.cismet.cidsx.base.types.MediaTypes;
-import de.cismet.cidsx.base.types.Type;
-import de.cismet.cidsx.server.actions.RestApiCidsServerAction;
-import de.cismet.cidsx.server.api.types.ActionInfo;
-import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
-import de.cismet.cidsx.server.api.types.ActionParameterInfo;
-import java.net.URL;
-import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
+
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.CRC32;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import de.cismet.cids.server.actions.ServerActionParameter;
+
+import de.cismet.cidsx.base.types.MediaTypes;
+import de.cismet.cidsx.base.types.Type;
+
+import de.cismet.cidsx.server.actions.RestApiCidsServerAction;
+import de.cismet.cidsx.server.api.types.ActionInfo;
+import de.cismet.cidsx.server.api.types.ActionParameterInfo;
+import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
 
 /**
  * DOCUMENT ME!
@@ -48,17 +51,26 @@ public class CsvExportAction implements RestApiCidsServerAction {
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(CsvExportAction.class);
-    
+
     public static final String TASK_NAME = "csvExportAction";
-    
-    private final ActionInfo actionInfo;
-    
+
+    //~ Enums ------------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
     public enum PARAMETER_TYPE {
+
+        //~ Enum constants -----------------------------------------------------
+
         ZIP
     }
 
-
     //~ Instance fields --------------------------------------------------------
+
+    private final ActionInfo actionInfo;
 
     private final transient String exportQuery = "SELECT title as name,\n"
                 + "       abstract as description,\n"
@@ -75,14 +87,13 @@ public class CsvExportAction implements RestApiCidsServerAction {
      * Creates a new CsvExportAction object.
      */
     public CsvExportAction() {
-        
         actionInfo = new ActionInfo();
         actionInfo.setName("Meta-Data Repository CSV Export");
         actionInfo.setActionKey(TASK_NAME);
         actionInfo.setDescription("Export the SWITCH-ON Meta-Data Repository as (zipped) CSV File.");
 
         final List<ActionParameterInfo> parameterDescriptions = new LinkedList<ActionParameterInfo>();
-        ActionParameterInfo parameterDescription;
+        final ActionParameterInfo parameterDescription;
 
         parameterDescription = new ActionParameterInfo();
         parameterDescription.setKey(PARAMETER_TYPE.ZIP.name());
@@ -90,7 +101,7 @@ public class CsvExportAction implements RestApiCidsServerAction {
         parameterDescription.setDescription("ZIP the CSV File (true or false)");
         parameterDescriptions.add(parameterDescription);
         actionInfo.setParameterDescription(parameterDescriptions);
-        
+
         final ActionParameterInfo returnDescription = new ActionParameterInfo();
         returnDescription.setKey("return");
         returnDescription.setType(Type.STRING);
@@ -166,28 +177,28 @@ public class CsvExportAction implements RestApiCidsServerAction {
                 final ByteArrayOutputStream output = new ByteArrayOutputStream();
                 final ZipOutputStream zipStream = new ZipOutputStream(output);
                 final String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-                
+
                 final byte[] csv = csvBuilder.toString().getBytes("UTF-8");
                 final CRC32 crc = new CRC32();
                 crc.update(csv);
-                
-                final ZipEntry zipEntry = new ZipEntry("switchon-meta-data-repository-" 
-                        + dateString + ".csv");
-                zipEntry.setLastModifiedTime(FileTime.fromMillis(System.currentTimeMillis()));
+
+                final ZipEntry zipEntry = new ZipEntry("switchon-meta-data-repository-"
+                                + dateString + ".csv");
+                zipEntry.setComment("SWITCH-ON Meta-Data Repository CSV Export created on " + dateString);
                 zipEntry.setTime(System.currentTimeMillis());
                 zipEntry.setSize(csv.length);
                 zipEntry.setCrc(crc.getValue());
-               
+
                 zipStream.putNextEntry(zipEntry);
                 zipStream.write(csv);
                 zipStream.closeEntry();
                 zipStream.close();
 
                 final byte[] zippedCsv = output.toByteArray();
-                return new GenericResourceWithContentType(MediaTypes.APPLICATION_ZIP, zippedCsv);  
+                return new GenericResourceWithContentType(MediaTypes.APPLICATION_ZIP, zippedCsv);
             } else {
                 final String csv = csvBuilder.toString();
-                return new GenericResourceWithContentType(MediaTypes.TEXT_CSV, csv);  
+                return new GenericResourceWithContentType(MediaTypes.TEXT_CSV, csv);
             }
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -199,7 +210,7 @@ public class CsvExportAction implements RestApiCidsServerAction {
     public String getTaskName() {
         return TASK_NAME;
     }
-    
+
     @Override
     public ActionInfo getActionInfo() {
         return this.actionInfo;
