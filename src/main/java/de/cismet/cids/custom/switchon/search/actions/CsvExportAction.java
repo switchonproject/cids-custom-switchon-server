@@ -27,7 +27,7 @@ import de.cismet.cidsx.base.types.Type;
 import de.cismet.cidsx.server.actions.RestApiCidsServerAction;
 import de.cismet.cidsx.server.api.types.ActionInfo;
 import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
-import de.cismet.cidsx.server.api.types.ParameterInfo;
+import de.cismet.cidsx.server.api.types.ActionParameterInfo;
 import java.net.URL;
 import java.nio.file.attribute.FileTime;
 import java.text.SimpleDateFormat;
@@ -81,17 +81,17 @@ public class CsvExportAction implements RestApiCidsServerAction {
         actionInfo.setActionKey(TASK_NAME);
         actionInfo.setDescription("Export the SWITCH-ON Meta-Data Repository as (zipped) CSV File.");
 
-        final List<ParameterInfo> parameterDescriptions = new LinkedList<ParameterInfo>();
-        ParameterInfo parameterDescription;
+        final List<ActionParameterInfo> parameterDescriptions = new LinkedList<ActionParameterInfo>();
+        ActionParameterInfo parameterDescription;
 
-        parameterDescription = new ParameterInfo();
+        parameterDescription = new ActionParameterInfo();
         parameterDescription.setKey(PARAMETER_TYPE.ZIP.name());
         parameterDescription.setType(Type.BOOLEAN);
         parameterDescription.setDescription("ZIP the CSV File (true or false)");
         parameterDescriptions.add(parameterDescription);
         actionInfo.setParameterDescription(parameterDescriptions);
         
-        final ParameterInfo returnDescription = new ParameterInfo();
+        final ActionParameterInfo returnDescription = new ActionParameterInfo();
         returnDescription.setKey("return");
         returnDescription.setType(Type.STRING);
         returnDescription.setMediaType(MediaTypes.TEXT_CSV);

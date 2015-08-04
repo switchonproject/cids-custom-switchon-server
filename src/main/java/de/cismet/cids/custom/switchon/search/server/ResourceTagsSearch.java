@@ -24,7 +24,7 @@ import de.cismet.cids.server.search.SearchException;
 import de.cismet.cidsx.base.types.Type;
 
 import de.cismet.cidsx.server.api.types.SearchInfo;
-import de.cismet.cidsx.server.api.types.ParameterInfo;
+import de.cismet.cidsx.server.api.types.SearchParameterInfo;
 import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
 
 /**
@@ -48,17 +48,17 @@ public class ResourceTagsSearch extends AbstractCidsServerSearch implements Rest
         SEARCH_INFO.setDescription(
             "Search for tags of the specified group that are actually assigned to resources in the Meta-Data Repository");
 
-        final List<ParameterInfo> parameterDescription = new LinkedList<ParameterInfo>();
-        final ParameterInfo searchParameterInfo;
+        final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
+        final SearchParameterInfo searchParameterInfo;
 
-        searchParameterInfo = new ParameterInfo();
+        searchParameterInfo = new SearchParameterInfo();
         searchParameterInfo.setKey("taggroup");
         searchParameterInfo.setType(Type.STRING);
         parameterDescription.add(searchParameterInfo);
 
         SEARCH_INFO.setParameterDescription(parameterDescription);
 
-        final ParameterInfo resultParameterInfo = new ParameterInfo();
+        final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
         resultParameterInfo.setKey("return");
         resultParameterInfo.setArray(true);
         resultParameterInfo.setType(Type.STRING);
