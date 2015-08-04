@@ -108,7 +108,7 @@ public class CsvExportAction implements RestApiCidsServerAction {
         boolean zip = false;
         if (params.length > 0) {
             if ((params[0].getKey() != null) && (params[0].getValue() != null)
-                        && params[0].getKey().equalsIgnoreCase("zip")) {
+                        && params[0].getKey().equalsIgnoreCase(PARAMETER_TYPE.ZIP.name())) {
                 zip = Boolean.valueOf(params[0].getValue().toString());
             }
         } else {
