@@ -5,11 +5,6 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cismet.cids.custom.switchon.search.actions;
 
 import Sirius.server.middleware.impls.domainserver.DomainServerImpl;
@@ -26,8 +21,20 @@ import java.sql.Statement;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import de.cismet.cids.server.actions.ServerAction;
 import de.cismet.cids.server.actions.ServerActionParameter;
+import de.cismet.cidsx.base.types.MediaTypes;
+import de.cismet.cidsx.base.types.Type;
+import de.cismet.cidsx.server.actions.RestApiCidsServerAction;
+import de.cismet.cidsx.server.api.types.ActionInfo;
+import de.cismet.cidsx.server.api.types.GenericResourceWithContentType;
+import de.cismet.cidsx.server.api.types.ParameterInfo;
+import java.net.URL;
+import java.nio.file.attribute.FileTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.zip.CRC32;
 
 /**
  * DOCUMENT ME!
@@ -35,12 +42,21 @@ import de.cismet.cids.server.actions.ServerActionParameter;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
-@org.openide.util.lookup.ServiceProvider(service = ServerAction.class)
-public class CsvExportAction implements ServerAction {
+@org.openide.util.lookup.ServiceProvider(service = RestApiCidsServerAction.class)
+public class CsvExportAction implements RestApiCidsServerAction {
 
     //~ Static fields/initializers ---------------------------------------------
 
     private static final Logger LOG = Logger.getLogger(CsvExportAction.class);
+    
+    public static final String TASK_NAME = "csvExportAction";
+    
+    private final ActionInfo actionInfo;
+    
+    public enum PARAMETER_TYPE {
+        ZIP
+    }
+
 
     //~ Instance fields --------------------------------------------------------
 
@@ -59,12 +75,34 @@ public class CsvExportAction implements ServerAction {
      * Creates a new CsvExportAction object.
      */
     public CsvExportAction() {
+        
+        actionInfo = new ActionInfo();
+        actionInfo.setName("Meta-Data Repository CSV Export");
+        actionInfo.setActionKey(TASK_NAME);
+        actionInfo.setDescription("Export the SWITCH-ON Meta-Data Repository as (zipped) CSV File.");
+
+        final List<ParameterInfo> parameterDescriptions = new LinkedList<ParameterInfo>();
+        ParameterInfo parameterDescription;
+
+        parameterDescription = new ParameterInfo();
+        parameterDescription.setKey(PARAMETER_TYPE.ZIP.name());
+        parameterDescription.setType(Type.BOOLEAN);
+        parameterDescription.setDescription("ZIP the CSV File (true or false)");
+        parameterDescriptions.add(parameterDescription);
+        actionInfo.setParameterDescription(parameterDescriptions);
+        
+        final ParameterInfo returnDescription = new ParameterInfo();
+        returnDescription.setKey("return");
+        returnDescription.setType(Type.STRING);
+        returnDescription.setMediaType(MediaTypes.TEXT_CSV);
+        returnDescription.setDescription("(Zipped) CSV File");
+        actionInfo.setResultDescription(returnDescription);
     }
 
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public Object execute(final Object body, final ServerActionParameter... params) {
+    public GenericResourceWithContentType execute(final Object body, final ServerActionParameter... params) {
         LOG.info("exporting Meta-Data Repository with query: \n" + this.exportQuery);
 
         boolean zip = false;
@@ -127,14 +165,29 @@ public class CsvExportAction implements ServerAction {
                 }
                 final ByteArrayOutputStream output = new ByteArrayOutputStream();
                 final ZipOutputStream zipStream = new ZipOutputStream(output);
-                zipStream.putNextEntry(new ZipEntry("switchon-meta-data-repository.csv"));
-                zipStream.write(csvBuilder.toString().getBytes("UTF-8"));
+                final String dateString = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+                
+                final byte[] csv = csvBuilder.toString().getBytes("UTF-8");
+                final CRC32 crc = new CRC32();
+                crc.update(csv);
+                
+                final ZipEntry zipEntry = new ZipEntry("switchon-meta-data-repository-" 
+                        + dateString + ".csv");
+                zipEntry.setLastModifiedTime(FileTime.fromMillis(System.currentTimeMillis()));
+                zipEntry.setTime(System.currentTimeMillis());
+                zipEntry.setSize(csv.length);
+                zipEntry.setCrc(crc.getValue());
+               
+                zipStream.putNextEntry(zipEntry);
+                zipStream.write(csv);
                 zipStream.closeEntry();
                 zipStream.close();
 
-                return output.toByteArray();
+                final byte[] zippedCsv = output.toByteArray();
+                return new GenericResourceWithContentType(MediaTypes.APPLICATION_ZIP, zippedCsv);  
             } else {
-                return csvBuilder.toString();
+                final String csv = csvBuilder.toString();
+                return new GenericResourceWithContentType(MediaTypes.TEXT_CSV, csv);  
             }
         } catch (Exception ex) {
             LOG.error(ex.getMessage(), ex);
@@ -144,6 +197,11 @@ public class CsvExportAction implements ServerAction {
 
     @Override
     public String getTaskName() {
-        return "csvExportAction";
+        return TASK_NAME;
+    }
+    
+    @Override
+    public ActionInfo getActionInfo() {
+        return this.actionInfo;
     }
 }

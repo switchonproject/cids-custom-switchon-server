@@ -41,7 +41,7 @@ import de.cismet.cids.server.search.SearchException;
 import de.cismet.cidsx.base.types.Type;
 
 import de.cismet.cidsx.server.api.types.SearchInfo;
-import de.cismet.cidsx.server.api.types.SearchParameterInfo;
+import de.cismet.cidsx.server.api.types.ParameterInfo;
 import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
 
 /**
@@ -93,10 +93,10 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
         SEARCH_INFO.setDescription(
             "Meta Object Node Universal Search for SWITCH-ON pure REST clients");
 
-        final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
-        final SearchParameterInfo searchParameterInfo;
+        final List<ParameterInfo> parameterDescription = new LinkedList<ParameterInfo>();
+        final ParameterInfo searchParameterInfo;
 
-        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo = new ParameterInfo();
         searchParameterInfo.setKey("query");
         searchParameterInfo.setType(Type.STRING);
         searchParameterInfo.setDescription("The Universal Query Format is parameter:\"value:\", "
@@ -105,7 +105,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
 
         SEARCH_INFO.setParameterDescription(parameterDescription);
 
-        final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
+        final ParameterInfo resultParameterInfo = new ParameterInfo();
         resultParameterInfo.setKey("return");
         resultParameterInfo.setDescription("Collection of Object Nodes");
         resultParameterInfo.setArray(true);

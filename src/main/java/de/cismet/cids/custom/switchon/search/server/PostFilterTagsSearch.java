@@ -33,7 +33,7 @@ import de.cismet.cids.server.search.SearchException;
 import de.cismet.cidsx.base.types.Type;
 
 import de.cismet.cidsx.server.api.types.SearchInfo;
-import de.cismet.cidsx.server.api.types.SearchParameterInfo;
+import de.cismet.cidsx.server.api.types.ParameterInfo;
 import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
 
 /**
@@ -59,17 +59,17 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch impleme
         SEARCH_INFO.setDescription(
             "Post Filter Tags Search for SWITCH-ON pure REST clients");
 
-        final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
-        SearchParameterInfo searchParameterInfo;
+        final List<ParameterInfo> parameterDescription = new LinkedList<ParameterInfo>();
+        ParameterInfo searchParameterInfo;
 
-        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo = new ParameterInfo();
         searchParameterInfo.setKey("query");
         searchParameterInfo.setType(Type.STRING);
         searchParameterInfo.setDescription("The Universal Query Format is parameter:\"value:\", "
                     + "e.g. keyword:\"water\"");
         parameterDescription.add(searchParameterInfo);
 
-        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo = new ParameterInfo();
         searchParameterInfo.setKey("filterTagGroups");
         searchParameterInfo.setType(Type.STRING);
         searchParameterInfo.setDescription("comma separated list of tag groups used for post search filtering");
@@ -77,7 +77,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch impleme
 
         SEARCH_INFO.setParameterDescription(parameterDescription);
 
-        final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
+        final ParameterInfo resultParameterInfo = new ParameterInfo();
         resultParameterInfo.setKey("return");
         resultParameterInfo.setDescription("<Map.Entry<String, List<Map.Entry<String, String>>>> Collection");
         resultParameterInfo.setArray(true);
