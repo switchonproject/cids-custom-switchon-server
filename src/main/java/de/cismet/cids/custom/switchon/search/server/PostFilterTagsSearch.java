@@ -93,6 +93,7 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch impleme
 
     private final String TAGGROUP_FILTER_KEYWORD = "keyword";
     private final String TAGGROUP_FILTER_KEYWORD_XCUAHSI = "keyword-xcuahsi";
+    private final String TAGGROUP_FILTER_COLLECTION = "collection";
     private final String TAGGROUP_FILTER_ACCESS_CONDITONS = "access-condition";
     private final String TAGGROUP_FILTER_PROTOCOL = "protocol";
     private final String TAGGROUP_FILTER_FUNCTION = "function";
@@ -110,8 +111,10 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch impleme
     public PostFilterTagsSearch() {
         this.metaObjectUniversalSearchStatement = new MetaObjectUniversalSearchStatement();
 
+        // maps the taggroup REST parameter to the internal taggroup name
         TAGGROUPS.put(TAGGROUP_FILTER_KEYWORD, "keywords%");
         TAGGROUPS.put(TAGGROUP_FILTER_KEYWORD_XCUAHSI, "keywords - X-CUAHSI");
+        TAGGROUPS.put(TAGGROUP_FILTER_COLLECTION, "collection");
         TAGGROUPS.put(TAGGROUP_FILTER_ACCESS_CONDITONS, "access conditions");
         TAGGROUPS.put(TAGGROUP_FILTER_PROTOCOL, "protocol");
         TAGGROUPS.put(TAGGROUP_FILTER_FUNCTION, "function");
@@ -196,6 +199,14 @@ public final class PostFilterTagsSearch extends AbstractCidsServerSearch impleme
                                     .append(tagGroup)
                                     .append("''')");
                             queryBuilder.append(groupByQuery);
+                            break;
+                        }
+                        case TAGGROUP_FILTER_COLLECTION: {
+                            queryBuilder.insert(0, baseQuery);
+                            queryBuilder.append(") rrr,");
+                            queryBuilder.append(
+                                " resource, tag rtag WHERE rrr.id = resource.id and resource.collection = rtag.id");
+                            queryBuilder.append(" GROUP BY rtag.name ORDER BY rtag.name");
                             break;
                         }
                         case TAGGROUP_FILTER_ACCESS_CONDITONS: {
