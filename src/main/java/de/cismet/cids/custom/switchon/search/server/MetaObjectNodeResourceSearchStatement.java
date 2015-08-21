@@ -28,6 +28,7 @@ import java.sql.Timestamp;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.cismet.cids.server.search.AbstractCidsServerSearch;
@@ -107,12 +108,13 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected long geoBuffer = 0;
     protected List<String[]> keywordGroupList;
     protected List<String> negatedKeywordList;
-    protected String collection;
     protected List<String> functionList;
     protected List<String> negatedFunctionList;
     protected List<String> accessConditions;
     protected List<String> negatedAccessConditions;
     protected int offset = 0;
+
+    protected List<String> collections;
     private int limit = 0;
 
     private GeometryFunction geometryFunction = GeometryFunction.INTERSECT;
@@ -129,6 +131,24 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * Get the value of collections.
+     *
+     * @return  the value of collections
+     */
+    public List<String> getCollections() {
+        return collections;
+    }
+
+    /**
+     * Set the value of collections.
+     *
+     * @param  collections  new value of collections
+     */
+    public void setCollections(final List<String> collections) {
+        this.collections = collections;
+    }
 
     @Override
     public Collection<MetaObjectNode> performServerSearch() throws SearchException {
@@ -223,7 +243,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      * DOCUMENT ME!
      */
     protected void joinCollection() {
-        if (collection != null) {
+        if ((this.collections != null) && !this.collections.isEmpty()) {
             query.append(" INNER JOIN tag tc ON r.collection = tc.id");
         }
 
@@ -437,7 +457,20 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
      * DOCUMENT ME!
      */
     private void appendCollection() {
-        if (collection != null) {
+        if ((collections != null) && !collections.isEmpty()) {
+            for (final String collection : collections) {
+                this.appendCollection(collection);
+            }
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  collection  DOCUMENT ME!
+     */
+    private void appendCollection(final String collection) {
+        if ((collection != null) && !collection.isEmpty()) {
             final StringBuilder parameter = new StringBuilder(collection);
             query.append(" AND to_tsvector('simple', tc.name) @@ to_tsquery('simple', '");
             if (checkForNot(parameter)) {
@@ -845,19 +878,32 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     /**
      * Get the value of collection.
      *
-     * @return  the value of collection
+     * @return      the value of collection
+     *
+     * @deprecated  use getCollections instead!
      */
+    @Deprecated
     public String getCollection() {
-        return collection;
+        return ((this.collections != null) && !this.collections.isEmpty()) ? this.collections.get(0) : null;
     }
 
     /**
      * Set the value of collection.
      *
-     * @param  collection  new value of collection
+     * @param       collection  new value of collection
+     *
+     * @deprecated  use setCollections instead!
      */
+    @Deprecated
     public void setCollection(final String collection) {
-        this.collection = collection;
+        if ((this.collections != null) && !this.collections.isEmpty()) {
+            if (!this.collections.contains(collection)) {
+                this.collections.add(collection);
+            }
+        } else {
+            this.collections = new LinkedList<String>();
+            this.collections.add(collection);
+        }
     }
 
     /**

@@ -206,11 +206,11 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
             String topic = null;
             int limit = -1;
             int offset = -1;
-            String collection = null;
             final List<String> functionList = new LinkedList<String>();
             final List<String> negatedFunctionList = new LinkedList<String>();
             final List<String> accessConditions = new LinkedList<String>();
             final List<String> negatedAccessConditions = new LinkedList<String>();
+            final List<String> collections = new LinkedList<String>();
 
             // add resource class by default
             try {
@@ -346,10 +346,13 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                             if (LOG.isDebugEnabled()) {
                                 LOG.debug("applying not filter to '" + key + ": '" + value + "'");
                             }
-                            value = "!" + value;
+                            // what a mess: now readding the ! to avoid needing
+                            // a  dedicated not collection filter list
+                            collections.add((NOT_FILTER + value));
+                        } else {
+                            collections.add(value);
                         }
 
-                        collection = value;
                         break;
                     }
                     case FILTER__FUNCTION: {
@@ -498,11 +501,11 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                 nrs.setLimit(limit);
             }
 
-            if ((collection != null) && (collection.length() > 0)) {
+            if ((collections != null) && (!collections.isEmpty())) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("COLLECTION: \"" + collection + "\"");
+                    LOG.debug("COLLECTIONs: \"" + collections.size() + "\"");
                 }
-                nrs.setCollection(collection);
+                nrs.setCollections(collections);
             }
 
             if (!functionList.isEmpty()) {
@@ -521,7 +524,7 @@ public class MetaObjectUniversalSearchStatement extends AbstractCidsServerSearch
                 if (LOG.isDebugEnabled()) {
                     for (final String function : negatedFunctionList) {
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("FUNCTION \"" + function + "\" added");
+                            LOG.debug("!FUNCTION \"" + function + "\" added");
                         }
                     }
                 }
