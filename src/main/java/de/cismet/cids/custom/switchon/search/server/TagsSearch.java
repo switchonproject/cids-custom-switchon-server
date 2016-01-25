@@ -18,12 +18,14 @@ import org.openide.util.lookup.ServiceProvider;
 
 import java.rmi.RemoteException;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import de.cismet.cids.custom.switchon.search.server.types.Tag;
 import de.cismet.cids.custom.switchon.search.server.types.Taggroup;
@@ -108,7 +110,7 @@ public final class TagsSearch extends AbstractCidsServerSearch implements RestAp
             }
         }
 
-        final HashMap<String, List<Tag>> result = new LinkedHashMap<String, List<Tag>>();
+        final HashMap<String, List<Tag>> tagsMap = new LinkedHashMap<String, List<Tag>>();
 
         final MetaService ms = (MetaService)getActiveLocalServers().get(DOMAIN);
 
@@ -169,24 +171,34 @@ public final class TagsSearch extends AbstractCidsServerSearch implements RestAp
                 final Taggroup taggroup = new Taggroup(taggroupId, taggroupName, taggroupDescription);
                 final Tag tag = new Tag(tagId, tagName, tagDescription, taggroup);
 
-                if (!result.containsKey(taggroupName)) {
+                if (!tagsMap.containsKey(taggroupName)) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("collecting tags of taggroup '" + taggroupName + "'");
                     }
-                    result.put(taggroupName, new ArrayList<Tag>());
+                    tagsMap.put(taggroupName, new ArrayList<Tag>());
                 }
-                final List<Tag> tagList = result.get(taggroupName);
+                final List<Tag> tagList = tagsMap.get(taggroupName);
                 tagList.add(tag);
 
                 i++;
             }
 
-            if (taggroupsArray.length != result.size()) {
+            if (taggroupsArray.length != tagsMap.size()) {
                 LOG.warn("expected to get tags of " + taggroupsArray.length
-                            + " taggroups but found tags of " + result.size() + taggroups + "'!");
+                            + " taggroups but found tags of " + tagsMap.size() + " taggroups!");
             }
 
-            return result.entrySet();
+            //  java.util.LinkedHashMap$LinkedEntrySet is Not Serializable
+            final LinkedList resultList = new LinkedList<Map.Entry<String, List<Tag>>>();
+            for (final Map.Entry<String, List<Tag>> mapEntry : tagsMap.entrySet()) {
+                final Map.Entry<String, List<Tag>> resultEntry = new AbstractMap.SimpleEntry<String, List<Tag>>(
+                        mapEntry.getKey(),
+                        mapEntry.getValue());
+
+                resultList.add(resultEntry);
+            }
+
+            return resultList;
         } catch (final RemoteException re) {
             throw new SearchException("search for tags could not be performed", re); // NOI18N
         }

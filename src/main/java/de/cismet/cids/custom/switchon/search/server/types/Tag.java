@@ -9,6 +9,7 @@ package de.cismet.cids.custom.switchon.search.server.types;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
+import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +29,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @JacksonXmlRootElement
-public class Tag implements Cloneable, Comparable<Tag> {
+public class Tag implements Serializable, Cloneable, Comparable<Tag> {
 
     //~ Instance fields --------------------------------------------------------
 
