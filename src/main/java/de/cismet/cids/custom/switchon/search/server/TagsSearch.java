@@ -18,14 +18,10 @@ import org.openide.util.lookup.ServiceProvider;
 
 import java.rmi.RemoteException;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import de.cismet.cids.custom.switchon.search.server.types.Tag;
 import de.cismet.cids.custom.switchon.search.server.types.Taggroup;
@@ -63,28 +59,35 @@ public final class TagsSearch extends AbstractCidsServerSearch implements RestAp
             "Tags Search for SWITCH-ON pure REST clients");
 
         final List<SearchParameterInfo> parameterDescription = new LinkedList<SearchParameterInfo>();
-        final SearchParameterInfo searchParameterInfo;
+        SearchParameterInfo searchParameterInfo;
 
         searchParameterInfo = new SearchParameterInfo();
-        searchParameterInfo.setKey("taggroups");
+        searchParameterInfo.setKey("taggroup");
         searchParameterInfo.setType(Type.STRING);
-        searchParameterInfo.setDescription("comma separated list of tag groups");
+        searchParameterInfo.setDescription("name of the tag group");
+        parameterDescription.add(searchParameterInfo);
+
+        searchParameterInfo = new SearchParameterInfo();
+        searchParameterInfo.setKey("tags");
+        searchParameterInfo.setType(Type.STRING);
+        searchParameterInfo.setDescription("comma separated list of tag names");
         parameterDescription.add(searchParameterInfo);
 
         SEARCH_INFO.setParameterDescription(parameterDescription);
 
         final SearchParameterInfo resultParameterInfo = new SearchParameterInfo();
         resultParameterInfo.setKey("return");
-        resultParameterInfo.setDescription("<Map.Entry<String, List<Tag>> Collection");
+        resultParameterInfo.setDescription("List<Tag> Collection");
         resultParameterInfo.setArray(true);
         resultParameterInfo.setType(Type.JAVA_CLASS);
-        resultParameterInfo.setAdditionalTypeInfo("com.fasterxml.jackson.databind.node.ObjectNode");
+        resultParameterInfo.setAdditionalTypeInfo("de.cismet.cids.custom.switchon.search.server.types.Tag");
         SEARCH_INFO.setResultDescription(resultParameterInfo);
     }
 
     //~ Instance fields --------------------------------------------------------
 
-    @Getter @Setter private String taggroups;
+    @Getter @Setter private String taggroup;
+    @Getter @Setter private String tags;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -97,34 +100,35 @@ public final class TagsSearch extends AbstractCidsServerSearch implements RestAp
     //~ Methods ----------------------------------------------------------------
 
     @Override
-    public Collection performServerSearch() throws SearchException {
-        final String[] taggroupsArray;
-        if ((this.taggroups == null) || this.taggroups.isEmpty()) {
-            final String msg = "'taggroups' is a required parameter of this search function!";
+    public Collection<Tag> performServerSearch() throws SearchException {
+        final String[] tagArray;
+        final LinkedList<Tag> tagList = new LinkedList<Tag>();
+        final MetaService ms = (MetaService)getActiveLocalServers().get(DOMAIN);
+        final StringBuilder queryBuilder = new StringBuilder();
+
+        if ((this.taggroup == null) || this.taggroup.isEmpty()) {
+            final String msg = "'taggroup' is a required parameter of this search function!";
             LOG.error(msg);
             throw new SearchException(msg); // NOI18N
-        } else {
-            taggroupsArray = this.taggroups.split(",");
-            if (LOG.isDebugEnabled()) {
-                LOG.debug(taggroupsArray.length + " tag groups found in '" + this.taggroups + "'");
-            }
         }
 
-        final HashMap<String, List<Tag>> tagsMap = new LinkedHashMap<String, List<Tag>>();
+        if ((this.tags != null) && !this.tags.isEmpty()) {
+            tagArray = this.tags.split(",");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug(tagArray.length + " tag found in '" + this.tags + "'");
+            }
+        } else {
+            tagArray = new String[0];
+        }
 
-        final MetaService ms = (MetaService)getActiveLocalServers().get(DOMAIN);
+        LOG.info("searching for tags of taggroup '" + taggroup
+                    + "' and restricting by " + tagArray.length + " tags");
 
         if (ms == null) {
             final String msg = "no metaservice for domain '" + DOMAIN + "' found!";
             LOG.error(msg);
             throw new SearchException(msg); // NOI18N
         }
-
-        if (LOG.isDebugEnabled()) {
-            LOG.info("retrieving tags of " + taggroupsArray.length + " tag groups");
-        }
-
-        final StringBuilder queryBuilder = new StringBuilder();
 
         queryBuilder.append("SELECT DISTINCT tag.id AS tag_id, \n");
         queryBuilder.append("       tag.name AS tag_name, \n");
@@ -134,16 +138,20 @@ public final class TagsSearch extends AbstractCidsServerSearch implements RestAp
         queryBuilder.append("       taggroup.description AS taggroup_description \n");
         queryBuilder.append("FROM tag \n");
         queryBuilder.append("JOIN taggroup ON tag.taggroup = taggroup.id \n");
-        queryBuilder.append("WHERE taggroup.name in (");
+        queryBuilder.append("WHERE taggroup.name = '").append(this.taggroup).append("' \n");
 
-        for (int i = 0; i < taggroupsArray.length; i++) {
-            if (i > 0) {
-                queryBuilder.append(',');
+        if (tagArray.length > 0) {
+            queryBuilder.append("AND tag.name in (");
+            for (int i = 0; i < tagArray.length; i++) {
+                if (i > 0) {
+                    queryBuilder.append(',');
+                }
+                queryBuilder.append('\'').append(tagArray[i]).append('\'');
             }
-            queryBuilder.append('\'').append(taggroupsArray[i]).append('\'');
+
+            queryBuilder.append(") \n");
         }
 
-        queryBuilder.append(") \n");
         queryBuilder.append("ORDER BY taggroup.name, tag.name;");
 
         try {
@@ -153,52 +161,39 @@ public final class TagsSearch extends AbstractCidsServerSearch implements RestAp
             final ArrayList<ArrayList> resultset = ms.performCustomSearch(queryBuilder.toString()); // NOI18N
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug(resultset.size() + " different tags for " + taggroupsArray.length
+                LOG.debug(resultset.size() + " different tags for " + tagArray.length
                             + " taggroups in query result found");
             }
 
-            int i = 0;
-            // add tag name + tag results count to the tag group list
+            // add tagArray name + tagArray results count to the tagArray group list
+            Taggroup theTaggroup = null;
             for (final ArrayList row : resultset) {
                 final int tagId = (int)row.get(0);
                 final String tagName = String.valueOf(row.get(1));
                 final String tagDescription = String.valueOf(row.get(2));
 
-                final int taggroupId = (int)row.get(3);
-                final String taggroupName = String.valueOf(row.get(4));
-                final String taggroupDescription = String.valueOf(row.get(5));
+                if (theTaggroup == null) {
+                    final int taggroupId = (int)row.get(3);
+                    final String taggroupName = String.valueOf(row.get(4));
+                    final String taggroupDescription = String.valueOf(row.get(5));
 
-                final Taggroup taggroup = new Taggroup(taggroupId, taggroupName, taggroupDescription);
-                final Tag tag = new Tag(tagId, tagName, tagDescription, taggroup);
-
-                if (!tagsMap.containsKey(taggroupName)) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("collecting tags of taggroup '" + taggroupName + "'");
-                    }
-                    tagsMap.put(taggroupName, new ArrayList<Tag>());
+                    theTaggroup = new Taggroup(taggroupId, taggroupName, taggroupDescription);
                 }
-                final List<Tag> tagList = tagsMap.get(taggroupName);
+
+                final Tag tag = new Tag(tagId, tagName, tagDescription, theTaggroup);
+
                 tagList.add(tag);
-
-                i++;
             }
 
-            if (taggroupsArray.length != tagsMap.size()) {
-                LOG.warn("expected to get tags of " + taggroupsArray.length
-                            + " taggroups but found tags of " + tagsMap.size() + " taggroups!");
+            if ((tagArray.length > 0) && (tagList.size() != tagArray.length)) {
+                LOG.warn("expected to get " + tagArray.length + " tags but actually found "
+                            + tagList.size() + " tags!");
             }
 
-            //  java.util.LinkedHashMap$LinkedEntrySet is Not Serializable
-            final LinkedList resultList = new LinkedList<Map.Entry<String, List<Tag>>>();
-            for (final Map.Entry<String, List<Tag>> mapEntry : tagsMap.entrySet()) {
-                final Map.Entry<String, List<Tag>> resultEntry = new AbstractMap.SimpleEntry<String, List<Tag>>(
-                        mapEntry.getKey(),
-                        mapEntry.getValue());
+            LOG.info("found " + tagList.size() + " for tags of taggroup '" + taggroup
+                        + "' restricted by " + tagArray.length + " tags");
 
-                resultList.add(resultEntry);
-            }
-
-            return resultList;
+            return tagList;
         } catch (final RemoteException re) {
             throw new SearchException("search for tags could not be performed", re); // NOI18N
         }

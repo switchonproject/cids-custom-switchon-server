@@ -9,12 +9,13 @@ package de.cismet.cids.custom.switchon.search.server.types;
 
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-import java.io.Serializable;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.io.Serializable;
 
 import java.util.Objects;
 
@@ -35,9 +36,9 @@ public class Taggroup implements Serializable, Cloneable, Comparable<Taggroup> {
 
     @JacksonXmlProperty private int id;
 
-    @JacksonXmlProperty private String description;
-
     @JacksonXmlProperty private String name;
+
+    @JacksonXmlProperty private String description;
 
     //~ Constructors -----------------------------------------------------------
 
