@@ -9,12 +9,13 @@ package de.cismet.cids.custom.switchon.search.server;
 
 import Sirius.server.middleware.interfaces.domainserver.MetaService;
 import Sirius.server.middleware.types.MetaObject;
-import Sirius.server.newuser.User;
 
 import lombok.Getter;
 import lombok.Setter;
 
 import org.apache.log4j.Logger;
+
+import org.openide.util.lookup.ServiceProvider;
 
 import java.rmi.RemoteException;
 
@@ -39,6 +40,7 @@ import de.cismet.cidsx.server.search.RestApiCidsServerSearch;
  * @author   Pascal Dihé
  * @version  $Revision$, $Date$
  */
+@ServiceProvider(service = RestApiCidsServerSearch.class)
 public class ResourceContentLocationSearch extends AbstractCidsServerSearch implements RestApiCidsServerSearch {
 
     //~ Static fields/initializers ---------------------------------------------
@@ -76,8 +78,7 @@ public class ResourceContentLocationSearch extends AbstractCidsServerSearch impl
     private static final String QUERY_TEMPLATE = "SELECT\n"
                 + "  (SELECT id\n"
                 + "   FROM cs_class\n"
-                + "   WHERE name ILIKE 'resource'), resource.name,\n"
-                + "                                 resource.id\n"
+                + "   WHERE name ILIKE 'resource'), resource.id\n"
                 + "FROM resource\n"
                 + "INNER JOIN jt_resource_representation jtrr ON resource.id = jtrr.resource_reference\n"
                 + "INNER JOIN representation ON jtrr.representationid = representation.id\n"
@@ -105,7 +106,7 @@ public class ResourceContentLocationSearch extends AbstractCidsServerSearch impl
             throw new SearchException(msg); // NOI18N
         }
 
-        final String query = (url + QUERY_TEMPLATE + "'");
+        final String query = (QUERY_TEMPLATE + url + "'");
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(query);
         }
@@ -116,6 +117,8 @@ public class ResourceContentLocationSearch extends AbstractCidsServerSearch impl
                 final MetaObject[] metaObjects = ms.getMetaObject(this.getUser(), query);
                 final ArrayList<MetaObject> collection = new ArrayList<MetaObject>(Arrays.asList(
                             metaObjects));
+                LOGGER.info(collection.size() + " resources found matching the content location '"
+                            + url + "'");
                 return collection;
             } catch (RemoteException ex) {
                 LOGGER.error(ex.getMessage(), ex);
