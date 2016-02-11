@@ -20,7 +20,6 @@ import org.apache.commons.io.FilenameUtils;
 
 import org.deegree.io.geotiff.GeoTiffReader;
 
-import org.openide.util.lookup.ServiceProvider;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
