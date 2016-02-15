@@ -52,8 +52,8 @@ public class ResourceContentLocationSearch extends AbstractCidsServerSearch impl
 
     static {
         SEARCH_INFO = new SearchInfo();
-        SEARCH_INFO.setKey(ClassNameSearch.class.getName());
-        SEARCH_INFO.setName(ClassNameSearch.class.getSimpleName());
+        SEARCH_INFO.setKey(ResourceContentLocationSearch.class.getName());
+        SEARCH_INFO.setName(ResourceContentLocationSearch.class.getSimpleName());
         SEARCH_INFO.setDescription(
             "Content Location (URL) Search for REST Clients");
 
