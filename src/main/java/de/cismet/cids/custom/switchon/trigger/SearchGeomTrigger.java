@@ -1,113 +1,173 @@
+/***************************************************
+*
+* cismet GmbH, Saarbruecken, Germany
+*
+*              ... and it just works.
+*
+****************************************************/
 package de.cismet.cids.custom.switchon.trigger;
 
+import Sirius.server.localserver.DBServer;
 import Sirius.server.newuser.User;
-import Sirius.server.sql.DBConnection;
+
+import org.openide.util.Exceptions;
+import org.openide.util.lookup.ServiceProvider;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 import de.cismet.cids.dynamics.CidsBean;
+
 import de.cismet.cids.trigger.AbstractDBAwareCidsTrigger;
 import de.cismet.cids.trigger.CidsTrigger;
 import de.cismet.cids.trigger.CidsTriggerKey;
+
 import de.cismet.commons.concurrency.CismetConcurrency;
-import java.sql.SQLException;
-import org.openide.util.lookup.ServiceProvider;
 
 /**
+ * DOCUMENT ME!
  *
- * @author Pascal Dihé <pascal.dihe@cismet.de>
+ * @author   Pascal Dihé <pascal.dihe@cismet.de>
+ * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsTrigger.class)
 public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
-    
+
+    //~ Static fields/initializers ---------------------------------------------
+
     private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(SearchGeomTrigger.class);
 
+    //~ Instance fields --------------------------------------------------------
+
+    private PreparedStatement searchGeomInsertStatement = null;
+
+    //~ Constructors -----------------------------------------------------------
+
+    /**
+     * Creates a new SearchGeomTrigger object.
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public SearchGeomTrigger() throws Exception {
+//        try {
+//            final Statement cleanupStatement = this.getDbServer()
+//                        .getActiveDBConnection()
+//                        .getConnection()
+//                        .createStatement();
+//            final int deleted = cleanupStatement.executeUpdate(
+//                    "DELETE FROM geom_search WHERE geom_search.resource NOT IN (SELECT id FROM resource);");
+//            if (LOGGER.isDebugEnabled()) {
+//                LOGGER.debug("cleanup of geom_search table removed " + deleted + " orphaned search geometries");
+//            }
+//        } catch (Exception ex) {
+//            LOGGER.error("could not perform cleanup of geom_search table:" + ex.getMessage(), ex);
+//        }
+    }
+
+    //~ Methods ----------------------------------------------------------------
+
     @Override
-    public void beforeInsert(CidsBean cidsBean, User user) {
-        
+    public void beforeInsert(final CidsBean cidsBean, final User user) {
     }
 
     @Override
-    public void afterInsert(CidsBean cidsBean, User user) {
-        
+    public void afterInsert(final CidsBean cidsBean, final User user) {
     }
 
     @Override
-    public void beforeUpdate(CidsBean cidsBean, User user) {
-        
+    public void beforeUpdate(final CidsBean cidsBean, final User user) {
     }
 
     @Override
-    public void afterUpdate(CidsBean cidsBean, User user) {
-        
+    public void afterUpdate(final CidsBean cidsBean, final User user) {
     }
 
     @Override
-    public void beforeDelete(CidsBean cidsBean, User user) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void beforeDelete(final CidsBean cidsBean, final User user) {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
-    public void afterDelete(CidsBean cidsBean, User user) {
-        
+    public void afterDelete(final CidsBean cidsBean, final User user) {
     }
 
     @Override
     public void afterCommittedInsert(final CidsBean cidsBean, final User user) {
-        LOGGER.info("new Resource '" + cidsBean.getProperty("name").toString() 
-                + "' (" + cidsBean.getPrimaryKeyValue() + ") created, copy geometry to search geometries table");
-        
-        CismetConcurrency.getInstance("SWITCHON").getDefaultExecutor().execute(new javax.swing.SwingWorker<Integer, Void>() {
+        if (searchGeomInsertStatement == null) {
+            try {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("initialising insert search geom statement");
+                }
+                // final String query_oracle = "insert into geom (geo_field) values(SDO_GEOMETRY('%1$s', %2$s))";
+                final String searchGeomInsertTpl = "INSERT INTO geom_search(resource, geo_field, geom)\n"
+                            + "SELECT resource.id,\n"
+                            + "       geom.geo_field,\n"
+                            + "       geom.id\n"
+                            + "FROM resource\n"
+                            + "JOIN geom ON resource.spatialcoverage = geom.id\n"
+                            + "WHERE resource.id = ? LIMIT 1;";
+                searchGeomInsertStatement = this.getDbServer().getActiveDBConnection().getConnection()
+                            .prepareStatement(searchGeomInsertTpl);
+            } catch (SQLException ex) {
+                LOGGER.error("couöd not prepare insert search geom statement: " + ex.getMessage(), ex);
+                return;
+            }
+        }
 
-                    @Override
-                    protected Integer doInBackground() throws Exception {
-                        try {
-                            final String name = cidsBean.toString();
-                            if ((name == null) || name.equals("")) {
-                                getDbServer().getActiveDBConnection()
-                                        .submitInternalUpdate(
-                                            DBConnection.DESC_DELETE_STRINGREPCACHEENTRY,
-                                            cidsBean.getMetaObject().getClassID(),
-                                            cidsBean.getMetaObject().getID());
-                                return 0;
-                            } else {
-                                return getDbServer().getActiveDBConnection()
-                                            .submitInternalUpdate(
-                                                DBConnection.DESC_UPDATE_STRINGREPCACHEENTRY,
-                                                name,
-                                                cidsBean.getMetaObject().getClassID(),
-                                                cidsBean.getMetaObject().getID());
+        final int id = cidsBean.getPrimaryKeyValue();
+        LOGGER.info("new Resource '" + cidsBean.getProperty("name").toString()
+                    + "' (" + id + ") created, copying geometry to search geometries table");
+
+        CismetConcurrency.getInstance("SWITCHON")
+                .getDefaultExecutor()
+                .execute(new javax.swing.SwingWorker<Integer, Void>() {
+
+                        @Override
+                        protected Integer doInBackground() throws Exception {
+                            // final int srid = -1; final Geometry g = (Geometry)cidsBean.getProperty("geo_field");
+                            // final String dialect = Lookup.getDefault().lookup(DialectProvider.class).getDialect();
+                            // final String geometry = SQLTools.getGeometryFactory(dialect).getDbString(g);
+
+                            searchGeomInsertStatement.setInt(1, id);
+                            final int updated = searchGeomInsertStatement.executeUpdate();
+                            return updated;
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                final Integer updated = get();
+                                if (LOGGER.isDebugEnabled()) {
+                                    LOGGER.debug(
+                                        updated
+                                        + "search geometries of new Resource '"
+                                        + cidsBean.getProperty("name").toString()
+                                        + "' ("
+                                        + id
+                                        + ") copied to search geometries table");
+                                }
+                            } catch (Exception e) {
+                                LOGGER.error(
+                                    "could not copy search geometries of new Resource '"
+                                    + cidsBean.getProperty("name").toString()
+                                    + "' ("
+                                    + id
+                                    + ")  to search geometries table: "
+                                    + e.getMessage(),
+                                    e);
                             }
-                        } catch (SQLException e) {
-                            getDbServer().getActiveDBConnection().submitInternalUpdate(
-                                        DBConnection.DESC_DELETE_STRINGREPCACHEENTRY,
-                                        cidsBean.getMetaObject().getClassID(),
-                                        cidsBean.getMetaObject().getID());
-                            return getDbServer().getActiveDBConnection()
-                                        .submitInternalUpdate(
-                                            DBConnection.DESC_INSERT_STRINGREPCACHEENTRY,
-                                            cidsBean.getMetaObject().getClassID(),
-                                            cidsBean.getMetaObject().getID(),
-                                            cidsBean.toString());
                         }
-                    }
-
-                    @Override
-                    protected void done() {
-                        try {
-                            final Integer result = get();
-                        } catch (Exception e) {
-                            LOGGER.error("Exception in Background Thread: afterUpdate", e);
-                        }
-                    }
-                }); 
+                    });
     }
 
     @Override
-    public void afterCommittedUpdate(CidsBean cidsBean, User user) {
-        
+    public void afterCommittedUpdate(final CidsBean cidsBean, final User user) {
     }
 
     @Override
-    public void afterCommittedDelete(CidsBean cidsBean, User user) {
-        
+    public void afterCommittedDelete(final CidsBean cidsBean, final User user) {
     }
 
     @Override
@@ -116,7 +176,12 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     @Override
-    public int compareTo(CidsTrigger o) {
+    public int compareTo(final CidsTrigger o) {
         return -1;
+    }
+
+    @Override
+    public final DBServer getDbServer() {
+        return dbServer;
     }
 }
