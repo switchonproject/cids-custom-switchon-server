@@ -3,14 +3,15 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="chrome=1">
-        <title>Cids-custom-switchon-server by switchonproject</title>
+        <meta name="date" content="2016-03-15T00:00:00+02:00"/> 
+        <title>SIP Expert Catalogue Management APIs</title>
 
         <link rel="stylesheet" href="stylesheets/styles.css">
         <link rel="stylesheet" href="stylesheets/pygment_trac.css">
         <script src="javascripts/scale.fix.js"></script>
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
         <meta name="author" content="Pascal Dihé">
-        <meta name="description" content="This is the project page of the Expert Catalogue Management Java API of the Spatial Information Platform of the SWITCH-ON EU FP7 collaborative project.">
+        <meta name="description" content="This is the project page of the Expert Catalogue Management API of the Spatial Information Platform of the SWITCH-ON EU FP7 collaborative project.">
         <!--[if lt IE 9]>
         <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
         <![endif]-->
@@ -34,25 +35,29 @@
     <body>
         <div class="wrapper">
             <header>
-                <h1>SIP Expert Catalogue Management Java APIs</h1>
+                <h1>SIP Expert Catalogue Management APIs</h1>
                 <p>cids-custom-switchon-server website on github.io</p>
                 <p class="view"><a href="https://github.com/switchonproject/cids-custom-switchon-server">View the Project on GitHub <small>switchonproject/cids-custom-switchon-server</small></a></p>
                 <ul>
                     <li><a href="https://switchonproject.github.io/" title="switchonproject website on github.io"><strong>Return</strong> Home</a></li>
+                    <li><a href="#accessing" title="Access the REST API"><strong>Access</strong> REST API</a></li>
                     <li><a href="#documentation" title="Read the developer documentation"><strong>Read</strong> Documentation</a></li>
                     <li><a href="#downloads" title="Download sourcecode and binaries"><strong>Download</strong> Software</a></li>
-                    <!--<li><a href="#running" title="Run the Application"><strong>Run</strong> Application</a></li>-->
-                    <!--<li><a href="#tutorials" title="Watch interactive tutorial videos"><strong>Watch</strong> Tutorial Videos</a></li>-->
+                    <li><a href="#demo" title="View API Demo"><strong>View</strong> Demo</a></li>
                 </ul>
             </header>
             <section>
                 <h3>
-                    <a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>About the Expert Java API
+                    <a name="about" class="anchor" href="#about"><span class="octicon octicon-link"></span></a>
+                    About the Meta-Data REST API
                 </h3>
                 <p>
-                    This is the <strong>SIP Expert Catalogue Management Java API</strong> of the Spatial Information Platform (SIP) 
+                    This is the <strong>SIP Expert Catalogue Management API</strong> (Meta-Data REST API) of the Spatial Information Platform (SIP) 
                     of the <a href="http://www.water-switch-on.eu/" title="SWITCH-ON" target="_blank">SWITCH-ON</a> 
                     EU FP7 collaborative project.
+                </p>
+                <p>
+                    <img src="https://switchonproject.github.io/cids-custom-switchon-server/images/meta-data-rest-api.png" alt="Meta-Data REST API"/>
                 </p>
                 <p>
                     Besides the functionalities for providing access to a meta-data catalogue, 
@@ -62,16 +67,31 @@
                     (semi-automatic) creation of meta-data from open-data, and 
                     advanced functionalities not supported by the catalogue standards. 
                     Meta-data are served in accordance with the Standard Information Model of the SIP.
-                    The Expert Java API is implemented by SWITCH-ON partner 
-                    <a href="http://www.cismet.de" title="cismet GmbH" target="_blank">cismet</a> on basis of the <a href="https://github.com/cismet/cids-server" title="Server components of the cids system" target="_blank">cids server</a> components of the <a href="http://www.cismet.de/cidsReadme.html" title="cids README">cids system</a>.
+                    The Meta-Data REST API is implemented by SWITCH-ON partner 
+                    <a href="http://www.cismet.de" title="cismet GmbH" target="_blank">cismet</a> on 
+                    basis of the <a href="https://github.com/cismet/cids-server" title="Server components of the cids system" target="_blank">cids server</a> 
+                    components of the <a href="http://www.cismet.de/cidsReadme.html" title="cids README">cids system</a>  a set of web services.
                 </p>
                 
-                 <h3>
+                <h3>
+                    <a name="accessing" class="anchor" href="#accessing"><span class="octicon octicon-link"></span></a>
+                    Accessing the Meta-Data REST API
+                </h3>
+                <p>
+                    The Meta-Data REST API can be found at <br/> 
+                    <strong><a href="http://tl-243.xtr.deltares.nl/switchon_server_rest/swagger/" target="_blank">http://tl-243.xtr.deltares.nl/switchon_server_rest/swagger/</a></strong>. 
+                </p>
+                                
+                <h3>
                     <a name="documentation" class="anchor" href="#documentation"><span class="octicon octicon-link"></span></a>Technical Documentation
                 </h3>
                 <p>
                     Currently, the following technical documentation regarding the SIP Expert API is available:
                     <ul>
+                        <li>
+                            <strong><a href="assets/Meta-Data-API-Specification.pdf" title="Meta-Data API Specification" target="_blank">Meta-Data API Specification</a></strong><br>
+                            This document provides a specification of the available Meta-Data APIs.
+                        </li> 
                         <li>
                             <strong><a href="assets/D2_6_FINAL_270614.pdf" title="Standard Information Model for Meta-Data" target="_blank">Standard Information Model for Meta-Data</a></strong><br>
                             This document provides a detailed and explanatory description 
@@ -97,53 +117,15 @@
                 </p>
                 
                 <h3>
-                    <a name="related" class="anchor" href="#related"><span class="octicon octicon-link"></span></a>Related Components
+                    <a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo
                 </h3>
                 <p>
-                    The following related software components are currently work in progress or not yet available on GitHub as separate projects.   
-                </p>
-                <h4>
-                    SIP Expert Catalogue Management REST APIs
-                </h4>
-                <p>
-                    The following video showcases the planned features of the new REST API 
-                    that is currently under development and that will replace the 
-                    current Java API in the long term. A prototype of the REST API
-                    is not yet available.
+                    The following video showcases the features of Meta-Data REST API 
                 </p>
                 <p>
                    <iframe width="640" height="480" src="//www.youtube-nocookie.com/embed/1vWpg0tEeeg?rel=0" frameborder="0" allowfullscreen></iframe>
                 </p>
-                <h4>
-                    Published Catalogue Access APIs
-                </h4>
-                <p>
-                    Those are web services that provide (read only) access to the 
-                    meta-data catalogue through standardised service interface mainly 
-                    for the purpose to find Open Data. They can be used by any (external) 
-                    client that supports the respective standard. They are currently realised 
-                    as OGC Web Catalogue Service (CSW) and implemented by <a href="http://pycsw.org/" target="_blank">pyCSW</a>. 
-                    The following prototypical components are available: 
-                </p>
-                <ul>
-                    <li>
-                        <strong><a href="http://tl-ap001.xtr.deltares.nl/demo_csw" title="pyCSW Endpoint" target="_blank">SWITCH-ON OGC CSW</a></strong> (Demo)<br>
-                        Endpoint of the Demo OGC CSW deployed at deltares. Provides read-only access to the Meta-Data Repository of the SIP.
-                    </li>
-                    <li>
-                        <strong><a href="http://tl-ap001.xtr.deltares.nl/cswclient/" title="Simple CSW Client" target="_blank">Simple CSW Client</a></strong> (Third-Party Application)<br>
-                        An example for an external client connected to the SIP Catalogue.
-                        The Simple CSW Client uses the CSW Endpoint listed above.
-                    </li>
-                </ul>
-                <p>
-                    This video shows how external clients can connect to the SIP 
-                    via a Published Catalogue Access APIs (OGC CSW).
-                </p>
-                <p>
-                      <iframe width="853" height="480" src="//www.youtube-nocookie.com/embed/w7EzA3nlAGU?list=UUOAPooTB-gFIsnCAN4qu5Xw" frameborder="0" allowfullscreen></iframe>
-                </p>
-                    
+                
                 <h3>
                     <a name="problems" class="anchor" href="#problems"><span class="octicon octicon-link"></span></a>Reporting Problems
                 </h3>
@@ -155,6 +137,7 @@
         </div>
         <footer>
             <p>Project maintained by <a href="https://github.com/switchonproject">switchonproject</a></p>
+            <!--<p>Software developed by <a href="http://www.cismet.de">cismet GmbH</a></p>-->
             <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
         </footer>
         <!--[if !IE]><script>fixScale(document);</script><![endif]-->
