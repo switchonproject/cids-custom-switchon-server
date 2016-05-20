@@ -71,8 +71,34 @@ public class SpatialIndexTools {
                 "-q"
             });
 
-    protected final String polygonExtractCmd =
-        "ogr2ogr -progress -simplify 500 --config PG_USE_COPY YES -f PostgreSQL PG:\"host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser\" -lco DIM=2 $file -overwrite -lco OVERWRITE=YES -t_srs \"EPSG:4326\" -a_srs \"EPSG:4326\" -lco SCHEMA=import_tables -lco GEOMETRY_NAME=geom -nln geosearch_import -gt 65536 -nlt PROMOTE_TO_MULTI";
+    protected final List<String> ogr2ogpPolygonCmdTpl = Arrays.asList(new String[]{
+        "ogr2ogr", 
+        "-progress", 
+        "-simplify", "500", 
+        "--config", "PG_USE_COPY YES",
+        "-f",
+        "PostgreSQL",
+        "PG:\"host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser\"",
+        "-lco",
+        "DIM=2",
+        "$file",
+        "-overwrite",
+        "-lco", 
+        "OVERWRITE=YES", 
+        "-t_srs",
+        "\"EPSG:4326\"",
+        "-a_srs",
+        "\"EPSG:4326\"",
+        "-lco",
+        "SCHEMA=import_tables",
+        "-lco",
+        "GEOMETRY_NAME=geom",
+        "-nln",
+        "geosearch_import", 
+        "-gt",
+        "65536",
+        "-nlt",
+        "PROMOTE_TO_MULTI"});
 
     protected final Path tempPath;
 
@@ -232,6 +258,60 @@ public class SpatialIndexTools {
             LOGGER.debug(sb.toString());
         }
         return sb.toString();
+    }
+    
+    protected void importGeometries(
+            final File workingDir, 
+            final String file, 
+            final String database, 
+            final String host, 
+            final String port, 
+            final String user, 
+            final String password) throws IOException,
+        InterruptedException,
+        TimeoutException,
+        ExecutionException {
+        
+        LOGGER.info("getting info of file '" + file + "' in '"
+                    + workingDir.getAbsolutePath() + "'");
+
+        final String[] ogrinfoCmd = ogrinfoCmdTpl.toArray(new String[ogrinfoCmdTpl.size() + 1]);
+        ogrinfoCmd[ogrinfoCmd.length - 1] = file;
+        final int timeout = 6;
+
+        final ProcessBuilder processBuilder = new ProcessBuilder(ogrinfoCmd);
+        processBuilder.directory(workingDir);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(Arrays.toString(ogrinfoCmd));
+        }
+        final Process process = processBuilder.start();
+        final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
+        if (!completed) {
+            process.destroy();
+            throw new TimeoutException("getting info of file '" + file + "' timed out after " + timeout + " seconds.");
+        }
+
+        final int exitValue = process.exitValue();
+        if (exitValue != 0) {
+            final String message = outputError(process.getInputStream(), process.getErrorStream());
+            LOGGER.error(message);
+            final Exception processException = new Exception(message);
+            throw new ExecutionException("getting info of file '" + file + "' failed with exit value " + exitValue,
+                processException);
+        }
+
+        final String[] output = output(process.getInputStream());
+        if (output.length == 0) {
+            throw new IOException("getting info of file '" + file + "' failed: no info found by ogrinfo");
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        for (final String line : output) {
+            sb.append(line).append(System.getProperty("line.separator"));
+        }
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(sb.toString());
+        }
     }
 
     /**
