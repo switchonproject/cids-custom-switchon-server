@@ -163,7 +163,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                     final int objectID = (Integer)dokument.get(1);
                     final String name = (String)dokument.get(2);
 
-                    final MetaObjectNode node = new MetaObjectNode(DOMAIN, objectID, classID, name,null,null);// TODO: Check4CashedGeomAndLightweightJson
+                    final MetaObjectNode node = new MetaObjectNode(DOMAIN, objectID, classID, name, null, null); // TODO: Check4CashedGeomAndLightweightJson
 
                     result.add(node);
                 }

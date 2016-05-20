@@ -10,12 +10,10 @@ package de.cismet.cids.custom.switchon.trigger;
 import Sirius.server.localserver.DBServer;
 import Sirius.server.newuser.User;
 
-import org.openide.util.Exceptions;
 import org.openide.util.lookup.ServiceProvider;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -26,7 +24,8 @@ import de.cismet.cids.trigger.CidsTriggerKey;
 import de.cismet.commons.concurrency.CismetConcurrency;
 
 /**
- * DOCUMENT ME!
+ * This trigger copies a geometry from the geom table to the search_geom table when a new resource is added to the
+ * repository.
  *
  * @author   Pascal Dihé <pascal.dihe@cismet.de>
  * @version  $Revision$, $Date$
