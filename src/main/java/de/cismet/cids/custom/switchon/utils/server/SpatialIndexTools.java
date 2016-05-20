@@ -23,7 +23,9 @@ import java.net.URL;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 
+import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -42,12 +44,34 @@ public class SpatialIndexTools {
 
     //~ Instance fields --------------------------------------------------------
 
-    protected final String curlArgsTpl =
-        "--output download.zip --fail --write-out \"%{http_code}\" --retry 3 --silent $url";
-    protected final String unzipArgs = "-o -j download.zip";
-    protected final String lsArgsTpl = "| grep -i \"$pattern\"";
-    protected final String ogrinfoArgsTpl = "-ro $file";
-    protected final String polygonExtractArgs =
+    protected final List<String> curlCmdTpl = Arrays.asList(
+            new String[] {
+                "curl",
+                "--output",
+                "download.zip",
+                "--fail",
+                "--write-out",
+                "\"%{http_code}\"",
+                "--retry",
+                "3",
+                "--silent"
+            });
+
+    protected final String[] unzipCmd = new String[] {
+            "unzip",
+            "-o",
+            "-j",
+            "download.zip"
+        };
+
+    protected final List<String> ogrinfoCmdTpl = Arrays.asList(
+            new String[] {
+                "ogrinfo",
+                "-ro",
+                "-q"
+            });
+
+    protected final String polygonExtractCmd =
         "ogr2ogr -progress -simplify 500 --config PG_USE_COPY YES -f PostgreSQL PG:\"host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser\" -lco DIM=2 $file -overwrite -lco OVERWRITE=YES -t_srs \"EPSG:4326\" -a_srs \"EPSG:4326\" -lco SCHEMA=import_tables -lco GEOMETRY_NAME=geom -nln geosearch_import -gt 65536 -nlt PROMOTE_TO_MULTI";
 
     protected final Path tempPath;
@@ -81,13 +105,16 @@ public class SpatialIndexTools {
         LOGGER.info("downloading file from '" + fileURL + "' to '"
                     + workingDir.getAbsolutePath() + "'");
 
-        final String curlArgs = curlArgsTpl.replace("$url", fileURL.toString());
+        final String[] curlCmd = curlCmdTpl.toArray(new String[curlCmdTpl.size() + 1]);
+        curlCmd[curlCmd.length - 1] = fileURL.toString();
+
         final int timeout = 60;
-        final ProcessBuilder processBuilder = new ProcessBuilder("curl", curlArgs);
+        final ProcessBuilder processBuilder = new ProcessBuilder(curlCmd);
         processBuilder.directory(workingDir);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("curl " + curlArgs);
+            LOGGER.debug(Arrays.toString(curlCmd));
         }
+
         final Process process = processBuilder.start();
         final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
         if (!completed) {
@@ -98,8 +125,9 @@ public class SpatialIndexTools {
 
         final int exitValue = process.exitValue();
         if (exitValue != 0) {
-            final Exception processException = new Exception(
-                    outputError(process.getInputStream(), process.getErrorStream()));
+            final String message = outputError(process.getInputStream(), process.getErrorStream());
+            LOGGER.error(message);
+            final Exception processException = new Exception(message);
             throw new ExecutionException("downloading " + fileURL
                         + " failed with exit value " + exitValue,
                 processException);
@@ -124,10 +152,10 @@ public class SpatialIndexTools {
                     + workingDir.getAbsolutePath() + "'");
 
         final int timeout = 30;
-        final ProcessBuilder processBuilder = new ProcessBuilder("unzip", unzipArgs);
+        final ProcessBuilder processBuilder = new ProcessBuilder(unzipCmd);
         processBuilder.directory(workingDir);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("unzip " + unzipArgs);
+            LOGGER.debug(Arrays.toString(unzipCmd));
         }
         final Process process = processBuilder.start();
         final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
@@ -138,8 +166,9 @@ public class SpatialIndexTools {
 
         final int exitValue = process.exitValue();
         if (exitValue != 0) {
-            final Exception processException = new Exception(
-                    outputError(process.getInputStream(), process.getErrorStream()));
+            final String message = outputError(process.getInputStream(), process.getErrorStream());
+            LOGGER.error(message);
+            final Exception processException = new Exception(message);
             throw new ExecutionException("unzipping 'download.zip' failed with exit value " + exitValue,
                 processException);
         }
@@ -165,13 +194,14 @@ public class SpatialIndexTools {
         LOGGER.info("getting info of file '" + file + "' in '"
                     + workingDir.getAbsolutePath() + "'");
 
-        final String ogrinfoArgs = ogrinfoArgsTpl.replace("$file", file);
+        final String[] ogrinfoCmd = ogrinfoCmdTpl.toArray(new String[ogrinfoCmdTpl.size() + 1]);
+        ogrinfoCmd[ogrinfoCmd.length - 1] = file;
         final int timeout = 6;
 
-        final ProcessBuilder processBuilder = new ProcessBuilder("ogrinfo", ogrinfoArgs);
+        final ProcessBuilder processBuilder = new ProcessBuilder(ogrinfoCmd);
         processBuilder.directory(workingDir);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("ogrinfo " + ogrinfoArgs);
+            LOGGER.debug(Arrays.toString(ogrinfoCmd));
         }
         final Process process = processBuilder.start();
         final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
@@ -182,8 +212,9 @@ public class SpatialIndexTools {
 
         final int exitValue = process.exitValue();
         if (exitValue != 0) {
-            final Exception processException = new Exception(
-                    outputError(process.getInputStream(), process.getErrorStream()));
+            final String message = outputError(process.getInputStream(), process.getErrorStream());
+            LOGGER.error(message);
+            final Exception processException = new Exception(message);
             throw new ExecutionException("getting info of file '" + file + "' failed with exit value " + exitValue,
                 processException);
         }
@@ -222,62 +253,6 @@ public class SpatialIndexTools {
 
         return files;
     }
-
-    /**
-     * List all files in the working directory that match a specific pattern.
-     *
-     * @param       workingDir  DOCUMENT ME!
-     * @param       pattern     DOCUMENT ME!
-     *
-     * @return      DOCUMENT ME!
-     *
-     * @throws      FileNotFoundException  DOCUMENT ME!
-     * @throws      IOException            DOCUMENT ME!
-     * @throws      InterruptedException   DOCUMENT ME!
-     * @throws      TimeoutException       DOCUMENT ME!
-     * @throws      ExecutionException     DOCUMENT ME!
-     *
-     * @depreacted  replaced by platform independent listFiles operation
-     */
-    protected String[] getFilenames(final File workingDir, final String pattern) throws FileNotFoundException,
-        IOException,
-        InterruptedException,
-        TimeoutException,
-        ExecutionException {
-        final String lsArgs = lsArgsTpl.replaceAll("$pattern", pattern);
-        final int timeout = 6;
-        final ProcessBuilder processBuilder = new ProcessBuilder("ls", lsArgs);
-        processBuilder.directory(workingDir);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("ls " + lsArgs);
-        }
-        final Process process = processBuilder.start();
-        final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
-        if (!completed) {
-            process.destroy();
-            throw new TimeoutException("getting file names from '"
-                        + workingDir.getAbsolutePath() + "' timed out after " + timeout + " seconds.");
-        }
-
-        final int exitValue = process.exitValue();
-        if (exitValue != 0) {
-            final Exception processException = new Exception(
-                    outputError(process.getInputStream(), process.getErrorStream()));
-            throw new ExecutionException("getting file names from '"
-                        + workingDir.getAbsolutePath() + "' failed with exit value " + exitValue,
-                processException);
-        }
-
-        final String[] output = output(process.getInputStream());
-        if (output.length == 0) {
-            throw new FileNotFoundException("getting file names from '"
-                        + workingDir.getAbsolutePath() + "' did not find any file matching the pattern '"
-                        + pattern + "'");
-        }
-
-        return output;
-    }
-
     /**
      * DOCUMENT ME!
      *
@@ -299,14 +274,14 @@ public class SpatialIndexTools {
 
             spatialIndexTools.unzipFile(workingDir);
 
-            final String[] filenames = spatialIndexTools.getFilenames(workingDir, "shp");
-            if (filenames.length == 0) {
+            final File[] files = spatialIndexTools.listFiles(workingDir, "shp");
+            if (files.length == 0) {
                 throw new FileNotFoundException("getting file names from '"
                             + workingDir.getAbsolutePath() + "' did not find any file matching the pattern '*.shp'");
             }
 
-            for (final String filename : filenames) {
-                final String fileInfo = spatialIndexTools.getFileInfo(workingDir, filename);
+            for (final File file : files) {
+                final String fileInfo = spatialIndexTools.getFileInfo(workingDir, file.getName());
                 System.out.println(fileInfo);
             }
         } catch (Throwable t) {
@@ -325,7 +300,7 @@ public class SpatialIndexTools {
      */
     protected static String outputError(final InputStream processOutputStream, final InputStream processErrorStream) {
         final StringBuilder sb = outputError(processOutputStream);
-        sb.append(System.getProperty("line.separator")).append(processErrorStream);
+        sb.append(System.getProperty("line.separator")).append(outputError(processErrorStream));
 
         return sb.toString();
     }
