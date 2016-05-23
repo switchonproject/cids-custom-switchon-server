@@ -338,11 +338,11 @@ public class SpatialIndexTools {
             argFileIndex = 9;
         }
 
-        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pghost", pghost);
-        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pgport", pgport);
-        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pgdbname", pgdbname);
-        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pgpassword", pgpassword);
-        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pguser", pguser);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replace("$pghost", pghost);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replace("$pgport", pgport);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replace("$pgdbname", pgdbname);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replace("$pgpassword", pgpassword);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replace("$pguser", pguser);
         ogr2ogrCmd[argFileIndex] = file;
 
         // wait 5 minutes for import
@@ -435,6 +435,16 @@ public class SpatialIndexTools {
                 final String fileInfo = spatialIndexTools.getFileInfo(workingDir, file.getName());
                 System.out.println(fileInfo);
             }
+
+            spatialIndexTools.importGeometries(
+                workingDir,
+                true,
+                "switchon.cismet.de",
+                "5434",
+                "switchon_dev",
+                "",
+                "postgres",
+                files[0].getName());
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
             System.exit(1);
