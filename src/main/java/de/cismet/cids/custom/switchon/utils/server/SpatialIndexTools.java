@@ -17,6 +17,7 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 import java.net.URL;
 
@@ -30,6 +31,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import javax.activation.UnsupportedDataTypeException;
+
 /**
  * DOCUMENT ME!
  *
@@ -42,6 +45,45 @@ public class SpatialIndexTools {
 
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
 
+    //~ Enums ------------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @version  $Revision$, $Date$
+     */
+    public enum GeometryType {
+
+        //~ Enum constants -----------------------------------------------------
+
+        POINT("POINT"), POLYGON("POLYGON");
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String text;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new GeometryType object.
+         *
+         * @param  text  DOCUMENT ME!
+         */
+        private GeometryType(final String text) {
+            this.text = text;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /* (non-Javadoc)
+         * @see java.lang.Enum#toString()
+         */
+        @Override
+        public String toString() {
+            return text;
+        }
+    }
+
     //~ Instance fields --------------------------------------------------------
 
     protected final List<String> curlCmdTpl = Arrays.asList(
@@ -51,7 +93,7 @@ public class SpatialIndexTools {
                 "download.zip",
                 "--fail",
                 "--write-out",
-                "\"%{http_code}\"",
+                "\'%{http_code}\'",
                 "--retry",
                 "3",
                 "--silent"
@@ -79,9 +121,8 @@ public class SpatialIndexTools {
                 "500",
                 "--config",
                 "PG_USE_COPY YES",
-                "-f",
-                "PostgreSQL",
-                "PG:\"host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser\"",
+                "-f PostgreSQL",
+                "PG:host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser",
                 "-lco",
                 "DIM=2",
                 "$file",
@@ -89,9 +130,9 @@ public class SpatialIndexTools {
                 "-lco",
                 "OVERWRITE=YES",
                 "-t_srs",
-                "\"EPSG:4326\"",
+                "EPSG:4326",
                 "-a_srs",
-                "\"EPSG:4326\"",
+                "EPSG:4326",
                 "-lco",
                 "SCHEMA=import_tables",
                 "-lco",
@@ -110,9 +151,8 @@ public class SpatialIndexTools {
                 "-progress",
                 "--config",
                 "PG_USE_COPY YES",
-                "-f",
-                "PostgreSQL",
-                "PG:\"host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser\"",
+                "-f PostgreSQL",
+                "PG:host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser",
                 "-lco",
                 "DIM=2",
                 "$file",
@@ -120,9 +160,9 @@ public class SpatialIndexTools {
                 "-lco",
                 "OVERWRITE=YES",
                 "-t_srs",
-                "\"EPSG:4326\"",
+                "EPSG:4326",
                 "-a_srs",
-                "\"EPSG:4326\"",
+                "EPSG:4326",
                 "-lco",
                 "SCHEMA=import_tables",
                 "-lco",
@@ -134,6 +174,8 @@ public class SpatialIndexTools {
             });
 
     protected final Path tempPath;
+
+    String POINT = "(Point)";
 
     //~ Constructors -----------------------------------------------------------
 
@@ -241,15 +283,17 @@ public class SpatialIndexTools {
      *
      * @return  DOCUMENT ME!
      *
-     * @throws  IOException           DOCUMENT ME!
-     * @throws  InterruptedException  DOCUMENT ME!
-     * @throws  TimeoutException      DOCUMENT ME!
-     * @throws  ExecutionException    DOCUMENT ME!
+     * @throws  IOException                   DOCUMENT ME!
+     * @throws  InterruptedException          DOCUMENT ME!
+     * @throws  TimeoutException              DOCUMENT ME!
+     * @throws  ExecutionException            DOCUMENT ME!
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
      */
-    protected String getFileInfo(final File workingDir, final String file) throws IOException,
+    protected GeometryType getFileInfo(final File workingDir, final String file) throws IOException,
         InterruptedException,
         TimeoutException,
-        ExecutionException {
+        ExecutionException,
+        UnsupportedDataTypeException {
         LOGGER.info("getting info of file '" + file + "' in '"
                     + workingDir.getAbsolutePath() + "'");
 
@@ -284,42 +328,64 @@ public class SpatialIndexTools {
         }
 
         final StringBuilder sb = new StringBuilder();
+        GeometryType geometryType = null;
+
         for (final String line : output) {
             sb.append(line).append(System.getProperty("line.separator"));
+            if (line.toLowerCase().contains(GeometryType.POINT.toString().toLowerCase())) {
+                geometryType = GeometryType.POINT;
+                break;
+            } else if (line.toLowerCase().contains(GeometryType.POINT.toString().toLowerCase())) {
+                geometryType = GeometryType.POLYGON;
+                break;
+            }
         }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(sb.toString());
         }
-        return sb.toString();
+
+        if (geometryType == null) {
+            throw new UnsupportedDataTypeException("info spatial file '" + file + "' does not contain '"
+                        + GeometryType.POINT.toString() + "' or '" + GeometryType.POLYGON.toString() + "': "
+                        + sb.toString());
+        }
+
+        return geometryType;
     }
 
     /**
      * DOCUMENT ME!
      *
-     * @param   workingDir  DOCUMENT ME!
-     * @param   polygon     DOCUMENT ME!
-     * @param   pghost      DOCUMENT ME!
-     * @param   pgport      DOCUMENT ME!
-     * @param   pgdbname    DOCUMENT ME!
-     * @param   pgpassword  DOCUMENT ME!
-     * @param   pguser      DOCUMENT ME!
-     * @param   file        DOCUMENT ME!
+     * @param   workingDir    DOCUMENT ME!
+     * @param   geometryType  DOCUMENT ME!
+     * @param   pghost        DOCUMENT ME!
+     * @param   pgport        DOCUMENT ME!
+     * @param   pgdbname      DOCUMENT ME!
+     * @param   pgpassword    DOCUMENT ME!
+     * @param   pguser        DOCUMENT ME!
+     * @param   file          DOCUMENT ME!
      *
-     * @throws  IOException           DOCUMENT ME!
-     * @throws  InterruptedException  DOCUMENT ME!
-     * @throws  TimeoutException      DOCUMENT ME!
-     * @throws  ExecutionException    DOCUMENT ME!
+     * @throws  IOException                   DOCUMENT ME!
+     * @throws  InterruptedException          DOCUMENT ME!
+     * @throws  TimeoutException              DOCUMENT ME!
+     * @throws  ExecutionException            DOCUMENT ME!
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
      */
     protected void importGeometries(
             final File workingDir,
-            final boolean polygon,
+            final GeometryType geometryType,
             final String pghost,
             final String pgport,
             final String pgdbname,
             final String pgpassword,
             final String pguser,
-            final String file) throws IOException, InterruptedException, TimeoutException, ExecutionException {
-        LOGGER.info("importing spatial file '" + file + "' from '"
+            final String file) throws IOException,
+        InterruptedException,
+        TimeoutException,
+        ExecutionException,
+        UnsupportedDataTypeException {
+        LOGGER.info("importing '" + geometryType + "' spatial file '" + file + "' from '"
                     + workingDir.getAbsolutePath() + "' into database '" + pghost + ":" + pgport + "/" + pgdbname
                     + "'");
 
@@ -328,14 +394,17 @@ public class SpatialIndexTools {
         final int argFileIndex;
 
         // choose polygon or point ogr2ogr import command
-        if (polygon) {
+        if (geometryType == GeometryType.POLYGON) {
             ogr2ogrCmd = ogr2ogrPolygonCmdTpl.toArray(new String[ogr2ogrPolygonCmdTpl.size()]);
             argPgIndex = 8;
-            argFileIndex = 11;
-        } else {
+            argFileIndex = 10;
+        } else if (geometryType == GeometryType.POINT) {
             ogr2ogrCmd = ogr2ogrPointCmdTpl.toArray(new String[ogr2ogrPointCmdTpl.size()]);
-            argPgIndex = 6;
-            argFileIndex = 9;
+            argPgIndex = 5;
+            argFileIndex = 8;
+        } else {
+            throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
+                        + "' is not supported by this operation");
         }
 
         ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replace("$pghost", pghost);
@@ -432,19 +501,17 @@ public class SpatialIndexTools {
             }
 
             for (final File file : files) {
-                final String fileInfo = spatialIndexTools.getFileInfo(workingDir, file.getName());
-                System.out.println(fileInfo);
+                final GeometryType geometryType = spatialIndexTools.getFileInfo(workingDir, file.getName());
+                spatialIndexTools.importGeometries(
+                    workingDir,
+                    geometryType,
+                    "switchon.cismet.de",
+                    "5434",
+                    "switchon_dev",
+                    "",
+                    "postgres",
+                    files[0].getName());
             }
-
-            spatialIndexTools.importGeometries(
-                workingDir,
-                true,
-                "switchon.cismet.de",
-                "5434",
-                "switchon_dev",
-                "",
-                "postgres",
-                files[0].getName());
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
             System.exit(1);
