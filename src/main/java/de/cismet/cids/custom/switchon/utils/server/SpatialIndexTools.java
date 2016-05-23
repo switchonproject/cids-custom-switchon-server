@@ -71,34 +71,67 @@ public class SpatialIndexTools {
                 "-q"
             });
 
-    protected final List<String> ogr2ogpPolygonCmdTpl = Arrays.asList(new String[]{
-        "ogr2ogr", 
-        "-progress", 
-        "-simplify", "500", 
-        "--config", "PG_USE_COPY YES",
-        "-f",
-        "PostgreSQL",
-        "PG:\"host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser\"",
-        "-lco",
-        "DIM=2",
-        "$file",
-        "-overwrite",
-        "-lco", 
-        "OVERWRITE=YES", 
-        "-t_srs",
-        "\"EPSG:4326\"",
-        "-a_srs",
-        "\"EPSG:4326\"",
-        "-lco",
-        "SCHEMA=import_tables",
-        "-lco",
-        "GEOMETRY_NAME=geom",
-        "-nln",
-        "geosearch_import", 
-        "-gt",
-        "65536",
-        "-nlt",
-        "PROMOTE_TO_MULTI"});
+    protected final List<String> ogr2ogrPolygonCmdTpl = Arrays.asList(
+            new String[] {
+                "ogr2ogr",
+                "-progress",
+                "-simplify",
+                "500",
+                "--config",
+                "PG_USE_COPY YES",
+                "-f",
+                "PostgreSQL",
+                "PG:\"host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser\"",
+                "-lco",
+                "DIM=2",
+                "$file",
+                "-overwrite",
+                "-lco",
+                "OVERWRITE=YES",
+                "-t_srs",
+                "\"EPSG:4326\"",
+                "-a_srs",
+                "\"EPSG:4326\"",
+                "-lco",
+                "SCHEMA=import_tables",
+                "-lco",
+                "GEOMETRY_NAME=geom",
+                "-nln",
+                "geosearch_import",
+                "-gt",
+                "65536",
+                "-nlt",
+                "PROMOTE_TO_MULTI"
+            });
+
+    protected final List<String> ogr2ogrPointCmdTpl = Arrays.asList(
+            new String[] {
+                "ogr2ogr",
+                "-progress",
+                "--config",
+                "PG_USE_COPY YES",
+                "-f",
+                "PostgreSQL",
+                "PG:\"host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser\"",
+                "-lco",
+                "DIM=2",
+                "$file",
+                "-overwrite",
+                "-lco",
+                "OVERWRITE=YES",
+                "-t_srs",
+                "\"EPSG:4326\"",
+                "-a_srs",
+                "\"EPSG:4326\"",
+                "-lco",
+                "SCHEMA=import_tables",
+                "-lco",
+                "GEOMETRY_NAME=geom",
+                "-nln",
+                "geosearch_import",
+                "-gt",
+                "65536"
+            });
 
     protected final Path tempPath;
 
@@ -259,36 +292,75 @@ public class SpatialIndexTools {
         }
         return sb.toString();
     }
-    
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   workingDir  DOCUMENT ME!
+     * @param   polygon     DOCUMENT ME!
+     * @param   pghost      DOCUMENT ME!
+     * @param   pgport      DOCUMENT ME!
+     * @param   pgdbname    DOCUMENT ME!
+     * @param   pgpassword  DOCUMENT ME!
+     * @param   pguser      DOCUMENT ME!
+     * @param   file        DOCUMENT ME!
+     *
+     * @throws  IOException           DOCUMENT ME!
+     * @throws  InterruptedException  DOCUMENT ME!
+     * @throws  TimeoutException      DOCUMENT ME!
+     * @throws  ExecutionException    DOCUMENT ME!
+     */
     protected void importGeometries(
-            final File workingDir, 
-            final String file, 
-            final String database, 
-            final String host, 
-            final String port, 
-            final String user, 
-            final String password) throws IOException,
-        InterruptedException,
-        TimeoutException,
-        ExecutionException {
-        
-        LOGGER.info("getting info of file '" + file + "' in '"
-                    + workingDir.getAbsolutePath() + "'");
+            final File workingDir,
+            final boolean polygon,
+            final String pghost,
+            final String pgport,
+            final String pgdbname,
+            final String pgpassword,
+            final String pguser,
+            final String file) throws IOException, InterruptedException, TimeoutException, ExecutionException {
+        LOGGER.info("importing spatial file '" + file + "' from '"
+                    + workingDir.getAbsolutePath() + "' into database '" + pghost + ":" + pgport + "/" + pgdbname
+                    + "'");
 
-        final String[] ogrinfoCmd = ogrinfoCmdTpl.toArray(new String[ogrinfoCmdTpl.size() + 1]);
-        ogrinfoCmd[ogrinfoCmd.length - 1] = file;
-        final int timeout = 6;
+        final String[] ogr2ogrCmd;
+        final int argPgIndex;
+        final int argFileIndex;
 
-        final ProcessBuilder processBuilder = new ProcessBuilder(ogrinfoCmd);
+        // choose polygon or point ogr2ogr import command
+        if (polygon) {
+            ogr2ogrCmd = ogr2ogrPolygonCmdTpl.toArray(new String[ogr2ogrPolygonCmdTpl.size()]);
+            argPgIndex = 8;
+            argFileIndex = 11;
+        } else {
+            ogr2ogrCmd = ogr2ogrPointCmdTpl.toArray(new String[ogr2ogrPointCmdTpl.size()]);
+            argPgIndex = 6;
+            argFileIndex = 9;
+        }
+
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pghost", pghost);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pgport", pgport);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pgdbname", pgdbname);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pgpassword", pgpassword);
+        ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replaceAll("$pguser", pguser);
+        ogr2ogrCmd[argFileIndex] = file;
+
+        // wait 5 minutes for import
+        final int timeout = 300;
+
+        final ProcessBuilder processBuilder = new ProcessBuilder(ogr2ogrCmd);
         processBuilder.directory(workingDir);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(Arrays.toString(ogrinfoCmd));
+            LOGGER.debug(Arrays.toString(ogr2ogrCmd));
         }
         final Process process = processBuilder.start();
         final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
         if (!completed) {
             process.destroy();
-            throw new TimeoutException("getting info of file '" + file + "' timed out after " + timeout + " seconds.");
+
+            throw new TimeoutException("importing spatial file '" + file
+                        + "' into database '" + pghost + ":" + pgport + "/" + pgdbname + "' timed out after " + timeout
+                        + " seconds.");
         }
 
         final int exitValue = process.exitValue();
@@ -296,21 +368,20 @@ public class SpatialIndexTools {
             final String message = outputError(process.getInputStream(), process.getErrorStream());
             LOGGER.error(message);
             final Exception processException = new Exception(message);
-            throw new ExecutionException("getting info of file '" + file + "' failed with exit value " + exitValue,
+            throw new ExecutionException("importing spatial file '" + file
+                        + "' into database '" + pghost + ":" + pgport + "/" + pgdbname + "' failed with exit value "
+                        + exitValue,
                 processException);
         }
 
         final String[] output = output(process.getInputStream());
         if (output.length == 0) {
-            throw new IOException("getting info of file '" + file + "' failed: no info found by ogrinfo");
-        }
-
-        final StringBuilder sb = new StringBuilder();
-        for (final String line : output) {
-            sb.append(line).append(System.getProperty("line.separator"));
+            throw new IOException("importing spatial file '" + file
+                        + "' into database '" + pghost + ":" + pgport + "/" + pgdbname
+                        + "' failed: no progress reported from ogr2ogr command");
         }
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(sb.toString());
+            LOGGER.debug(Arrays.toString(output));
         }
     }
 
