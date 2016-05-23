@@ -7,6 +7,8 @@
 ****************************************************/
 package de.cismet.cids.custom.switchon.utils.server;
 
+import Sirius.server.sql.DBConnection;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
@@ -17,12 +19,17 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 
+import java.net.URI;
 import java.net.URL;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -34,7 +41,8 @@ import java.util.concurrent.TimeoutException;
 import javax.activation.UnsupportedDataTypeException;
 
 /**
- * DOCUMENT ME!
+ * Tool for importing point or polygon geometries from shapefiles into a postgres database. Updates the spatial index
+ * (geom_search table) of the SWITCH-ON Meta-Data Repository.
  *
  * @author   Pascal Dihé <pascal.dihe@cismet.de>
  * @version  $Revision$, $Date$
@@ -44,6 +52,11 @@ public class SpatialIndexTools {
     //~ Static fields/initializers ---------------------------------------------
 
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
+
+    protected static final String searchGeomInsertPolygonTpl =
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, geom FROM import_tables.geosearch_import";
+    protected static final String searchGeomInsertPointTpl =
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(geom) FROM import_tables.geosearch_import";
 
     //~ Enums ------------------------------------------------------------------
 
@@ -85,6 +98,15 @@ public class SpatialIndexTools {
     }
 
     //~ Instance fields --------------------------------------------------------
+
+    protected final PreparedStatement searchGeomInsertPointStatement;
+    protected final PreparedStatement searchGeomInsertPolygonStatement;
+
+    protected final String pghost;
+    protected final String pgport;
+    protected final String pgdbname;
+    protected final String pgpassword;
+    protected final String pguser;
 
     protected final List<String> curlCmdTpl = Arrays.asList(
             new String[] {
@@ -175,18 +197,143 @@ public class SpatialIndexTools {
 
     protected final Path tempPath;
 
-    String POINT = "(Point)";
-
     //~ Constructors -----------------------------------------------------------
 
     /**
      * Creates a new SpatialIndexTools object.
+     *
+     * @param   dbConnection  DOCUMENT ME!
+     *
+     * @throws  SQLException  DOCUMENT ME!
      */
-    public SpatialIndexTools() {
-        tempPath = FileSystems.getDefault().getPath(System.getProperty("java.io.tmpdir"), "switchon");
+    public SpatialIndexTools(final DBConnection dbConnection) throws SQLException {
+        this.tempPath = FileSystems.getDefault().getPath(System.getProperty("java.io.tmpdir"), "switchon");
+
+        final URI dbConnectionUri = URI.create(dbConnection.getURL().substring(5));
+
+        final String dbName = (dbConnectionUri.getPath().indexOf('/') == 0) ? dbConnectionUri.getPath().substring(1)
+                                                                            : dbConnectionUri.getPath();
+        this.pgdbname = (dbName.indexOf(';') != -1) ? dbName.substring(0, dbName.indexOf(';')) : dbName;
+        this.pghost = dbConnectionUri.getHost();
+        this.pgport = String.valueOf(dbConnectionUri.getPort());
+        this.pgpassword = dbConnection.getPassword();
+        this.pguser = dbConnection.getUser();
+        this.searchGeomInsertPointStatement = dbConnection.getConnection().prepareStatement(searchGeomInsertPointTpl);
+        this.searchGeomInsertPolygonStatement = dbConnection.getConnection()
+                    .prepareStatement(searchGeomInsertPolygonTpl);
+    }
+
+    /**
+     * Creates a new SpatialIndexTools object.
+     *
+     * @param   jdbcUrl   DOCUMENT ME!
+     * @param   user      DOCUMENT ME!
+     * @param   password  DOCUMENT ME!
+     *
+     * @throws  ClassNotFoundException  DOCUMENT ME!
+     * @throws  SQLException            DOCUMENT ME!
+     */
+    private SpatialIndexTools(final String jdbcUrl, final String user, final String password)
+            throws ClassNotFoundException, SQLException {
+        this.tempPath = FileSystems.getDefault().getPath(System.getProperty("java.io.tmpdir"), "switchon");
+
+        final URI dbConnectionUri = URI.create(jdbcUrl.substring(5));
+        final String dbName = (dbConnectionUri.getPath().indexOf('/') == 0) ? dbConnectionUri.getPath().substring(1)
+                                                                            : dbConnectionUri.getPath();
+
+        this.pgdbname = (dbName.indexOf(';') != -1) ? dbName.substring(0, dbName.indexOf(';')) : dbName;
+        this.pghost = dbConnectionUri.getHost();
+        this.pgport = String.valueOf(dbConnectionUri.getPort());
+        this.pgpassword = password;
+        this.pguser = user;
+
+        final Connection connection = DriverManager.getConnection(jdbcUrl, user, password);
+        this.searchGeomInsertPointStatement = connection.prepareStatement(searchGeomInsertPointTpl);
+        this.searchGeomInsertPolygonStatement = connection.prepareStatement(searchGeomInsertPolygonTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   fileURL     DOCUMENT ME!
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception  DOCUMENT ME!
+     */
+    public int updateSpatialIndex(final URL fileURL, final int resourceId) throws Exception {
+        return this.updateSpatialIndex(fileURL, "shp", resourceId);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   fileURL        DOCUMENT ME!
+     * @param   fileExtension  DOCUMENT ME!
+     * @param   resourceId     DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  Exception              DOCUMENT ME!
+     * @throws  FileNotFoundException  DOCUMENT ME!
+     */
+    public int updateSpatialIndex(final URL fileURL, final String fileExtension, final int resourceId)
+            throws Exception {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("downloading '" + fileURL + "' and inserting search geometries from *."
+                        + fileExtension + " files for resource with id " + resourceId);
+        }
+
+        final Path workingPath = this.tempPath.resolve(String.valueOf(System.currentTimeMillis()));
+
+        final File workingDir = workingPath.toFile();
+        workingDir.mkdirs();
+
+        this.downloadFile(workingDir, fileURL);
+
+        this.unzipFile(workingDir);
+
+        final File[] files = this.listFiles(workingDir, fileExtension);
+        if (files.length == 0) {
+            throw new FileNotFoundException("getting file names from '"
+                        + workingDir.getAbsolutePath() + "' did not find any file matching the pattern '*."
+                        + fileExtension + "'");
+        } else if (files.length > 1) {
+            LOGGER.warn("the file downloaded from '" + fileURL + "' contains "
+                        + files.length + " *." + fileExtension
+                        + " files! Commonly only one spatial file should be processed at once.");
+        }
+
+        int i = 0;
+        int updateCount = 0;
+        for (final File file : files) {
+            i++;
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("processing file " + i + " of" + files.length + ": '" + file.getAbsolutePath() + "'");
+            }
+
+            final GeometryType geometryType = this.getFileInfo(workingDir, file.getName());
+            this.importGeometries(
+                workingDir,
+                geometryType,
+                this.pghost,
+                this.pgport,
+                this.pgdbname,
+                this.pgpassword,
+                this.pguser,
+                files[0].getName());
+
+            updateCount += this.insertSearchGeometries(geometryType, resourceId);
+        }
+
+        LOGGER.info("downloaded '" + fileURL + "' and inserted " + updateCount + " search geometries from *."
+                    + fileExtension + " files for resource with id " + resourceId);
+
+        return updateCount;
+    }
 
     /**
      * DOCUMENT ME!
@@ -333,11 +480,21 @@ public class SpatialIndexTools {
         for (final String line : output) {
             sb.append(line).append(System.getProperty("line.separator"));
             if (line.toLowerCase().contains(GeometryType.POINT.toString().toLowerCase())) {
-                geometryType = GeometryType.POINT;
-                break;
+                if (geometryType == null) {
+                    geometryType = GeometryType.POINT;
+                } else {
+                    LOGGER.warn("spatial file '" + file + "' seems to contain more than one layer: '"
+                                + geometryType + "' + '" + GeometryType.POINT
+                                + "'! Only the type of the first layer is considered!");
+                }
             } else if (line.toLowerCase().contains(GeometryType.POINT.toString().toLowerCase())) {
-                geometryType = GeometryType.POLYGON;
-                break;
+                if (geometryType == null) {
+                    geometryType = GeometryType.POLYGON;
+                } else {
+                    LOGGER.warn("spatial file '" + file + "' seems to contain more than one layer: '"
+                                + geometryType + "' + '" + GeometryType.POLYGON
+                                + "'! Only the type of the first layer is considered!");
+                }
             }
         }
 
@@ -455,6 +612,42 @@ public class SpatialIndexTools {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @param   geometryType  DOCUMENT ME!
+     * @param   resourceId    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     */
+    protected int insertSearchGeometries(final GeometryType geometryType, final int resourceId)
+            throws UnsupportedDataTypeException, SQLException {
+        LOGGER.info("inserting imported '" + geometryType + "' geometries for resource with id '"
+                    + resourceId + "' into the search geometries table");
+
+        final PreparedStatement searchGeomInsertStatement;
+        if (geometryType == GeometryType.POLYGON) {
+            searchGeomInsertStatement = searchGeomInsertPolygonStatement;
+        } else if (geometryType == GeometryType.POINT) {
+            searchGeomInsertStatement = searchGeomInsertPointStatement;
+        } else {
+            throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
+                        + "' is not supported by this operation");
+        }
+
+        searchGeomInsertStatement.setInt(1, resourceId);
+        final int updateCount = searchGeomInsertStatement.executeUpdate();
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(updateCount + " imported '" + geometryType + "' geometries for resource with id '"
+                        + resourceId + "' inserted into the search geometries table");
+        }
+
+        return updateCount;
+    }
+
+    /**
      * List all files in the working directory that have a specific pattern .
      *
      * @param   workingDir  DOCUMENT ME!
@@ -481,42 +674,27 @@ public class SpatialIndexTools {
     public static void main(final String[] args) {
         BasicConfigurator.configure();
 
-        final SpatialIndexTools spatialIndexTools = new SpatialIndexTools();
+        if (args.length == 0) {
+            LOGGER.fatal("first required argument pg password is missing, bailing out!");
+            System.exit(1);
+        }
 
         try {
-            final URL url = new URL("http://dl-ng003.xtr.deltares.nl/downloadallzip/zippeddownload/regulartzt.zip");
-            final Path workingPath = spatialIndexTools.tempPath.resolve(String.valueOf(System.currentTimeMillis()));
-
-            final File workingDir = workingPath.toFile();
-            workingDir.mkdirs();
-
-            spatialIndexTools.downloadFile(workingDir, url);
-
-            spatialIndexTools.unzipFile(workingDir);
-
-            final File[] files = spatialIndexTools.listFiles(workingDir, "shp");
-            if (files.length == 0) {
-                throw new FileNotFoundException("getting file names from '"
-                            + workingDir.getAbsolutePath() + "' did not find any file matching the pattern '*.shp'");
-            }
-
-            for (final File file : files) {
-                final GeometryType geometryType = spatialIndexTools.getFileInfo(workingDir, file.getName());
-                spatialIndexTools.importGeometries(
-                    workingDir,
-                    geometryType,
-                    "switchon.cismet.de",
-                    "5434",
-                    "switchon_dev",
-                    "",
+            final SpatialIndexTools spatialIndexTools = new SpatialIndexTools(
+                    "jdbc:postgresql://switchon.cismet.de:5434/switchon_dev",
                     "postgres",
-                    files[0].getName());
-            }
+                    args[0]);
+
+            spatialIndexTools.updateSpatialIndex(
+                new URL("http://dl-ng003.xtr.deltares.nl/downloadallzip/zippeddownload/regulartzt.zip"),
+                11986);
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
             System.exit(1);
         }
     }
+
+    // Connection
 
     /**
      * DOCUMENT ME!
