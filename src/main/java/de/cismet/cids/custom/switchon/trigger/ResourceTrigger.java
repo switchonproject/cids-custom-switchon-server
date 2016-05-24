@@ -50,14 +50,15 @@ import de.cismet.tools.PasswordEncrypter;
 import de.cismet.tools.PropertyReader;
 
 /**
- * Checks if the inserted or updated Resource has a representation s with a certain publish type tag. If this is the
- * case, a new representation l will be added to the resource, this e.g. represents a layer from a geoserver. Then the
- * resource will be saved. After the save, the content of s will be uploaded to a server, e.g. a geotiff or a shapefile
- * will be uploaded to a geoserver. Then the url is saved as contentlocation to l. Furthermore a state (Finished,
- * Failed) and a message will be saved to lo.
+ * Checks if the inserted or updated Resource has a representation (s) with a certain publish type tag. If this is the
+ * case, a new representation (l) will be added to the resource, this e.g. represents a layer from a geoserver. Then the
+ * resource will be saved. After the save, the content of (s) will be uploaded to a server, e.g. a geotiff or a
+ * shapefile will be uploaded to a geoserver. Then the url is saved as contentlocation to (l). Furthermore a state
+ * (Finished, Failed) and a message will be saved to (l).
  *
- * @author   Gilles Baatz
- * @version  $Revision$, $Date$
+ * @author      Gilles Baatz
+ * @version     $Revision$, $Date$
+ * @deprecated  Geoserver Upload is now performed by the new HTML5 Upload Tool
  */
 //@ServiceProvider(service = CidsTrigger.class)
 public class ResourceTrigger extends AbstractDBAwareCidsTrigger {

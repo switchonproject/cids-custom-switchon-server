@@ -51,12 +51,23 @@ public class SpatialIndexTools {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    public static final String SPATIAL_PROCESSING_INSTRUCTION = "deriveSpatialIndex:";
+    public static final String FILETYPE_SHP = "shp";
+
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
 
     protected static final String searchGeomInsertPolygonTpl =
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, geom FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertPointTpl =
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(geom) FROM import_tables.geosearch_import";
+
+    protected static final String searchGeomCopyTpl = "INSERT INTO geom_search(resource, geo_field, geom)\n"
+                + "SELECT resource.id,\n"
+                + "       geom.geo_field,\n"
+                + "       geom.id\n"
+                + "FROM resource\n"
+                + "JOIN geom ON resource.spatialcoverage = geom.id\n"
+                + "WHERE resource.id = ? LIMIT 1;";
 
     //~ Enums ------------------------------------------------------------------
 
@@ -101,6 +112,7 @@ public class SpatialIndexTools {
 
     protected final PreparedStatement searchGeomInsertPointStatement;
     protected final PreparedStatement searchGeomInsertPolygonStatement;
+    protected final PreparedStatement searchGeomCopyStatement;
 
     protected final String pghost;
     protected final String pgport;
@@ -221,6 +233,7 @@ public class SpatialIndexTools {
         this.searchGeomInsertPointStatement = dbConnection.getConnection().prepareStatement(searchGeomInsertPointTpl);
         this.searchGeomInsertPolygonStatement = dbConnection.getConnection()
                     .prepareStatement(searchGeomInsertPolygonTpl);
+        this.searchGeomCopyStatement = dbConnection.getConnection().prepareStatement(searchGeomCopyTpl);
     }
 
     /**
@@ -250,12 +263,13 @@ public class SpatialIndexTools {
         final Connection connection = DriverManager.getConnection(jdbcUrl, user, password);
         this.searchGeomInsertPointStatement = connection.prepareStatement(searchGeomInsertPointTpl);
         this.searchGeomInsertPolygonStatement = connection.prepareStatement(searchGeomInsertPolygonTpl);
+        this.searchGeomCopyStatement = connection.prepareStatement(searchGeomCopyTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * Convienence operation for updateSpatialIndex that processes SHP Files by default.
      *
      * @param   fileURL     DOCUMENT ME!
      * @param   resourceId  DOCUMENT ME!
@@ -265,15 +279,18 @@ public class SpatialIndexTools {
      * @throws  Exception  DOCUMENT ME!
      */
     public int updateSpatialIndex(final URL fileURL, final int resourceId) throws Exception {
-        return this.updateSpatialIndex(fileURL, "shp", resourceId);
+        return this.updateSpatialIndex(fileURL, FILETYPE_SHP, resourceId);
     }
 
     /**
-     * DOCUMENT ME!
+     * Updates the spatial index of the Meta-Data Repository with the geometries from the the file downloaded from <i>
+     * fileURL</i> and associates the geometries into the geom_search table with the respurc eindentified by the
+     * parameter *resourceId*.<br>
+     * This operation supports currently only zippded ESRI SHape Files.
      *
-     * @param   fileURL        DOCUMENT ME!
-     * @param   fileExtension  DOCUMENT ME!
-     * @param   resourceId     DOCUMENT ME!
+     * @param   fileURL        link to download file
+     * @param   fileExtension  shp by default
+     * @param   resourceId     id of the resource
      *
      * @return  DOCUMENT ME!
      *
@@ -769,5 +786,14 @@ public class SpatialIndexTools {
         }
 
         return output.toArray(new String[output.size()]);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public PreparedStatement getSearchGeomCopyStatement() {
+        return searchGeomCopyStatement;
     }
 }
