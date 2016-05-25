@@ -42,11 +42,12 @@ import de.cismet.commons.concurrency.CismetConcurrency;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsTrigger.class)
-public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
+public class UploadToGeoServerTrigger extends AbstractDBAwareCidsTrigger {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(SearchGeomTrigger.class);
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(
+            UploadToGeoServerTrigger.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -59,7 +60,7 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public SearchGeomTrigger() throws Exception {
+    public UploadToGeoServerTrigger() throws Exception {
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -133,7 +134,6 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
                         @Override
                         protected Integer doInBackground() throws Exception {
                             int updated = -1;
-                            final boolean processingInstructionFound = false;
                             final List<CidsBean> representations = resource.getBeanCollectionProperty(
                                     "representations");
                             if ((representations != null) && !representations.isEmpty()) {
