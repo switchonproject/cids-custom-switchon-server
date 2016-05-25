@@ -9,6 +9,7 @@ package de.cismet.cids.custom.switchon.utils.server;
 
 import Sirius.server.sql.DBConnection;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
@@ -223,6 +224,7 @@ public class SpatialIndexTools {
             "unzip",
             "-o",
             "-j",
+            "-s",
             "download.zip"
         };
 
@@ -246,6 +248,8 @@ public class SpatialIndexTools {
                 "-lco",
                 "DIM=2",
                 "$file",
+                "-sql",
+                "SELECT FID FROM \"$layer\"",
                 "-overwrite",
                 "-lco",
                 "OVERWRITE=YES",
@@ -262,7 +266,8 @@ public class SpatialIndexTools {
                 "-gt",
                 "65536",
                 "-nlt",
-                "PROMOTE_TO_MULTI"
+                "PROMOTE_TO_MULTI",
+                "-skipfailures"
             });
 
     protected final List<String> ogr2ogrPointCmdTpl = Arrays.asList(
@@ -276,6 +281,8 @@ public class SpatialIndexTools {
                 "-lco",
                 "DIM=2",
                 "$file",
+                "-sql",
+                "SELECT FID FROM \"$layer\"",
                 "-overwrite",
                 "-lco",
                 "OVERWRITE=YES",
@@ -290,7 +297,8 @@ public class SpatialIndexTools {
                 "-nln",
                 "geosearch_import",
                 "-gt",
-                "65536"
+                "65536",
+                "-skipfailures"
             });
 
     protected final Path tempPath;
@@ -401,7 +409,8 @@ public class SpatialIndexTools {
 
         this.unzipFile(workingDir);
 
-        final File[] files = this.listFiles(workingDir, fileType.toString());
+        final File[] files = this.listSupportedFiles(workingDir, fileType);
+
         if (files.length == 0) {
             throw new FileNotFoundException("getting file names from '"
                         + workingDir.getAbsolutePath() + "' did not find any file matching the pattern '*."
@@ -592,7 +601,7 @@ public class SpatialIndexTools {
                                 + geometryType + "' + '" + GeometryType.POINT
                                 + "'! Only the type of the first layer is considered!");
                 }
-            } else if (line.toLowerCase().contains(GeometryType.POINT.toString().toLowerCase())) {
+            } else if (line.toLowerCase().contains(GeometryType.POLYGON.toString().toLowerCase())) {
                 if (geometryType == null) {
                     geometryType = GeometryType.POLYGON;
                 } else {
@@ -600,6 +609,8 @@ public class SpatialIndexTools {
                                 + geometryType + "' + '" + GeometryType.POLYGON
                                 + "'! Only the type of the first layer is considered!");
                 }
+            } else {
+                LOGGER.warn("no supported geometry type found in layer info: '" + line + "'");
             }
         }
 
@@ -650,20 +661,24 @@ public class SpatialIndexTools {
         LOGGER.info("importing '" + geometryType + "' spatial file '" + file + "' from '"
                     + workingDir.getAbsolutePath() + "' into database '" + pghost + ":" + pgport + "/" + pgdbname
                     + "'");
-
+        // FIXME: can we safely assume that the shp layer name is always the filename of the SHP file?
+        final String layer = FilenameUtils.removeExtension(file);
         final String[] ogr2ogrCmd;
         final int argPgIndex;
         final int argFileIndex;
+        final int argLayerIndex;
 
         // choose polygon or point ogr2ogr import command
         if (geometryType == GeometryType.POLYGON) {
             ogr2ogrCmd = ogr2ogrPolygonCmdTpl.toArray(new String[ogr2ogrPolygonCmdTpl.size()]);
-            argPgIndex = 8;
+            argPgIndex = 7;
             argFileIndex = 10;
+            argLayerIndex = 12;
         } else if (geometryType == GeometryType.POINT) {
             ogr2ogrCmd = ogr2ogrPointCmdTpl.toArray(new String[ogr2ogrPointCmdTpl.size()]);
             argPgIndex = 5;
             argFileIndex = 8;
+            argLayerIndex = 10;
         } else {
             throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
                         + "' is not supported by this operation");
@@ -675,8 +690,9 @@ public class SpatialIndexTools {
         ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replace("$pgpassword", pgpassword);
         ogr2ogrCmd[argPgIndex] = ogr2ogrCmd[argPgIndex].replace("$pguser", pguser);
         ogr2ogrCmd[argFileIndex] = file;
+        ogr2ogrCmd[argLayerIndex] = ogr2ogrCmd[argLayerIndex].replace("$layer", layer);
 
-        // wait 5 minutes for import
+        // wait 30 minutes for import
         final int timeout = 30;
 
         final ProcessBuilder processBuilder = new ProcessBuilder(ogr2ogrCmd);
@@ -711,6 +727,7 @@ public class SpatialIndexTools {
                         + "' into database '" + pghost + ":" + pgport + "/" + pgdbname
                         + "' failed: no progress reported from ogr2ogr command");
         }
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(Arrays.toString(output));
         }
@@ -759,16 +776,16 @@ public class SpatialIndexTools {
      * List all files in the working directory that have a specific pattern .
      *
      * @param   workingDir  DOCUMENT ME!
-     * @param   extension   DOCUMENT ME!
+     * @param   fileType    extension DOCUMENT ME!
      *
      * @return  DOCUMENT ME!
      */
-    protected File[] listFiles(final File workingDir, final String extension) {
+    protected File[] listSupportedFiles(final File workingDir, final FileType fileType) {
         final File[] files = workingDir.listFiles(new FilenameFilter() {
 
                     @Override
                     public boolean accept(final File dir, final String name) {
-                        return name.toLowerCase().endsWith("." + extension.toLowerCase());
+                        return name.toLowerCase().endsWith("." + fileType.toString().toLowerCase());
                     }
                 });
 

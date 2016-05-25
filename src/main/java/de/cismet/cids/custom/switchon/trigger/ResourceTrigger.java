@@ -134,13 +134,13 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                         protected Integer doInBackground() throws Exception {
                             int updated = -1;
                             final List<CidsBean> representations = resource.getBeanCollectionProperty(
-                                    "representations");
+                                    "representation");
                             if ((representations != null) && !representations.isEmpty()) {
                                 if (LOGGER.isDebugEnabled()) {
                                     LOGGER.debug(
                                         "searching "
                                         + representations.size()
-                                        + " for processing instructions");
+                                        + " representation (s) for processing instructions");
                                 }
 
                                 for (final CidsBean representation : representations) {
@@ -214,8 +214,8 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     protected int processRepresentation(final CidsBean representation,
             final int resourceId,
             final String resourceName) {
-        final String processingInstruction = (representation.getProperty("uploadstatus") != null)
-            ? representation.getProperty("uploadstatus").toString() : null;
+        final String processingInstruction = (representation.getProperty("uploadmessage") != null)
+            ? representation.getProperty("uploadmessage").toString() : null;
 
         if (processingInstruction != null) {
             if (LOGGER.isDebugEnabled()) {
@@ -252,8 +252,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
                 FileType filterType = null;
                 final String fileTypeString = processingInstruction.substring(
-                            processingInstruction.toLowerCase().indexOf(
-                                SpatialIndexTools.SPATIAL_PROCESSING_INSTRUCTION.toLowerCase()))
+                        SpatialIndexTools.SPATIAL_PROCESSING_INSTRUCTION.length())
                             .toLowerCase();
 
                 for (final FileType ft : FileType.values()) {
