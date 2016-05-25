@@ -461,7 +461,7 @@ public class SpatialIndexTools {
         final String[] curlCmd = curlCmdTpl.toArray(new String[curlCmdTpl.size() + 1]);
         curlCmd[curlCmd.length - 1] = fileURL.toString();
 
-        final int timeout = 60;
+        final int timeout = 15;
         final ProcessBuilder processBuilder = new ProcessBuilder(curlCmd);
         processBuilder.directory(workingDir);
         if (LOGGER.isDebugEnabled()) {
@@ -469,11 +469,11 @@ public class SpatialIndexTools {
         }
 
         final Process process = processBuilder.start();
-        final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
+        final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES);
         if (!completed) {
             process.destroy();
             throw new TimeoutException("downloading " + fileURL
-                        + " timed out after " + timeout + " seconds.");
+                        + " timed out after " + timeout + " minutes.");
         }
 
         final int exitValue = process.exitValue();
@@ -504,17 +504,17 @@ public class SpatialIndexTools {
         LOGGER.info("unzipping downloaded file to '"
                     + workingDir.getAbsolutePath() + "'");
 
-        final int timeout = 30;
+        final int timeout = 2;
         final ProcessBuilder processBuilder = new ProcessBuilder(unzipCmd);
         processBuilder.directory(workingDir);
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(Arrays.toString(unzipCmd));
         }
         final Process process = processBuilder.start();
-        final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
+        final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES);
         if (!completed) {
             process.destroy();
-            throw new TimeoutException("unzipping 'download.zip' timed out after " + timeout + " seconds.");
+            throw new TimeoutException("unzipping 'download.zip' timed out after " + timeout + " minutes.");
         }
 
         final int exitValue = process.exitValue();
@@ -551,7 +551,7 @@ public class SpatialIndexTools {
 
         final String[] ogrinfoCmd = ogrinfoCmdTpl.toArray(new String[ogrinfoCmdTpl.size() + 1]);
         ogrinfoCmd[ogrinfoCmd.length - 1] = file;
-        final int timeout = 6;
+        final int timeout = 30;
 
         final ProcessBuilder processBuilder = new ProcessBuilder(ogrinfoCmd);
         processBuilder.directory(workingDir);
@@ -677,7 +677,7 @@ public class SpatialIndexTools {
         ogr2ogrCmd[argFileIndex] = file;
 
         // wait 5 minutes for import
-        final int timeout = 300;
+        final int timeout = 30;
 
         final ProcessBuilder processBuilder = new ProcessBuilder(ogr2ogrCmd);
         processBuilder.directory(workingDir);
@@ -685,7 +685,7 @@ public class SpatialIndexTools {
             LOGGER.debug(Arrays.toString(ogr2ogrCmd));
         }
         final Process process = processBuilder.start();
-        final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
+        final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES);
         if (!completed) {
             process.destroy();
 
