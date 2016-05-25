@@ -61,11 +61,12 @@ import de.cismet.tools.PropertyReader;
  * @deprecated  Geoserver Upload is now performed by the new HTML5 Upload Tool
  */
 //@ServiceProvider(service = CidsTrigger.class)
-public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
+public class MakeAdditionalRepresentationAndUploadToGeoServerTrigger extends AbstractDBAwareCidsTrigger {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(ResourceTrigger.class);
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(
+            MakeAdditionalRepresentationAndUploadToGeoServerTrigger.class);
 
     private static final PropertyReader propertyReader;
 
@@ -104,7 +105,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     /**
      * Creates a new ResourceTrigger object.
      */
-    public ResourceTrigger() {
+    public MakeAdditionalRepresentationAndUploadToGeoServerTrigger() {
         try {
             geoServerRESTReader = new GeoServerRESTReader(
                     GEOSERVER_REST_URL,
