@@ -52,7 +52,6 @@ public class SpatialIndexTools {
     //~ Static fields/initializers ---------------------------------------------
 
     public static final String SPATIAL_PROCESSING_INSTRUCTION = "deriveSpatialIndex:";
-    public static final String FILETYPE_SHP = "shp";
 
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
 
@@ -60,6 +59,17 @@ public class SpatialIndexTools {
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, geom FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertPointTpl =
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(geom) FROM import_tables.geosearch_import";
+
+    protected static final String updateRepresentationStatusTpl = "UPDATE \"public\".representation\n"
+                + "SET uploadstatus =\n"
+                + "  (SELECT id\n"
+                + "   FROM \"public\".tag\n"
+                + "   WHERE name = ?\n"
+                + "     AND taggroup =\n"
+                + "       (SELECT id\n"
+                + "        FROM \"public\".taggroup\n"
+                + "        WHERE name = 'upload status' LIMIT 1) LIMIT 1), uploadmessage = ?\n"
+                + "WHERE uuid = ?;";
 
     protected static final String searchGeomCopyTpl = "INSERT INTO geom_search(resource, geo_field, geom)\n"
                 + "SELECT resource.id,\n"
@@ -72,7 +82,7 @@ public class SpatialIndexTools {
     //~ Enums ------------------------------------------------------------------
 
     /**
-     * DOCUMENT ME!
+     * List of supported Geometry Types.
      *
      * @version  $Revision$, $Date$
      */
@@ -108,11 +118,87 @@ public class SpatialIndexTools {
         }
     }
 
+    /**
+     * List of supported File Types.
+     *
+     * @version  $Revision$, $Date$
+     */
+    public enum FileType {
+
+        //~ Enum constants -----------------------------------------------------
+
+        SHAPE("shp");
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String fileExtension;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new GeometryType object.
+         *
+         * @param  fileExtension  DOCUMENT ME!
+         */
+        private FileType(final String fileExtension) {
+            this.fileExtension = fileExtension;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /* (non-Javadoc)
+         * @see java.lang.Enum#toString()
+         */
+        @Override
+        public String toString() {
+            return fileExtension;
+        }
+    }
+
+    /**
+     * List of supported update status types.
+     *
+     * @version  $Revision$, $Date$
+     */
+    public enum UpdateStatus {
+
+        //~ Enum constants -----------------------------------------------------
+
+        // yes, 'uploading' is right. We reuse the tag group 'upload status'
+        FAILED("failed"), FINISHED("finished"), UPDATING("uploading");
+
+        //~ Instance fields ----------------------------------------------------
+
+        private final String status;
+
+        //~ Constructors -------------------------------------------------------
+
+        /**
+         * Creates a new GeometryType object.
+         *
+         * @param  status  fileExtension DOCUMENT ME!
+         */
+        private UpdateStatus(final String status) {
+            this.status = status;
+        }
+
+        //~ Methods ------------------------------------------------------------
+
+        /* (non-Javadoc)
+         * @see java.lang.Enum#toString()
+         */
+        @Override
+        public String toString() {
+            return status;
+        }
+    }
+
     //~ Instance fields --------------------------------------------------------
 
     protected final PreparedStatement searchGeomInsertPointStatement;
     protected final PreparedStatement searchGeomInsertPolygonStatement;
     protected final PreparedStatement searchGeomCopyStatement;
+    protected final PreparedStatement updateRepresentationStatusStatement;
 
     protected final String pghost;
     protected final String pgport;
@@ -234,6 +320,8 @@ public class SpatialIndexTools {
         this.searchGeomInsertPolygonStatement = dbConnection.getConnection()
                     .prepareStatement(searchGeomInsertPolygonTpl);
         this.searchGeomCopyStatement = dbConnection.getConnection().prepareStatement(searchGeomCopyTpl);
+        this.updateRepresentationStatusStatement = dbConnection.getConnection()
+                    .prepareStatement(updateRepresentationStatusTpl);
     }
 
     /**
@@ -264,6 +352,7 @@ public class SpatialIndexTools {
         this.searchGeomInsertPointStatement = connection.prepareStatement(searchGeomInsertPointTpl);
         this.searchGeomInsertPolygonStatement = connection.prepareStatement(searchGeomInsertPolygonTpl);
         this.searchGeomCopyStatement = connection.prepareStatement(searchGeomCopyTpl);
+        this.updateRepresentationStatusStatement = connection.prepareStatement(updateRepresentationStatusTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -279,7 +368,7 @@ public class SpatialIndexTools {
      * @throws  Exception  DOCUMENT ME!
      */
     public int updateSpatialIndex(final URL fileURL, final int resourceId) throws Exception {
-        return this.updateSpatialIndex(fileURL, FILETYPE_SHP, resourceId);
+        return this.updateSpatialIndex(fileURL, FileType.SHAPE, resourceId);
     }
 
     /**
@@ -288,20 +377,19 @@ public class SpatialIndexTools {
      * parameter *resourceId*.<br>
      * This operation supports currently only zippded ESRI SHape Files.
      *
-     * @param   fileURL        link to download file
-     * @param   fileExtension  shp by default
-     * @param   resourceId     id of the resource
+     * @param   fileURL     link to download file
+     * @param   fileType    DOCUMENT ME!
+     * @param   resourceId  id of the resource
      *
      * @return  DOCUMENT ME!
      *
      * @throws  Exception              DOCUMENT ME!
      * @throws  FileNotFoundException  DOCUMENT ME!
      */
-    public int updateSpatialIndex(final URL fileURL, final String fileExtension, final int resourceId)
-            throws Exception {
+    public int updateSpatialIndex(final URL fileURL, final FileType fileType, final int resourceId) throws Exception {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("downloading '" + fileURL + "' and inserting search geometries from *."
-                        + fileExtension + " files for resource with id " + resourceId);
+                        + fileType.toString() + " files for resource with id " + resourceId);
         }
 
         final Path workingPath = this.tempPath.resolve(String.valueOf(System.currentTimeMillis()));
@@ -313,14 +401,14 @@ public class SpatialIndexTools {
 
         this.unzipFile(workingDir);
 
-        final File[] files = this.listFiles(workingDir, fileExtension);
+        final File[] files = this.listFiles(workingDir, fileType.toString());
         if (files.length == 0) {
             throw new FileNotFoundException("getting file names from '"
                         + workingDir.getAbsolutePath() + "' did not find any file matching the pattern '*."
-                        + fileExtension + "'");
+                        + fileType.toString() + "'");
         } else if (files.length > 1) {
             LOGGER.warn("the file downloaded from '" + fileURL + "' contains "
-                        + files.length + " *." + fileExtension
+                        + files.length + " *." + fileType.toString()
                         + " files! Commonly only one spatial file should be processed at once.");
         }
 
@@ -347,7 +435,7 @@ public class SpatialIndexTools {
         }
 
         LOGGER.info("downloaded '" + fileURL + "' and inserted " + updateCount + " search geometries from *."
-                    + fileExtension + " files for resource with id " + resourceId);
+                    + fileType.toString() + " files for resource with id " + resourceId);
 
         return updateCount;
     }
@@ -654,11 +742,14 @@ public class SpatialIndexTools {
                         + "' is not supported by this operation");
         }
 
-        searchGeomInsertStatement.setInt(1, resourceId);
-        final int updateCount = searchGeomInsertStatement.executeUpdate();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(updateCount + " imported '" + geometryType + "' geometries for resource with id '"
-                        + resourceId + "' inserted into the search geometries table");
+        final int updateCount;
+        synchronized (searchGeomInsertStatement) {
+            searchGeomInsertStatement.setInt(1, resourceId);
+            updateCount = searchGeomInsertStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(updateCount + " imported '" + geometryType + "' geometries for resource with id '"
+                            + resourceId + "' inserted into the search geometries table");
+            }
         }
 
         return updateCount;
@@ -795,5 +886,14 @@ public class SpatialIndexTools {
      */
     public PreparedStatement getSearchGeomCopyStatement() {
         return searchGeomCopyStatement;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public PreparedStatement getUpdateRepresentationStatusStatement() {
+        return updateRepresentationStatusStatement;
     }
 }

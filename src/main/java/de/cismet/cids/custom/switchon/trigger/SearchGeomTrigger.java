@@ -12,12 +12,18 @@ import Sirius.server.newuser.User;
 
 import org.openide.util.lookup.ServiceProvider;
 
+import java.net.URL;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.util.List;
 
+import javax.activation.UnsupportedDataTypeException;
+
 import de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools;
+import de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools.FileType;
+import de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools.UpdateStatus;
 
 import de.cismet.cids.dynamics.CidsBean;
 
@@ -81,6 +87,7 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
 
         return true;
     }
+
     @Override
     public void beforeInsert(final CidsBean cidsBean, final User user) {
     }
@@ -125,7 +132,7 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
 
                         @Override
                         protected Integer doInBackground() throws Exception {
-                            int updated = 0;
+                            int updated = -1;
                             final boolean processingInstructionFound = false;
                             final List<CidsBean> representations = resource.getBeanCollectionProperty(
                                     "representations");
@@ -136,51 +143,32 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
                                         + representations.size()
                                         + " for processing instructions");
                                 }
+
                                 for (final CidsBean representation : representations) {
-                                    if (!processingInstructionFound) {
-                                        final Object processingInstruction = representation.getProperty("uploadstatus");
-                                        if (processingInstruction != null) {
-                                            if (
-                                        processingInstruction.toString().toLowerCase().indexOf(
-                                                    SpatialIndexTools.SPATIAL_PROCESSING_INSTRUCTION.toLowerCase())
-                                                != -1) {
-                                                final String fileType = processingInstruction.toString()
-                                                    .substring(
-                                                        processingInstruction.toString().toLowerCase().indexOf(
-                                                            SpatialIndexTools.SPATIAL_PROCESSING_INSTRUCTION
-                                                                .toLowerCase()));
-                                            } else {
-                                                LOGGER.error(
-                                                    "unsupported processing instruction '"
-                                                    + processingInstruction
-                                                    + "' found in repesentation '"
-                                                    + representation.getProperty("contentlocation")
-                                                    + "' ("
-                                                    + representation.getPrimaryKeyValue()
-                                                    + ") of resource '"
-                                                    + resourceName
-                                                    + "' ("
-                                                    + resourceId
-                                                    + ")");
-                                            }
-                                        }
+                                    updated = processRepresentation(representation, resourceId, resourceName);
+
+                                    // import successfully performed, return updated polygon count
+                                    if (updated != -1) {
+                                        return updated;
                                     }
                                 }
                             }
 
-                            synchronized (SearchGeomTrigger.this) {
-                                if (!processingInstructionFound) {
-                                    if (LOGGER.isDebugEnabled()) {
-                                        LOGGER.debug(
-                                            "no processing instruction found in representations of resurce '"
-                                            + resourceName
-                                            + "' ("
-                                            + resourceId
-                                            + ") updating spatial index with geometry of resource");
-                                    }
+                            // continue when updated == -1 (no processing instruction or import failed)
+                            final PreparedStatement searchGeomCopyStatement =
+                                spatialIndexTools.getSearchGeomCopyStatement();
+
+                            // aquire lock to prevent using the prepared statement from other threads!
+                            synchronized (searchGeomCopyStatement) {
+                                if (LOGGER.isDebugEnabled()) {
+                                    LOGGER.debug(
+                                        "no processing instruction found in representations of resource '"
+                                        + resourceName
+                                        + "' ("
+                                        + resourceId
+                                        + ") updating spatial index with geometry of resource");
                                 }
-                                final PreparedStatement searchGeomCopyStatement =
-                                    spatialIndexTools.getSearchGeomCopyStatement();
+
                                 searchGeomCopyStatement.setInt(1, resourceId);
                                 updated = searchGeomCopyStatement.executeUpdate();
                             }
@@ -193,9 +181,9 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
                             try {
                                 final Integer updated = get();
                                 if (LOGGER.isDebugEnabled()) {
-                                    LOGGER.debug(
+                                    LOGGER.info(
                                         updated
-                                        + "search geometries of new Resource '"
+                                        + " search geometries of new resource '"
                                         + resourceName
                                         + "' ("
                                         + resourceId
@@ -203,7 +191,7 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
                                 }
                             } catch (Exception e) {
                                 LOGGER.error(
-                                    "could not copy search geometries of new Resource '"
+                                    "could not copy search geometries of new resource '"
                                     + resourceName
                                     + "' ("
                                     + resourceId
@@ -213,6 +201,157 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
                             }
                         }
                     });
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   representation  DOCUMENT ME!
+     * @param   resourceId      DOCUMENT ME!
+     * @param   resourceName    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected int processRepresentation(final CidsBean representation,
+            final int resourceId,
+            final String resourceName) {
+        final String processingInstruction = (representation.getProperty("uploadstatus") != null)
+            ? representation.getProperty("uploadstatus").toString() : null;
+
+        if (processingInstruction != null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("processing instruction '"
+                            + processingInstruction
+                            + "' found in repesentation '"
+                            + representation.getProperty("contentlocation")
+                            + "' ("
+                            + representation.getPrimaryKeyValue()
+                            + ") of resource '"
+                            + resourceName
+                            + "' ("
+                            + resourceId
+                            + ")");
+            }
+            try {
+                if (
+                    processingInstruction.toLowerCase().indexOf(
+                                SpatialIndexTools.SPATIAL_PROCESSING_INSTRUCTION.toLowerCase())
+                            != 0) {
+                    throw new UnsupportedOperationException(
+                        "unsupported processing instruction '"
+                                + processingInstruction
+                                + "' found in repesentation '"
+                                + representation.getProperty("contentlocation")
+                                + "' ("
+                                + representation.getPrimaryKeyValue()
+                                + ") of resource '"
+                                + resourceName
+                                + "' ("
+                                + resourceId
+                                + ")");
+                }
+
+                FileType filterType = null;
+                final String fileTypeString = processingInstruction.substring(
+                            processingInstruction.toLowerCase().indexOf(
+                                SpatialIndexTools.SPATIAL_PROCESSING_INSTRUCTION.toLowerCase()))
+                            .toLowerCase();
+
+                for (final FileType ft : FileType.values()) {
+                    if (ft.toString().equalsIgnoreCase(fileTypeString)) {
+                        filterType = ft;
+                        break;
+                    }
+                }
+
+                if (filterType == null) {
+                    throw new UnsupportedDataTypeException("unsupported file type '"
+                                + fileTypeString + "' found in processing instruction '"
+                                + processingInstruction
+                                + "' found in repesentation '"
+                                + representation.getProperty("contentlocation")
+                                + "' ("
+                                + representation.getPrimaryKeyValue()
+                                + ") of resource '"
+                                + resourceName
+                                + "' ("
+                                + resourceId
+                                + ")");
+                }
+
+                final URL fileUrl = new URL(representation.getProperty("contentlocation").toString());
+
+                return this.spatialIndexTools.updateSpatialIndex(fileUrl, filterType, resourceId);
+            } catch (final Throwable t) {
+                final String message = t.getClass().getSimpleName()
+                            + " while executing processing instruction '"
+                            + processingInstruction
+                            + "' found in repesentation '"
+                            + representation.getProperty("contentlocation")
+                            + "' ("
+                            + representation.getPrimaryKeyValue()
+                            + ") of resource '"
+                            + resourceName
+                            + "' ("
+                            + resourceId
+                            + "): "
+                            + t.getMessage();
+
+                LOGGER.error(message, t);
+                this.updateRepresentationStatus(representation, message);
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  representation  DOCUMENT ME!
+     * @param  message         DOCUMENT ME!
+     */
+    protected void updateRepresentationStatus(final CidsBean representation, final String message) {
+        final String uuid = (representation.getProperty("uuid") != null) ? representation.getProperty("uuid").toString()
+                                                                         : null;
+
+        if (uuid != null) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("updating status of representation '" + representation.getProperty("contentlocation")
+                            + "' (" + uuid + ")");
+            }
+            try {
+                final PreparedStatement updateRepresentationStatusStatement =
+                    spatialIndexTools.getUpdateRepresentationStatusStatement();
+
+                synchronized (updateRepresentationStatusStatement) {
+                    updateRepresentationStatusStatement.setString(1, UpdateStatus.FAILED.toString());
+                    updateRepresentationStatusStatement.setString(2, message);
+                    updateRepresentationStatusStatement.setString(3, uuid);
+
+                    final int updateStatus = updateRepresentationStatusStatement.executeUpdate();
+                    if (updateStatus == 1) {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("status of representation '" + representation.getProperty("contentlocation")
+                                        + "' (" + uuid + ") successfully updated");
+                        }
+                    } else {
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.debug("status of representation '" + representation.getProperty("contentlocation")
+                                        + "' (" + uuid + ") not updated correctly (update count = " + updateStatus
+                                        + ") but no exception was thrown!");
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                LOGGER.error("status of representation '" + representation.getProperty("contentlocation")
+                            + "' (" + uuid + ") could not be updated: " + e.getMessage(),
+                    e);
+            }
+        } else {
+            LOGGER.warn("cannot update status of representation '" + representation.getProperty("contentlocation")
+                        + "' (" + representation.getPrimaryKeyValue() + "): no UUID property found in representation!");
+        }
     }
 
     @Override
@@ -231,7 +370,7 @@ public class SearchGeomTrigger extends AbstractDBAwareCidsTrigger {
 
     @Override
     public int compareTo(final CidsTrigger o) {
-        return -1;
+        return Integer.MAX_VALUE;
     }
 
     @Override
