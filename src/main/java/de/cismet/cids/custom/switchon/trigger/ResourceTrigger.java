@@ -42,12 +42,11 @@ import de.cismet.commons.concurrency.CismetConcurrency;
  * @version  $Revision$, $Date$
  */
 @ServiceProvider(service = CidsTrigger.class)
-public class UploadToGeoServerTrigger extends AbstractDBAwareCidsTrigger {
+public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(
-            UploadToGeoServerTrigger.class);
+    private static final org.apache.log4j.Logger LOGGER = org.apache.log4j.Logger.getLogger(ResourceTrigger.class);
 
     //~ Instance fields --------------------------------------------------------
 
@@ -60,7 +59,7 @@ public class UploadToGeoServerTrigger extends AbstractDBAwareCidsTrigger {
      *
      * @throws  Exception  DOCUMENT ME!
      */
-    public UploadToGeoServerTrigger() throws Exception {
+    public ResourceTrigger() throws Exception {
     }
 
     //~ Methods ----------------------------------------------------------------
