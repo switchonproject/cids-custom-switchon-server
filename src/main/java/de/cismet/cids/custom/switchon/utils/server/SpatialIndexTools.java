@@ -228,7 +228,6 @@ public class SpatialIndexTools {
             "unzip",
             "-o",
             "-j",
-            "-s",
             DOWNLOAD_FILENAME
         };
 
