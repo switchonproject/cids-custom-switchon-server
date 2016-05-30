@@ -5,18 +5,9 @@
 *              ... and it just works.
 *
 ****************************************************/
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cismet.cids.custom.switchon.utils.server;
 
-import Sirius.server.sql.DBConnection;
-
 import org.apache.log4j.Logger;
-
-import org.openide.util.Exceptions;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -35,6 +26,23 @@ public class CleanupTools {
     protected static final Logger LOGGER = Logger.getLogger(CleanupTools.class);
 
     //~ Instance fields --------------------------------------------------------
+
+    protected final String deleteRelationshipMetadataTagReferencesTpl = "DELETE\n"
+                + "FROM jt_metadata_tag\n"
+                + "WHERE metadata_reference IN\n"
+                + "    ( SELECT id\n"
+                + "     FROM \"public\".metadata\n"
+                + "     WHERE \"type\" =\n"
+                + "         (SELECT id\n"
+                + "          FROM \"public\".tag\n"
+                + "          WHERE name = 'relationship meta-data' LIMIT 1)\n"
+                + "       AND id IN\n"
+                + "         (SELECT metadataid\n"
+                + "          FROM \"public\".jt_metadata_relationship\n"
+                + "          WHERE relationship_reference IN\n"
+                + "              (SELECT id\n"
+                + "               FROM \"public\".relationship\n"
+                + "               WHERE toresource = 5711)))";
 
     protected final String deleteRelationshipMetadataTpl = "DELETE\n"
                 + "FROM \"public\".metadata\n"
@@ -57,8 +65,35 @@ public class CleanupTools {
                 + "     FROM \"public\".relationship\n"
                 + "     WHERE toresource = ?)";
 
+    protected final String deleteRelationshipResourceReferenceTpl = "DELETE\n"
+                + "FROM \"public\".jt_fromresource_relationship\n"
+                + "WHERE resourceid = ?";
+
+    protected final String deleteRelationshipResourceReferencesTpl = "DELETE\n"
+                + "FROM \"public\".jt_fromresource_relationship\n"
+                + "WHERE relationship_reference IN\n"
+                + "    (SELECT id\n"
+                + "     FROM \"public\".relationship\n"
+                + "     WHERE toresource = ?)";
+
+    protected final String deleteRelationshipTagReferencesTpl = "DELETE\n"
+                + "FROM \"public\".jt_relationship_tag\n"
+                + "WHERE relationship_reference IN\n"
+                + "    (SELECT id\n"
+                + "     FROM \"public\".relationship\n"
+                + "     WHERE toresource = 1)";
+
+    protected final String deleteRelationshipTpl = "DELETE\n"
+                + "FROM \"public\".relationship\n"
+                + "WHERE toresource = 5711";
+
+    protected final PreparedStatement deleteRelationshipMetadataTagReferencesStatement;
     protected final PreparedStatement deleteRelationshipMetadataStatement;
     protected final PreparedStatement deleteRelationshipMetadataReferenceStatement;
+    protected final PreparedStatement deleteRelationshipResourceReferenceStatement;
+    protected final PreparedStatement deleteRelationshipResourceReferencesStatement;
+    protected final PreparedStatement deleteRelationshipTagReferencesStatement;
+    protected final PreparedStatement deleteRelationshipStatement;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -70,13 +105,69 @@ public class CleanupTools {
      * @throws  SQLException  DOCUMENT ME!
      */
     public CleanupTools(final Connection connection) throws SQLException {
+        this.deleteRelationshipMetadataTagReferencesStatement = connection.prepareStatement(
+                deleteRelationshipMetadataTagReferencesTpl);
         this.deleteRelationshipMetadataStatement = connection.prepareStatement(deleteRelationshipMetadataTpl);
-
         this.deleteRelationshipMetadataReferenceStatement = connection.prepareStatement(
                 deleteRelationshipMetadataReferenceTpl);
+        this.deleteRelationshipResourceReferencesStatement = connection.prepareStatement(
+                deleteRelationshipResourceReferencesTpl);
+        this.deleteRelationshipResourceReferenceStatement = connection.prepareStatement(
+                deleteRelationshipResourceReferenceTpl);
+        this.deleteRelationshipTagReferencesStatement = connection.prepareStatement(deleteRelationshipTagReferencesTpl);
+        this.deleteRelationshipStatement = connection.prepareStatement(deleteRelationshipTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    public int cleanupResource(final int resourceId) {
+        int result = 0;
+
+        result += this.deleteRelationshipMetadataTagReferences(resourceId);
+        result += this.deleteRelationshipMetadata(resourceId);
+        result += this.deleteRelationshipMetadataReference(resourceId);
+        result += this.deleteRelationshipResourceReference(resourceId);
+        result += this.deleteRelationshipResourceReferences(resourceId);
+        result += this.deleteRelationshipTagReferences(resourceId);
+        result += this.deleteRelationship(resourceId);
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    synchronized int deleteRelationshipMetadataTagReferences(final int resourceId) {
+        int result = 0;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Relationship Metadata Tag References for Resource with id " + resourceId);
+            }
+            this.deleteRelationshipMetadataTagReferencesStatement.setInt(1, resourceId);
+            result = this.deleteRelationshipMetadataTagReferencesStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Relationship Metadata Tag References records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Relationship Metadata Tag References for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
 
     /**
      * Delete Relationship Metadata if the target resource (toresource) of the reletionship has been deleted.
@@ -86,7 +177,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected synchronized int deleteRelationshipMetadata(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Relationship Metadata for Resource with id " + resourceId);
@@ -106,7 +197,8 @@ public class CleanupTools {
     }
 
     /**
-     * DOCUMENT ME!
+     * Delete the Relationship Meta Data Reference a if the target resource (toresource) of the Relationship has been
+     * deleted.
      *
      * @param   resourceId  DOCUMENT ME!
      *
@@ -125,7 +217,120 @@ public class CleanupTools {
                             + resourceId);
             }
         } catch (SQLException ex) {
-            LOGGER.error("could not delete Relationship Reference Metadata for Resource with id "
+            LOGGER.error("could not delete Relationship Metadata Reference for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * Delete <strong>all</strong> Relationship Resource References a if the target resource (toresource) of the
+     * Relationship has been deleted.
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteRelationshipResourceReference(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Relationship Resource Reference for Resource with id " + resourceId);
+            }
+            this.deleteRelationshipResourceReferenceStatement.setInt(1, resourceId);
+            result = this.deleteRelationshipResourceReferenceStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Relationship Relationship Reference records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Relationship Relationship Reference for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteRelationshipResourceReferences(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting all Relationship Resource References for Resource with id " + resourceId);
+            }
+            this.deleteRelationshipResourceReferencesStatement.setInt(1, resourceId);
+            result = this.deleteRelationshipResourceReferencesStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Relationship Resource References records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Relationship Resource References for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteRelationshipTagReferences(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting all Relationship Tag References for Resource with id " + resourceId);
+            }
+            this.deleteRelationshipTagReferencesStatement.setInt(1, resourceId);
+            result = this.deleteRelationshipTagReferencesStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Relationship Tag References records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Relationship Resource References for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * Delete the Relationship if the target resource (toresource) of the Relationship has been deleted.
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteRelationship(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Relationship for Resource with id " + resourceId);
+            }
+            this.deleteRelationshipStatement.setInt(1, resourceId);
+            result = this.deleteRelationshipStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Relationship records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Relationship for Resource with id "
                         + resourceId + ": " + ex.getMessage(),
                 ex);
         }
