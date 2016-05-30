@@ -485,14 +485,11 @@ public class SpatialIndexTools {
         }
 
         final Process process = processBuilder.start();
-        final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES);
-        if (!completed) {
-            process.destroy();
-            throw new TimeoutException("downloading " + fileURL
-                        + " timed out after " + timeout + " minutes.");
-        }
+        // disabled for Java 1.7 compatibility final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES); if
+        // (!completed) { process.destroy(); throw new TimeoutException("downloading " + fileURL + " timed out after " +
+        // timeout + " minutes."); }
 
-        final int exitValue = process.exitValue();
+        final int exitValue = process.waitFor();
         if (exitValue != 0) {
             final String message = outputError(process.getInputStream(), process.getErrorStream());
             LOGGER.error(message);
@@ -527,14 +524,11 @@ public class SpatialIndexTools {
             LOGGER.debug(Arrays.toString(unzipCmd));
         }
         final Process process = processBuilder.start();
-        final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES);
-        if (!completed) {
-            process.destroy();
-            throw new TimeoutException("unzipping '" + DOWNLOAD_FILENAME + "' timed out after " + timeout
-                        + " minutes.");
-        }
+        // disabled for Java 1.7 compatibility final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES); if
+        // (!completed) { process.destroy(); throw new TimeoutException("unzipping '" + DOWNLOAD_FILENAME + "' timed out
+        // after " + timeout + " minutes."); }
 
-        final int exitValue = process.exitValue();
+        final int exitValue = process.waitFor();
         if (exitValue != 0) {
             final String message = outputError(process.getInputStream(), process.getErrorStream());
             LOGGER.error(message);
@@ -576,13 +570,11 @@ public class SpatialIndexTools {
             LOGGER.debug(Arrays.toString(ogrinfoCmd));
         }
         final Process process = processBuilder.start();
-        final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS);
-        if (!completed) {
-            process.destroy();
-            throw new TimeoutException("getting info of file '" + file + "' timed out after " + timeout + " seconds.");
-        }
+        // disabled for Java 1.7 compatibility final boolean completed = process.waitFor(timeout, TimeUnit.SECONDS); if
+        // (!completed) { process.destroy(); throw new TimeoutException("getting info of file '" + file + "' timed out
+        // after " + timeout + " seconds."); }
 
-        final int exitValue = process.exitValue();
+        final int exitValue = process.waitFor();
         if (exitValue != 0) {
             final String message = outputError(process.getInputStream(), process.getErrorStream());
             LOGGER.error(message);
@@ -709,16 +701,13 @@ public class SpatialIndexTools {
             LOGGER.debug(Arrays.toString(ogr2ogrCmd));
         }
         final Process process = processBuilder.start();
-        final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES);
-        if (!completed) {
-            process.destroy();
+        // disabled for Java 1.7 compatibility final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES); if
+        // (!completed) { process.destroy();
+        //
+        // throw new TimeoutException("importing spatial file '" + file + "' into database '" + pghost + ":" + pgport +
+        // "/" + pgdbname + "' timed out after " + timeout + " seconds."); }
 
-            throw new TimeoutException("importing spatial file '" + file
-                        + "' into database '" + pghost + ":" + pgport + "/" + pgdbname + "' timed out after " + timeout
-                        + " seconds.");
-        }
-
-        final int exitValue = process.exitValue();
+        final int exitValue = process.waitFor();
         if (exitValue != 0) {
             final String message = outputError(process.getInputStream(), process.getErrorStream());
             LOGGER.error(message);
