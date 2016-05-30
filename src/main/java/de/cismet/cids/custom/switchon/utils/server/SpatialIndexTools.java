@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 
-import java.nio.file.CopyOption;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -400,6 +399,8 @@ public class SpatialIndexTools {
      * @throws  FileNotFoundException  DOCUMENT ME!
      */
     public int updateSpatialIndex(final URL fileURL, final FileType fileType, final int resourceId) throws Exception {
+        final long currentTime = System.currentTimeMillis();
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("downloading '" + fileURL + "' and inserting search geometries from *."
                         + fileType.toString() + " files for resource with id " + resourceId);
@@ -431,7 +432,7 @@ public class SpatialIndexTools {
         for (final File file : files) {
             i++;
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("processing file " + i + " of" + files.length + ": '" + file.getAbsolutePath() + "'");
+                LOGGER.debug("processing file " + i + " of " + files.length + ": '" + file.getAbsolutePath() + "'");
             }
 
             final GeometryType geometryType = this.getFileInfo(workingDir, file.getName());
@@ -449,7 +450,8 @@ public class SpatialIndexTools {
         }
 
         LOGGER.info("downloaded '" + fileURL + "' and inserted " + updateCount + " search geometries from *."
-                    + fileType.toString() + " files for resource with id " + resourceId);
+                    + fileType.toString() + " files for resource with id " + resourceId
+                    + " in " + ((System.currentTimeMillis() - currentTime) / 1000) + " seconds.");
 
         return updateCount;
     }
