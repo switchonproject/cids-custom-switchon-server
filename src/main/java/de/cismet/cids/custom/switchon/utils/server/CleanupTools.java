@@ -42,7 +42,7 @@ public class CleanupTools {
                 + "          WHERE relationship_reference IN\n"
                 + "              (SELECT id\n"
                 + "               FROM \"public\".relationship\n"
-                + "               WHERE toresource = 5711)))";
+                + "               WHERE toresource = ?)))";
 
     protected final String deleteRelationshipMetadataTpl = "DELETE\n"
                 + "FROM \"public\".metadata\n"
@@ -81,11 +81,37 @@ public class CleanupTools {
                 + "WHERE relationship_reference IN\n"
                 + "    (SELECT id\n"
                 + "     FROM \"public\".relationship\n"
-                + "     WHERE toresource = 1)";
+                + "     WHERE toresource = ?)";
 
     protected final String deleteRelationshipTpl = "DELETE\n"
                 + "FROM \"public\".relationship\n"
-                + "WHERE toresource = 5711";
+                + "WHERE toresource = ?";
+
+    protected final String deleteResourceMetadataTpl = "DELETE\n"
+                + "FROM \"public\".metadata\n"
+                + "WHERE id IN\n"
+                + "    (SELECT DISTINCT metadataid\n"
+                + "     FROM \"public\".jt_metadata_resource\n"
+                + "     WHERE metadataid IN\n"
+                + "         (SELECT DISTINCT metadataid\n"
+                + "          FROM \"public\".jt_metadata_resource\n"
+                + "          WHERE resource_reference = ?)\n"
+                + "     GROUP BY metadataid HAVING count(resource_reference) < 2)";
+
+    protected final String deleteResourceMetadataTagReferencesTpl = "DELETE\n"
+                + "FROM \"public\".jt_metadata_tag\n"
+                + "WHERE metadata_reference IN\n"
+                + "    (SELECT DISTINCT metadataid\n"
+                + "     FROM \"public\".jt_metadata_resource\n"
+                + "     WHERE metadataid IN\n"
+                + "         (SELECT DISTINCT metadataid\n"
+                + "          FROM \"public\".jt_metadata_resource\n"
+                + "          WHERE resource_reference = ?)\n"
+                + "     GROUP BY metadataid HAVING count(resource_reference) < 2)";
+
+    protected final String deleteResourceMetadataReferencesTpl = "DELETE\n"
+                + "FROM \"public\".jt_metadata_resource\n"
+                + "WHERE resource_reference = ?";
 
     protected final PreparedStatement deleteRelationshipMetadataTagReferencesStatement;
     protected final PreparedStatement deleteRelationshipMetadataStatement;
@@ -94,6 +120,10 @@ public class CleanupTools {
     protected final PreparedStatement deleteRelationshipResourceReferencesStatement;
     protected final PreparedStatement deleteRelationshipTagReferencesStatement;
     protected final PreparedStatement deleteRelationshipStatement;
+
+    protected final PreparedStatement deleteResourceMetadataStatement;
+    protected final PreparedStatement deleteResourceMetadataTagReferencesStatement;
+    protected final PreparedStatement deleteResourceMetadataReferencesStatement;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -116,6 +146,12 @@ public class CleanupTools {
                 deleteRelationshipResourceReferenceTpl);
         this.deleteRelationshipTagReferencesStatement = connection.prepareStatement(deleteRelationshipTagReferencesTpl);
         this.deleteRelationshipStatement = connection.prepareStatement(deleteRelationshipTpl);
+
+        this.deleteResourceMetadataStatement = connection.prepareStatement(deleteResourceMetadataTpl);
+        this.deleteResourceMetadataTagReferencesStatement = connection.prepareStatement(
+                deleteResourceMetadataTagReferencesTpl);
+        this.deleteResourceMetadataReferencesStatement = connection.prepareStatement(
+                deleteResourceMetadataReferencesTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -137,6 +173,10 @@ public class CleanupTools {
         result += this.deleteRelationshipResourceReferences(resourceId);
         result += this.deleteRelationshipTagReferences(resourceId);
         result += this.deleteRelationship(resourceId);
+
+        result += this.deleteResourceMetadata(resourceId);
+        result += this.deleteResourceMetadataTagReferences(resourceId);
+        result += this.deleteResourceMetadataReferences(resourceId);
 
         return result;
     }
@@ -331,6 +371,91 @@ public class CleanupTools {
             }
         } catch (SQLException ex) {
             LOGGER.error("could not delete Relationship for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * Delete Metadata record(s) of the resource if and only if the metadata record is not associated with any other
+     * resource.
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteResourceMetadata(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Resource Metadata for Resource with id " + resourceId);
+            }
+            this.deleteRelationshipMetadataStatement.setInt(1, resourceId);
+            result = this.deleteRelationshipMetadataStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Resource Metadata records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Resource Metadata for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteResourceMetadataTagReferences(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Resource Metadata Tag References for Resource with id " + resourceId);
+            }
+            this.deleteResourceMetadataTagReferencesStatement.setInt(1, resourceId);
+            result = this.deleteResourceMetadataTagReferencesStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Resource Metadata Tag References records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Resource Metadata Tag References for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteResourceMetadataReferences(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Resource Metadata References for Resource with id " + resourceId);
+            }
+            this.deleteResourceMetadataReferencesStatement.setInt(1, resourceId);
+            result = this.deleteResourceMetadataReferencesStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Resource Metadata References records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Resource Metadata Tag References for Resource with id "
                         + resourceId + ": " + ex.getMessage(),
                 ex);
         }
