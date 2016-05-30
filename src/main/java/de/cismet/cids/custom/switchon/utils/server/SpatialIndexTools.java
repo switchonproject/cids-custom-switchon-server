@@ -24,7 +24,9 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 
+import java.nio.file.CopyOption;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import java.sql.Connection;
@@ -41,6 +43,8 @@ import java.util.concurrent.TimeoutException;
 
 import javax.activation.UnsupportedDataTypeException;
 
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+
 /**
  * Tool for importing point or polygon geometries from shapefiles into a postgres database. Updates the spatial index
  * (geom_search table) of the SWITCH-ON Meta-Data Repository.
@@ -52,6 +56,7 @@ public class SpatialIndexTools {
 
     //~ Static fields/initializers ---------------------------------------------
 
+    public static final String DOWNLOAD_FILENAME = "download.zip";
     public static final String SPATIAL_PROCESSING_INSTRUCTION = "deriveSpatialIndex:";
 
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
@@ -211,7 +216,7 @@ public class SpatialIndexTools {
             new String[] {
                 "curl",
                 "--output",
-                "download.zip",
+                DOWNLOAD_FILENAME,
                 "--fail",
                 "--write-out",
                 "\'%{http_code}\'",
@@ -225,7 +230,7 @@ public class SpatialIndexTools {
             "-o",
             "-j",
             "-s",
-            "download.zip"
+            DOWNLOAD_FILENAME
         };
 
     protected final List<String> ogrinfoCmdTpl = Arrays.asList(
@@ -409,7 +414,7 @@ public class SpatialIndexTools {
 
         this.unzipFile(workingDir);
 
-        final File[] files = this.listSupportedFiles(workingDir, fileType);
+        final File[] files = this.sanitizeFilenames(workingDir, fileType);
 
         if (files.length == 0) {
             throw new FileNotFoundException("getting file names from '"
@@ -523,7 +528,8 @@ public class SpatialIndexTools {
         final boolean completed = process.waitFor(timeout, TimeUnit.MINUTES);
         if (!completed) {
             process.destroy();
-            throw new TimeoutException("unzipping 'download.zip' timed out after " + timeout + " minutes.");
+            throw new TimeoutException("unzipping '" + DOWNLOAD_FILENAME + "' timed out after " + timeout
+                        + " minutes.");
         }
 
         final int exitValue = process.exitValue();
@@ -531,7 +537,7 @@ public class SpatialIndexTools {
             final String message = outputError(process.getInputStream(), process.getErrorStream());
             LOGGER.error(message);
             final Exception processException = new Exception(message);
-            throw new ExecutionException("unzipping 'download.zip' failed with exit value " + exitValue,
+            throw new ExecutionException("unzipping '" + DOWNLOAD_FILENAME + "' failed with exit value " + exitValue,
                 processException);
         }
     }
@@ -770,6 +776,52 @@ public class SpatialIndexTools {
         }
 
         return updateCount;
+    }
+
+    /**
+     * Helper methid to sanitize File names for OGR2OGR.
+     *
+     * @param   workingDir  DOCUMENT ME!
+     * @param   fileType    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  IOException  DOCUMENT ME!
+     */
+    protected File[] sanitizeFilenames(final File workingDir, final FileType fileType) throws IOException {
+        if (fileType == FileType.SHAPE) {
+            final File[] allFiles = workingDir.listFiles(new FilenameFilter() {
+
+                        @Override
+                        public boolean accept(final File dir, final String name) {
+                            // don't sanitize zip file name
+                            return !name.equalsIgnoreCase(DOWNLOAD_FILENAME);
+                        }
+                    });
+
+            for (final File file : allFiles) {
+                if (file.isFile()) {
+                    boolean invalidFilename = true;
+                    try {
+                        Integer.parseInt(file.getName().substring(0, 1));
+                    } catch (final Throwable ignore) {
+                        invalidFilename = false;
+                    }
+
+                    if (invalidFilename) {
+                        final Path oldPath = file.toPath();
+                        final Path newPath = oldPath.resolveSibling(FileType.SHAPE.toString() + "_" + file.getName());
+                        LOGGER.warn("'" + oldPath.toString() + "' is an invalid "
+                                    + FileType.SHAPE.toString() + " filename, renaming to '"
+                                    + newPath.toString() + "'.");
+
+                        Files.move(oldPath, newPath, ATOMIC_MOVE);
+                    }
+                }
+            }
+        }
+
+        return listSupportedFiles(workingDir, fileType);
     }
 
     /**
