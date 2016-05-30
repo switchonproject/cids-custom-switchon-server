@@ -113,6 +113,24 @@ public class CleanupTools {
                 + "FROM \"public\".jt_metadata_resource\n"
                 + "WHERE resource_reference = ?";
 
+    protected final String deleteResourceRepresentationTpl = "DELETE\n"
+                + "FROM \"public\".representation\n"
+                + "WHERE id IN\n"
+                + "    (SELECT representationid\n"
+                + "     FROM \"public\".jt_resource_representation\n"
+                + "     WHERE resource_reference = ?)";
+
+    protected final String deleteResourceRepresentationTagReferencesTpl = "DELETE\n"
+                + "FROM \"public\".jt_representation_tag\n"
+                + "WHERE representation_reference IN\n"
+                + "    (SELECT representationid\n"
+                + "     FROM \"public\".jt_resource_representation\n"
+                + "     WHERE resource_reference = ?)";
+
+    protected final String deleteResourceRepresentationReferencesTpl = "DELETE\n"
+                + "FROM \"public\".jt_resource_representation\n"
+                + "WHERE resource_reference = ?";
+
     protected final PreparedStatement deleteRelationshipMetadataTagReferencesStatement;
     protected final PreparedStatement deleteRelationshipMetadataStatement;
     protected final PreparedStatement deleteRelationshipMetadataReferenceStatement;
@@ -124,6 +142,10 @@ public class CleanupTools {
     protected final PreparedStatement deleteResourceMetadataStatement;
     protected final PreparedStatement deleteResourceMetadataTagReferencesStatement;
     protected final PreparedStatement deleteResourceMetadataReferencesStatement;
+
+    protected final PreparedStatement deleteResourceRepresentationStatement;
+    protected final PreparedStatement deleteResourceRepresentationTagReferencesStatement;
+    protected final PreparedStatement deleteResourceRepresentationReferencesStatement;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -152,6 +174,12 @@ public class CleanupTools {
                 deleteResourceMetadataTagReferencesTpl);
         this.deleteResourceMetadataReferencesStatement = connection.prepareStatement(
                 deleteResourceMetadataReferencesTpl);
+
+        this.deleteResourceRepresentationStatement = connection.prepareStatement(deleteResourceRepresentationTpl);
+        this.deleteResourceRepresentationTagReferencesStatement = connection.prepareStatement(
+                deleteResourceRepresentationTagReferencesTpl);
+        this.deleteResourceRepresentationReferencesStatement = connection.prepareStatement(
+                deleteResourceRepresentationReferencesTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -177,6 +205,10 @@ public class CleanupTools {
         result += this.deleteResourceMetadata(resourceId);
         result += this.deleteResourceMetadataTagReferences(resourceId);
         result += this.deleteResourceMetadataReferences(resourceId);
+
+        result += this.deleteResourceRepresentation(resourceId);
+        result += this.deleteResourceRepresentationTagReferences(resourceId);
+        result += this.deleteResourceRepresentationReferences(resourceId);
 
         return result;
     }
@@ -392,8 +424,8 @@ public class CleanupTools {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Resource Metadata for Resource with id " + resourceId);
             }
-            this.deleteRelationshipMetadataStatement.setInt(1, resourceId);
-            result = this.deleteRelationshipMetadataStatement.executeUpdate();
+            this.deleteResourceMetadataStatement.setInt(1, resourceId);
+            result = this.deleteResourceMetadataStatement.executeUpdate();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(result + "  Resource Metadata records deleted for Resource with id "
                             + resourceId);
@@ -456,6 +488,91 @@ public class CleanupTools {
             }
         } catch (SQLException ex) {
             LOGGER.error("could not delete Resource Metadata Tag References for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * Delete Representation record(s) of the resource if and only if the metadata record is not associated with any
+     * other resource.
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteResourceRepresentation(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Resource Representation for Resource with id " + resourceId);
+            }
+            this.deleteResourceRepresentationStatement.setInt(1, resourceId);
+            result = this.deleteResourceRepresentationStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Resource Representation records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Resource Representation for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteResourceRepresentationTagReferences(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Resource Representation Tag References for Resource with id " + resourceId);
+            }
+            this.deleteResourceRepresentationTagReferencesStatement.setInt(1, resourceId);
+            result = this.deleteResourceRepresentationTagReferencesStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Resource Representation Tag References records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Resource Representation Tag References for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteResourceRepresentationReferences(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Resource Representation References for Resource with id " + resourceId);
+            }
+            this.deleteResourceRepresentationReferencesStatement.setInt(1, resourceId);
+            result = this.deleteResourceRepresentationReferencesStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Resource Representation References records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Resource Representation Tag References for Resource with id "
                         + resourceId + ": " + ex.getMessage(),
                 ex);
         }
