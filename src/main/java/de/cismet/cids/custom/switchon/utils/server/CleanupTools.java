@@ -142,6 +142,10 @@ public class CleanupTools {
                 + "FROM \"public\".geom_search\n"
                 + "WHERE resource = ?";
 
+    protected final String deleteResourceTagReferencesTpl = "DELETE\n"
+                + "FROM \"public\".jt_resource_tag\n"
+                + "WHERE resource_reference  = 12000";
+
     protected final PreparedStatement deleteRelationshipMetadataTagReferencesStatement;
     protected final PreparedStatement deleteRelationshipMetadataStatement;
     protected final PreparedStatement deleteRelationshipMetadataReferenceStatement;
@@ -160,6 +164,8 @@ public class CleanupTools {
 
     protected final PreparedStatement deleteResourceGeometryStatement;
     protected final PreparedStatement deleteResourceSearchGeometriesStatement;
+
+    protected final PreparedStatement deleteResourceTagReferencesStatement;
 
     //~ Constructors -----------------------------------------------------------
 
@@ -199,6 +205,8 @@ public class CleanupTools {
                 deleteResourceGeometryTpl);
         this.deleteResourceSearchGeometriesStatement = connection.prepareStatement(
                 deleteResourceSearchGeometriesTpl);
+
+        this.deleteResourceTagReferencesStatement = connection.prepareStatement(deleteResourceTagReferencesTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -231,6 +239,8 @@ public class CleanupTools {
 
         result += this.deleteResourceGeometry(resourceId);
         result += this.deleteResourceSearchGeometries(resourceId);
+
+        result += this.deleteResourceTagReferences(resourceId);
 
         return result;
     }
@@ -651,6 +661,34 @@ public class CleanupTools {
             }
         } catch (SQLException ex) {
             LOGGER.error("could not delete Resource Search Geometries for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
+    protected synchronized int deleteResourceTagReferences(final int resourceId) {
+        int result = -1;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting all Resource Tag References for Resource with id " + resourceId);
+            }
+            this.deleteResourceTagReferencesStatement.setInt(1, resourceId);
+            result = this.deleteResourceTagReferencesStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Resource Tag References records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Resource TagReferences for Resource with id "
                         + resourceId + ": " + ex.getMessage(),
                 ex);
         }
