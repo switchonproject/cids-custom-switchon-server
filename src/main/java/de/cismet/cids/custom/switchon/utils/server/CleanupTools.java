@@ -131,6 +131,10 @@ public class CleanupTools {
                 + "FROM \"public\".jt_resource_representation\n"
                 + "WHERE resource_reference = ?";
 
+    protected final String deleteResourceSearchGeometriesTpl = "DELETE\n"
+                + "FROM \"public\".geom_search\n"
+                + "WHERE resource = ?";
+
     protected final String deleteResourceGeometryTpl = "DELETE\n"
                 + "FROM \"public\".geom\n"
                 + "WHERE id IN\n"
@@ -138,13 +142,9 @@ public class CleanupTools {
                 + "     FROM \"public\".resource\n"
                 + "     WHERE id = ?)";
 
-    protected final String deleteResourceSearchGeometriesTpl = "DELETE\n"
-                + "FROM \"public\".geom_search\n"
-                + "WHERE resource = ?";
-
     protected final String deleteResourceTagReferencesTpl = "DELETE\n"
                 + "FROM \"public\".jt_resource_tag\n"
-                + "WHERE resource_reference  = 12000";
+                + "WHERE resource_reference  = ?";
 
     protected final PreparedStatement deleteRelationshipMetadataTagReferencesStatement;
     protected final PreparedStatement deleteRelationshipMetadataStatement;
@@ -162,8 +162,8 @@ public class CleanupTools {
     protected final PreparedStatement deleteResourceRepresentationTagReferencesStatement;
     protected final PreparedStatement deleteResourceRepresentationReferencesStatement;
 
-    protected final PreparedStatement deleteResourceGeometryStatement;
     protected final PreparedStatement deleteResourceSearchGeometriesStatement;
+    protected final PreparedStatement deleteResourceGeometryStatement;
 
     protected final PreparedStatement deleteResourceTagReferencesStatement;
 
@@ -201,10 +201,10 @@ public class CleanupTools {
         this.deleteResourceRepresentationReferencesStatement = connection.prepareStatement(
                 deleteResourceRepresentationReferencesTpl);
 
-        this.deleteResourceGeometryStatement = connection.prepareStatement(
-                deleteResourceGeometryTpl);
         this.deleteResourceSearchGeometriesStatement = connection.prepareStatement(
                 deleteResourceSearchGeometriesTpl);
+        this.deleteResourceGeometryStatement = connection.prepareStatement(
+                deleteResourceGeometryTpl);
 
         this.deleteResourceTagReferencesStatement = connection.prepareStatement(deleteResourceTagReferencesTpl);
     }
@@ -247,10 +247,11 @@ public class CleanupTools {
         result += this.deleteResourceSearchGeometries(resourceId);
 
         result += this.deleteResourceTagReferences(resourceId);
-        
+
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.info(result+" oprhanened entities of resource with id " 
-                    + resourceId + " cleaned in " + ((System.currentTimeMillis() - currentTime) / 1000) + " seconds.");
+            LOGGER.info(result + " oprhanened entities of resource with id "
+                        + resourceId + " cleaned in " + (System.currentTimeMillis() - currentTime)
+                        + " ms.");
         }
 
         return result;
@@ -320,7 +321,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteRelationshipMetadataReference(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Relationship Metadata Reference for Resource with id " + resourceId);
@@ -349,7 +350,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteRelationshipResourceReference(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Relationship Resource Reference for Resource with id " + resourceId);
@@ -377,7 +378,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteRelationshipResourceReferences(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting all Relationship Resource References for Resource with id " + resourceId);
@@ -405,7 +406,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteRelationshipTagReferences(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting all Relationship Tag References for Resource with id " + resourceId);
@@ -433,7 +434,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteRelationship(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Relationship for Resource with id " + resourceId);
@@ -462,7 +463,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteResourceMetadata(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Resource Metadata for Resource with id " + resourceId);
@@ -490,7 +491,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteResourceMetadataTagReferences(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Resource Metadata Tag References for Resource with id " + resourceId);
@@ -518,7 +519,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteResourceMetadataReferences(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Resource Metadata References for Resource with id " + resourceId);
@@ -547,7 +548,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteResourceRepresentation(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Resource Representation for Resource with id " + resourceId);
@@ -575,7 +576,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteResourceRepresentationTagReferences(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Resource Representation Tag References for Resource with id " + resourceId);
@@ -603,7 +604,7 @@ public class CleanupTools {
      * @return  DOCUMENT ME!
      */
     protected int deleteResourceRepresentationReferences(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Resource Representation References for Resource with id " + resourceId);
@@ -630,36 +631,8 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected int deleteResourceGeometry(final int resourceId) {
-        int result = -1;
-        try {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("deleting Resource Geometry for Resource with id " + resourceId);
-            }
-            this.deleteResourceGeometryStatement.setInt(1, resourceId);
-            result = this.deleteResourceGeometryStatement.executeUpdate();
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(result + "  Resource Geometry records deleted for Resource with id "
-                            + resourceId);
-            }
-        } catch (SQLException ex) {
-            LOGGER.error("could not delete Resource Geometry for Resource with id "
-                        + resourceId + ": " + ex.getMessage(),
-                ex);
-        }
-
-        return result;
-    }
-
-    /**
-     * DOCUMENT ME!
-     *
-     * @param   resourceId  DOCUMENT ME!
-     *
-     * @return  DOCUMENT ME!
-     */
     protected int deleteResourceSearchGeometries(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting Resource Searc hGeometries for Resource with id " + resourceId);
@@ -686,8 +659,36 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
+    protected int deleteResourceGeometry(final int resourceId) {
+        int result = 0;
+        try {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("deleting Resource Geometry for Resource with id " + resourceId);
+            }
+            this.deleteResourceGeometryStatement.setInt(1, resourceId);
+            result = this.deleteResourceGeometryStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(result + "  Resource Geometry records deleted for Resource with id "
+                            + resourceId);
+            }
+        } catch (SQLException ex) {
+            LOGGER.error("could not delete Resource Geometry for Resource with id "
+                        + resourceId + ": " + ex.getMessage(),
+                ex);
+        }
+
+        return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     */
     protected int deleteResourceTagReferences(final int resourceId) {
-        int result = -1;
+        int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug("deleting all Resource Tag References for Resource with id " + resourceId);

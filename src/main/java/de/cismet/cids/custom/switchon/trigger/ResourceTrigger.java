@@ -9,7 +9,6 @@ package de.cismet.cids.custom.switchon.trigger;
 
 import Sirius.server.localserver.DBServer;
 import Sirius.server.newuser.User;
-import de.cismet.cids.custom.switchon.utils.server.CleanupTools;
 
 import org.openide.util.lookup.ServiceProvider;
 
@@ -22,6 +21,7 @@ import java.util.List;
 
 import javax.activation.UnsupportedDataTypeException;
 
+import de.cismet.cids.custom.switchon.utils.server.CleanupTools;
 import de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools;
 import de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools.FileType;
 import de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools.UpdateStatus;
@@ -86,7 +86,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                 return false;
             }
         }
-        
+
         if (this.spatialIndexTools == null) {
             try {
                 if (LOGGER.isDebugEnabled()) {
@@ -374,7 +374,6 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
     @Override
     public void afterCommittedDelete(final CidsBean resource, final User user) {
-    
 // bail out if initialisation has failed;
         // FIXME(?): client will never know if trigger has failed
         if (!init()) {
