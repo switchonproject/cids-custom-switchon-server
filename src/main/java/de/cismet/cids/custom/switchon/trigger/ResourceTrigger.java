@@ -9,6 +9,7 @@ package de.cismet.cids.custom.switchon.trigger;
 
 import Sirius.server.localserver.DBServer;
 import Sirius.server.newuser.User;
+import de.cismet.cids.custom.switchon.utils.server.CleanupTools;
 
 import org.openide.util.lookup.ServiceProvider;
 
@@ -50,6 +51,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
 
     //~ Instance fields --------------------------------------------------------
 
+    private CleanupTools cleanupTools = null;
     private SpatialIndexTools spatialIndexTools = null;
 
     //~ Constructors -----------------------------------------------------------
@@ -71,6 +73,20 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
      * @return  true if initilaisation was successfull, false otherwise
      */
     protected synchronized boolean init() {
+        if (this.cleanupTools == null) {
+            try {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("initialising Cleanup Tools");
+                }
+
+                cleanupTools = new CleanupTools(this.getDbServer().getActiveDBConnection().getConnection());
+            } catch (SQLException ex) {
+                LOGGER.fatal("could not initialise CleanupTools: " + ex.getMessage(), ex);
+                this.cleanupTools = null;
+                return false;
+            }
+        }
+        
         if (this.spatialIndexTools == null) {
             try {
                 if (LOGGER.isDebugEnabled()) {
@@ -188,7 +204,7 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
                                         + resourceId
                                         + ") copied to search geometries table");
                                 }
-                            } catch (Exception e) {
+                            } catch (final Exception e) {
                                 LOGGER.error(
                                     "could not copy search geometries of new resource '"
                                     + resourceName
@@ -357,8 +373,54 @@ public class ResourceTrigger extends AbstractDBAwareCidsTrigger {
     }
 
     @Override
-    public void afterCommittedDelete(final CidsBean cidsBean, final User user) {
-        // TODO!!!!!!
+    public void afterCommittedDelete(final CidsBean resource, final User user) {
+    
+// bail out if initialisation has failed;
+        // FIXME(?): client will never know if trigger has failed
+        if (!init()) {
+            return;
+        }
+
+        final int resourceId = resource.getPrimaryKeyValue();
+        final String resourceName = (resource.getProperty("name") != null) ? resource.getProperty("name").toString()
+                                                                           : String.valueOf(resourceId);
+        LOGGER.info("Resource '" + resourceName + "' (" + resourceId
+                    + ") deleted, attempting to clean up orphaned entities");
+
+        CismetConcurrency.getInstance("SWITCHON")
+                .getDefaultExecutor()
+                .execute(new javax.swing.SwingWorker<Integer, Void>() {
+
+                        @Override
+                        protected Integer doInBackground() throws Exception {
+                            return cleanupTools.cleanupResource(resourceId);
+                        }
+
+                        @Override
+                        protected void done() {
+                            try {
+                                final Integer deleted = get();
+                                if (LOGGER.isDebugEnabled()) {
+                                    LOGGER.info(
+                                        deleted
+                                        + " entities cleaned after deletion of resource '"
+                                        + resourceName
+                                        + "' ("
+                                        + resourceId
+                                        + ").");
+                                }
+                            } catch (final Exception e) {
+                                LOGGER.error(
+                                    "could not clean up entities after deletion of resource '"
+                                    + resourceName
+                                    + "' ("
+                                    + resourceId
+                                    + "): "
+                                    + e.getMessage(),
+                                    e);
+                            }
+                        }
+                    });
     }
 
     @Override

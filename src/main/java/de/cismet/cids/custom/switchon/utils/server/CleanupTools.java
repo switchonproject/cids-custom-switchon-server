@@ -218,7 +218,13 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    public int cleanupResource(final int resourceId) {
+    public synchronized int cleanupResource(final int resourceId) {
+        final long currentTime = System.currentTimeMillis();
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("cleaning oprhanened entities of resource with id " + resourceId);
+        }
+
         int result = 0;
 
         result += this.deleteRelationshipMetadataTagReferences(resourceId);
@@ -241,6 +247,11 @@ public class CleanupTools {
         result += this.deleteResourceSearchGeometries(resourceId);
 
         result += this.deleteResourceTagReferences(resourceId);
+        
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.info(result+" oprhanened entities of resource with id " 
+                    + resourceId + " cleaned in " + ((System.currentTimeMillis() - currentTime) / 1000) + " seconds.");
+        }
 
         return result;
     }
@@ -252,7 +263,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    synchronized int deleteRelationshipMetadataTagReferences(final int resourceId) {
+    protected int deleteRelationshipMetadataTagReferences(final int resourceId) {
         int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -280,7 +291,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteRelationshipMetadata(final int resourceId) {
+    protected int deleteRelationshipMetadata(final int resourceId) {
         int result = 0;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -308,7 +319,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteRelationshipMetadataReference(final int resourceId) {
+    protected int deleteRelationshipMetadataReference(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -337,7 +348,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteRelationshipResourceReference(final int resourceId) {
+    protected int deleteRelationshipResourceReference(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -365,7 +376,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteRelationshipResourceReferences(final int resourceId) {
+    protected int deleteRelationshipResourceReferences(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -393,7 +404,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteRelationshipTagReferences(final int resourceId) {
+    protected int deleteRelationshipTagReferences(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -421,7 +432,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteRelationship(final int resourceId) {
+    protected int deleteRelationship(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -450,7 +461,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceMetadata(final int resourceId) {
+    protected int deleteResourceMetadata(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -478,7 +489,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceMetadataTagReferences(final int resourceId) {
+    protected int deleteResourceMetadataTagReferences(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -506,7 +517,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceMetadataReferences(final int resourceId) {
+    protected int deleteResourceMetadataReferences(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -535,7 +546,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceRepresentation(final int resourceId) {
+    protected int deleteResourceRepresentation(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -563,7 +574,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceRepresentationTagReferences(final int resourceId) {
+    protected int deleteResourceRepresentationTagReferences(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -591,7 +602,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceRepresentationReferences(final int resourceId) {
+    protected int deleteResourceRepresentationReferences(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -619,7 +630,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceGeometry(final int resourceId) {
+    protected int deleteResourceGeometry(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -647,7 +658,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceSearchGeometries(final int resourceId) {
+    protected int deleteResourceSearchGeometries(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
@@ -675,7 +686,7 @@ public class CleanupTools {
      *
      * @return  DOCUMENT ME!
      */
-    protected synchronized int deleteResourceTagReferences(final int resourceId) {
+    protected int deleteResourceTagReferences(final int resourceId) {
         int result = -1;
         try {
             if (LOGGER.isDebugEnabled()) {
