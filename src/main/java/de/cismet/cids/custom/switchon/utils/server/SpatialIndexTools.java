@@ -37,7 +37,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.activation.UnsupportedDataTypeException;
@@ -247,12 +246,12 @@ public class SpatialIndexTools {
                 "--config",
                 "PG_USE_COPY YES",
                 "-f PostgreSQL",
-                "PG:host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser",
+                "PG:'host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser'",
                 "-lco",
                 "DIM=2",
                 "$file",
                 "-sql",
-                "SELECT FID FROM \"$layer\"",
+                "'SELECT FID FROM \"$layer\"'",
                 "-overwrite",
                 "-lco",
                 "OVERWRITE=YES",
@@ -280,12 +279,12 @@ public class SpatialIndexTools {
                 "--config",
                 "PG_USE_COPY YES",
                 "-f PostgreSQL",
-                "PG:host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser",
+                "PG:'host=$pghost port=$pgport dbname=$pgdbname password=$pgpassword user=$pguser'",
                 "-lco",
                 "DIM=2",
                 "$file",
                 "-sql",
-                "SELECT FID FROM \"$layer\"",
+                "'SELECT FID FROM \"$layer\"'",
                 "-overwrite",
                 "-lco",
                 "OVERWRITE=YES",
@@ -846,14 +845,20 @@ public class SpatialIndexTools {
             System.exit(1);
         }
 
+        final String password = args[0];
+        final String user = (args.length > 1) ? args[1] : "postgres";
+        final String database = (args.length > 2) ? args[2] : "jdbc:postgresql://switchon.cismet.de:5434/switchon_dev";
+        final String download = (args.length > 3)
+            ? args[3] : "http://dl-ng003.xtr.deltares.nl/data/shp_upload_test_2016_06_13/download.zip";
+
         try {
             final SpatialIndexTools spatialIndexTools = new SpatialIndexTools(
-                    "jdbc:postgresql://switchon.cismet.de:5434/switchon_dev",
-                    "postgres",
-                    args[0]);
+                    database,
+                    user,
+                    password);
 
             spatialIndexTools.updateSpatialIndex(
-                new URL("http://dl-ng003.xtr.deltares.nl/downloadallzip/zippeddownload/regulartzt.zip"),
+                new URL(download),
                 11986);
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
