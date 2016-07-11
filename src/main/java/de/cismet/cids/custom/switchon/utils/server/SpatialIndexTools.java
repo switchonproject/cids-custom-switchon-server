@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -82,6 +83,18 @@ public class SpatialIndexTools {
                 + "FROM resource\n"
                 + "JOIN geom ON resource.spatialcoverage = geom.id\n"
                 + "WHERE resource.id = ? LIMIT 1;";
+
+    protected static final String insertRepresentationTlp = "WITH rep as \n"
+                + "(INSERT INTO \"public\".representation \n"
+                + "(\"type\", spatialresolution, \"name\", description, applicationprofile, tags, \n"
+                + "\"function\", contentlocation, temporalresolution, protocol, content, \n"
+                + "spatialscale, contenttype, uuid, uploadmessage, uploadstatus) \n"
+                + "VALUES (213, NULL, 'switchon:%RESOURCE_ID% Tileserver', \n"
+                + "'switchon:%RESOURCE_ID% Tileserver', 1359, 11950, 72, \n"
+                + "'http://data.water-switch-on.eu/tileserver/switchon:%RESOURCE_ID%@EPSG:900913@png/{z}/{x}/{y}.png', \n"
+                + "NULL, 205, NULL, NULL, 59, 'switchon:%RESOURCE_ID%', NULL, NULL) \n"
+                + "RETURNING id) INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference) \n"
+                + "SELECT id, %RESOURCE_ID% from rep;";
 
     //~ Enums ------------------------------------------------------------------
 
@@ -199,6 +212,8 @@ public class SpatialIndexTools {
 
     //~ Instance fields --------------------------------------------------------
 
+    protected final Connection connection;
+
     protected final PreparedStatement searchGeomInsertPointStatement;
     protected final PreparedStatement searchGeomInsertPolygonStatement;
     protected final PreparedStatement searchGeomCopyStatement;
@@ -242,7 +257,7 @@ public class SpatialIndexTools {
                 "ogr2ogr",
                 "-progress",
                 "-simplify",
-                "500",
+                "0.005",
                 "--config",
                 "PG_USE_COPY YES",
                 "-f PostgreSQL",
@@ -326,12 +341,11 @@ public class SpatialIndexTools {
         this.pgport = String.valueOf(dbConnectionUri.getPort());
         this.pgpassword = dbConnection.getPassword();
         this.pguser = dbConnection.getUser();
-        this.searchGeomInsertPointStatement = dbConnection.getConnection().prepareStatement(searchGeomInsertPointTpl);
-        this.searchGeomInsertPolygonStatement = dbConnection.getConnection()
-                    .prepareStatement(searchGeomInsertPolygonTpl);
-        this.searchGeomCopyStatement = dbConnection.getConnection().prepareStatement(searchGeomCopyTpl);
-        this.updateRepresentationStatusStatement = dbConnection.getConnection()
-                    .prepareStatement(updateRepresentationStatusTpl);
+        this.connection = dbConnection.getConnection();
+        this.searchGeomInsertPointStatement = this.connection.prepareStatement(searchGeomInsertPointTpl);
+        this.searchGeomInsertPolygonStatement = this.connection.prepareStatement(searchGeomInsertPolygonTpl);
+        this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
+        this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
     }
 
     /**
@@ -358,17 +372,17 @@ public class SpatialIndexTools {
         this.pgpassword = password;
         this.pguser = user;
 
-        final Connection connection = DriverManager.getConnection(jdbcUrl, user, password);
-        this.searchGeomInsertPointStatement = connection.prepareStatement(searchGeomInsertPointTpl);
-        this.searchGeomInsertPolygonStatement = connection.prepareStatement(searchGeomInsertPolygonTpl);
-        this.searchGeomCopyStatement = connection.prepareStatement(searchGeomCopyTpl);
-        this.updateRepresentationStatusStatement = connection.prepareStatement(updateRepresentationStatusTpl);
+        this.connection = DriverManager.getConnection(jdbcUrl, user, password);
+        this.searchGeomInsertPointStatement = this.connection.prepareStatement(searchGeomInsertPointTpl);
+        this.searchGeomInsertPolygonStatement = this.connection.prepareStatement(searchGeomInsertPolygonTpl);
+        this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
+        this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
 
     /**
-     * Convienence operation for updateSpatialIndex that processes SHP Files by default.
+     * Convenience operation for updateSpatialIndex that processes SHP Files by default.
      *
      * @param   fileURL     DOCUMENT ME!
      * @param   resourceId  DOCUMENT ME!
@@ -768,7 +782,36 @@ public class SpatialIndexTools {
     }
 
     /**
-     * Helper methid to sanitize File names for OGR2OGR.
+     * Helper Method to insert a new representation referring to a TMS Layer.
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     */
+    protected int insertRepresentation(final int resourceId) throws UnsupportedDataTypeException, SQLException {
+        LOGGER.info("inserting new representation for resource with id '"
+                    + resourceId + "'");
+
+        final String insertRepresentation = insertRepresentationTlp.replaceAll(
+                "%RESOURCE_ID%",
+                String.valueOf(resourceId));
+
+        final Statement insertRepresentationStatement = this.connection.createStatement();
+        final int updateCount = insertRepresentationStatement.executeUpdate(insertRepresentation);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(updateCount + " representations for resource with id '"
+                        + resourceId + "' inserted");
+        }
+
+        return updateCount;
+    }
+
+    /**
+     * Helper method to sanitize File names for OGR2OGR.
      *
      * @param   workingDir  DOCUMENT ME!
      * @param   fileType    DOCUMENT ME!
@@ -841,15 +884,24 @@ public class SpatialIndexTools {
         BasicConfigurator.configure();
 
         if (args.length == 0) {
-            LOGGER.fatal("first required argument pg password is missing, bailing out!");
+            LOGGER.fatal("first required argument resurce id is missing, bailing out!");
+            System.exit(1);
+        } else if (args.length < 2) {
+            LOGGER.fatal("2nd required pg password argument is missing, bailing out!");
             System.exit(1);
         }
 
-        final String password = args[0];
-        final String user = (args.length > 1) ? args[1] : "postgres";
-        final String database = (args.length > 2) ? args[2] : "jdbc:postgresql://switchon.cismet.de:5434/switchon_dev";
-        final String download = (args.length > 3)
-            ? args[3] : "http://dl-ng003.xtr.deltares.nl/data/shp_upload_test_2016_06_13/download.zip";
+        final int resourceId = Integer.parseInt(args[0]);
+        final String password = args[1];
+        final String download = (args.length > 2) ? args[2] : ("http://localhost:3030/" + resourceId + ".zip");
+        final String user = (args.length > 3) ? args[3] : "switchon";
+        final String database = (args.length > 4) ? args[4] : "jdbc:postgresql://127.0.0.1:5432/switchon";
+
+        SpatialIndexTools.LOGGER.info("Starting Spatial Index Import with \n "
+                    + "resource: '" + resourceId + "'\n "
+                    + "file: '" + download + "'\n "
+                    + "database: '" + database + "'\n "
+                    + "user: '" + user + "'");
 
         try {
             final SpatialIndexTools spatialIndexTools = new SpatialIndexTools(
@@ -859,7 +911,9 @@ public class SpatialIndexTools {
 
             spatialIndexTools.updateSpatialIndex(
                 new URL(download),
-                11986);
+                resourceId);
+
+            //spatialIndexTools.insertRepresentation(resourceId);
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
             System.exit(1);
