@@ -61,11 +61,11 @@ public class SpatialIndexTools {
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
 
     protected static final String searchGeomInsertPolygonTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, geom FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_MakeValid(geom FROM import_tables.geosearch_import)";
     protected static final String searchGeomInsertPointTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(geom) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(ST_MakeValid(geom)) FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertLineTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(geom) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(ST_MakeValid(geom)) FROM import_tables.geosearch_import";
 
     protected static final String updateRepresentationStatusTpl = "UPDATE \"public\".representation\n"
                 + "SET uploadstatus =\n"
