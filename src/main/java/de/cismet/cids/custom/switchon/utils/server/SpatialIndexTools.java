@@ -64,6 +64,8 @@ public class SpatialIndexTools {
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, geom FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertPointTpl =
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(geom) FROM import_tables.geosearch_import";
+    protected static final String searchGeomInsertLineTpl =
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(geom) FROM import_tables.geosearch_import";
 
     protected static final String updateRepresentationStatusTpl = "UPDATE \"public\".representation\n"
                 + "SET uploadstatus =\n"
@@ -84,7 +86,7 @@ public class SpatialIndexTools {
                 + "JOIN geom ON resource.spatialcoverage = geom.id\n"
                 + "WHERE resource.id = ? LIMIT 1;";
 
-    protected static final String insertRepresentationTlp = "WITH rep as \n"
+    protected static final String insertTMSRepresentationTlp = "WITH rep as \n"
                 + "(INSERT INTO \"public\".representation \n"
                 + "(\"type\", spatialresolution, \"name\", description, applicationprofile, tags, \n"
                 + "\"function\", contentlocation, temporalresolution, protocol, content, \n"
@@ -93,6 +95,18 @@ public class SpatialIndexTools {
                 + "'switchon:%RESOURCE_ID% Tileserver', 1359, 11950, 72, \n"
                 + "'http://data.water-switch-on.eu/tileserver/switchon:%RESOURCE_ID%@EPSG:900913@png/{z}/{x}/{y}.png', \n"
                 + "NULL, 205, NULL, NULL, 59, 'switchon:%RESOURCE_ID%', NULL, NULL) \n"
+                + "RETURNING id) INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference) \n"
+                + "SELECT id, %RESOURCE_ID% from rep;";
+
+    protected static final String insertWMSRepresentationTlp = "WITH rep as \n"
+                + "(INSERT INTO \"public\".representation \n"
+                + "(\"type\", spatialresolution, \"name\", description, applicationprofile, tags, \n"
+                + "\"function\", contentlocation, temporalresolution, protocol, content, \n"
+                + "spatialscale, contenttype, uuid, uploadmessage, uploadstatus) \n"
+                + "VALUES (213, NULL, 'switchon:%RESOURCE_ID%', \n"
+                + "'switchon:%RESOURCE_ID% WMS', 11, null, 72, \n"
+                + "'http://data.water-switch-on.eu/tileserver/switchon:%RESOURCE_ID%@EPSG:900913@png/{z}/{x}/{y}.png', \n"
+                + "NULL, 186, NULL, NULL, 51, 'switchon:%RESOURCE_ID%', NULL, NULL) \n"
                 + "RETURNING id) INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference) \n"
                 + "SELECT id, %RESOURCE_ID% from rep;";
 
@@ -107,7 +121,7 @@ public class SpatialIndexTools {
 
         //~ Enum constants -----------------------------------------------------
 
-        POINT("POINT"), POLYGON("POLYGON");
+        POINT("POINT"), POLYGON("POLYGON"), LINE("LINE");
 
         //~ Instance fields ----------------------------------------------------
 
@@ -216,6 +230,7 @@ public class SpatialIndexTools {
 
     protected final PreparedStatement searchGeomInsertPointStatement;
     protected final PreparedStatement searchGeomInsertPolygonStatement;
+    protected final PreparedStatement searchGeomInsertLineStatement;
     protected final PreparedStatement searchGeomCopyStatement;
     protected final PreparedStatement updateRepresentationStatusStatement;
 
@@ -344,6 +359,7 @@ public class SpatialIndexTools {
         this.connection = dbConnection.getConnection();
         this.searchGeomInsertPointStatement = this.connection.prepareStatement(searchGeomInsertPointTpl);
         this.searchGeomInsertPolygonStatement = this.connection.prepareStatement(searchGeomInsertPolygonTpl);
+        this.searchGeomInsertLineStatement = this.connection.prepareStatement(searchGeomInsertLineTpl);
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
     }
@@ -375,6 +391,7 @@ public class SpatialIndexTools {
         this.connection = DriverManager.getConnection(jdbcUrl, user, password);
         this.searchGeomInsertPointStatement = this.connection.prepareStatement(searchGeomInsertPointTpl);
         this.searchGeomInsertPolygonStatement = this.connection.prepareStatement(searchGeomInsertPolygonTpl);
+        this.searchGeomInsertLineStatement = this.connection.prepareStatement(searchGeomInsertLineTpl);
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
     }
@@ -621,6 +638,14 @@ public class SpatialIndexTools {
                                 + geometryType + "' + '" + GeometryType.POLYGON
                                 + "'! Only the type of the first layer is considered!");
                 }
+            } else if (line.toLowerCase().contains(GeometryType.LINE.toString().toLowerCase())) {
+                if (geometryType == null) {
+                    geometryType = GeometryType.LINE;
+                } else {
+                    LOGGER.warn("spatial file '" + file + "' seems to contain more than one layer: '"
+                                + geometryType + "' + '" + GeometryType.LINE
+                                + "'! Only the type of the first layer is considered!");
+                }
             } else {
                 LOGGER.warn("no supported geometry type found in layer info: '" + line + "'");
             }
@@ -632,7 +657,8 @@ public class SpatialIndexTools {
 
         if (geometryType == null) {
             throw new UnsupportedDataTypeException("info spatial file '" + file + "' does not contain '"
-                        + GeometryType.POINT.toString() + "' or '" + GeometryType.POLYGON.toString() + "': "
+                        + GeometryType.POINT.toString() + "', '" + GeometryType.POLYGON.toString()
+                        + "' or '" + GeometryType.LINE.toString() + "': "
                         + sb.toString());
         }
 
@@ -681,7 +707,7 @@ public class SpatialIndexTools {
         final int argLayerIndex;
 
         // choose polygon or point ogr2ogr import command
-        if (geometryType == GeometryType.POLYGON) {
+        if ((geometryType == GeometryType.POLYGON) || (geometryType == GeometryType.LINE)) {
             ogr2ogrCmd = ogr2ogrPolygonCmdTpl.toArray(new String[ogr2ogrPolygonCmdTpl.size()]);
             argPgIndex = 7;
             argFileIndex = 10;
@@ -763,6 +789,8 @@ public class SpatialIndexTools {
             searchGeomInsertStatement = searchGeomInsertPolygonStatement;
         } else if (geometryType == GeometryType.POINT) {
             searchGeomInsertStatement = searchGeomInsertPointStatement;
+        } else if (geometryType == GeometryType.LINE) {
+            searchGeomInsertStatement = searchGeomInsertLineStatement;
         } else {
             throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
                         + "' is not supported by this operation");
@@ -782,7 +810,7 @@ public class SpatialIndexTools {
     }
 
     /**
-     * Helper Method to insert a new representation referring to a TMS Layer.
+     * DOCUMENT ME!
      *
      * @param   resourceId  DOCUMENT ME!
      *
@@ -791,13 +819,51 @@ public class SpatialIndexTools {
      * @throws  UnsupportedDataTypeException  DOCUMENT ME!
      * @throws  SQLException                  DOCUMENT ME!
      */
-    protected int insertRepresentation(final int resourceId) throws UnsupportedDataTypeException, SQLException {
+    protected int insertTMSRepresentation(final int resourceId) throws UnsupportedDataTypeException, SQLException {
+        return this.insertRepresentation(resourceId, true);
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     */
+    protected int insertWMSRepresentation(final int resourceId) throws UnsupportedDataTypeException, SQLException {
+        return this.insertRepresentation(resourceId, false);
+    }
+
+    /**
+     * Helper Method to insert a new representation referring to a TMS Layer.
+     *
+     * @param   resourceId  DOCUMENT ME!
+     * @param   isTMS       DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     */
+    protected int insertRepresentation(final int resourceId, final boolean isTMS) throws UnsupportedDataTypeException,
+        SQLException {
         LOGGER.info("inserting new representation for resource with id '"
                     + resourceId + "'");
 
-        final String insertRepresentation = insertRepresentationTlp.replaceAll(
-                "%RESOURCE_ID%",
-                String.valueOf(resourceId));
+        final String insertRepresentation;
+
+        if (isTMS) {
+            insertRepresentation = insertTMSRepresentationTlp.replaceAll(
+                    "%RESOURCE_ID%",
+                    String.valueOf(resourceId));
+        } else {
+            insertRepresentation = insertWMSRepresentationTlp.replaceAll(
+                    "%RESOURCE_ID%",
+                    String.valueOf(resourceId));
+        }
 
         final Statement insertRepresentationStatement = this.connection.createStatement();
         final int updateCount = insertRepresentationStatement.executeUpdate(insertRepresentation);
@@ -895,7 +961,7 @@ public class SpatialIndexTools {
         final String password = args[1];
         final String download = (args.length > 2) ? args[2] : ("http://localhost:3030/" + resourceId + ".zip");
         final String user = (args.length > 3) ? args[3] : "switchon";
-        final String database = (args.length > 4) ? args[4] : "jdbc:postgresql://127.0.0.1:5432/switchon";
+        final String database = (args.length > 4) ? args[4] : "jdbc:postgresql://127.0.0.1:5432/switchon_dev";
 
         SpatialIndexTools.LOGGER.info("Starting Spatial Index Import with \n "
                     + "resource: '" + resourceId + "'\n "
@@ -913,7 +979,7 @@ public class SpatialIndexTools {
                 new URL(download),
                 resourceId);
 
-            //spatialIndexTools.insertRepresentation(resourceId);
+            spatialIndexTools.insertTMSRepresentation(resourceId);
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
             System.exit(1);
