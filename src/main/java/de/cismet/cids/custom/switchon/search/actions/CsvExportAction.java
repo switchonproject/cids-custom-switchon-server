@@ -46,7 +46,7 @@ public class CsvExportAction implements ServerAction {
                 + "       wkt_geometry as spatialextent,\n"
                 + "       conditionapplyingtoaccessanduse AS license,\n"
                 + "       substring(links FROM '.*,+(.*$)') AS link\n"
-                + "FROM pycsw.data_table order by title ASC;";
+                + "FROM pycsw.pycsw_view order by title ASC;";
 
     //~ Constructors -----------------------------------------------------------
 
