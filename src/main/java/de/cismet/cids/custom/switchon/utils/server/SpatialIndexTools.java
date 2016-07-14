@@ -9,6 +9,13 @@ package de.cismet.cids.custom.switchon.utils.server;
 
 import Sirius.server.sql.DBConnection;
 
+import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
+import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
+import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder;
+import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
+import it.geosolutions.geoserver.rest.encoder.metadata.virtualtable.GSVirtualTableEncoder;
+import it.geosolutions.geoserver.rest.encoder.metadata.virtualtable.VTGeometryEncoder;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
@@ -31,12 +38,14 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -55,17 +64,40 @@ public class SpatialIndexTools {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    public static final String DOWNLOAD_FILENAME = "download.zip";
+    protected static final String GEOSERVER_URL = "http://data.water-switch-on.eu/geoserver";
+    protected static final String GEOSERVER_WORKSPACE = "switchon";
+    protected static final String GEOSERVER_DATASOURCE = "switchon_dev";
+    protected static final String GEOSERVER_LINE_STYLE = "switchon_line";
+    protected static final String GEOSERVER_POLYGON_STYLE = "switchon_polygon";
+    protected static final String GEOSERVER_POINT_STYLE = "switchon_point";
+
+    protected static final String SRS = "EPSG:4326";
+    protected static final String DOWNLOAD_FILENAME = "download.zip";
     public static final String SPATIAL_PROCESSING_INSTRUCTION = "deriveSpatialIndex:";
 
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
 
+    protected static final String selectVirtualLayerTpl =
+        "SELECT id, geo_field FROM public.geom_search WHERE resource = %RESOURCE_ID%";
+    protected static final String selectGeometryTypeTpl =
+        "SELECT GeometryType(geo_field) from public.geom_search WHERE resource = %RESOURCE_ID% ORDER BY id DESC LIMIT 1";
+
     protected static final String searchGeomInsertPolygonTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_MakeValid(geom FROM import_tables.geosearch_import)";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_MakeValid(geom) FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertPointTpl =
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(ST_MakeValid(geom)) FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertLineTpl =
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(ST_MakeValid(geom)) FROM import_tables.geosearch_import";
+
+    protected static final String updateResourceSpatialcoverageTpl = "WITH geom_coverage AS\n"
+                + "  (INSERT INTO \"public\".geom (geo_field) SELECT ST_Envelope(ST_ConvexHull(ST_Collect(geo_field))) AS geo_field\n"
+                + "   FROM public.geom_search\n"
+                + "   WHERE resource = %RESOURCE_ID% RETURNING id)\n"
+                + "UPDATE \"public\".resource\n"
+                + "SET spatialcoverage =\n"
+                + "  (SELECT id\n"
+                + "   FROM geom_coverage)\n"
+                + "WHERE id = %RESOURCE_ID%";
 
     protected static final String updateRepresentationStatusTpl = "UPDATE \"public\".representation\n"
                 + "SET uploadstatus =\n"
@@ -226,6 +258,7 @@ public class SpatialIndexTools {
 
     //~ Instance fields --------------------------------------------------------
 
+    protected final GeoServerRESTPublisher publisher;
     protected final Connection connection;
 
     protected final PreparedStatement searchGeomInsertPointStatement;
@@ -286,9 +319,9 @@ public class SpatialIndexTools {
                 "-lco",
                 "OVERWRITE=YES",
                 "-t_srs",
-                "EPSG:4326",
+                SRS,
                 "-a_srs",
-                "EPSG:4326",
+                SRS,
                 "-lco",
                 "SCHEMA=import_tables",
                 "-lco",
@@ -319,9 +352,9 @@ public class SpatialIndexTools {
                 "-lco",
                 "OVERWRITE=YES",
                 "-t_srs",
-                "EPSG:4326",
+                SRS,
                 "-a_srs",
-                "EPSG:4326",
+                SRS,
                 "-lco",
                 "SCHEMA=import_tables",
                 "-lco",
@@ -362,20 +395,26 @@ public class SpatialIndexTools {
         this.searchGeomInsertLineStatement = this.connection.prepareStatement(searchGeomInsertLineTpl);
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
+        this.publisher = null;
     }
 
     /**
      * Creates a new SpatialIndexTools object.
      *
-     * @param   jdbcUrl   DOCUMENT ME!
-     * @param   user      DOCUMENT ME!
-     * @param   password  DOCUMENT ME!
+     * @param   jdbcUrl            DOCUMENT ME!
+     * @param   dbUser             DOCUMENT ME!
+     * @param   dbPassword         DOCUMENT ME!
+     * @param   geoserverUser      DOCUMENT ME!
+     * @param   geoserverPassword  DOCUMENT ME!
      *
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    private SpatialIndexTools(final String jdbcUrl, final String user, final String password)
-            throws ClassNotFoundException, SQLException {
+    private SpatialIndexTools(final String jdbcUrl,
+            final String dbUser,
+            final String dbPassword,
+            final String geoserverUser,
+            final String geoserverPassword) throws ClassNotFoundException, SQLException {
         this.tempPath = FileSystems.getDefault().getPath(System.getProperty("java.io.tmpdir"), "switchon");
 
         final URI dbConnectionUri = URI.create(jdbcUrl.substring(5));
@@ -385,10 +424,11 @@ public class SpatialIndexTools {
         this.pgdbname = (dbName.indexOf(';') != -1) ? dbName.substring(0, dbName.indexOf(';')) : dbName;
         this.pghost = dbConnectionUri.getHost();
         this.pgport = String.valueOf(dbConnectionUri.getPort());
-        this.pgpassword = password;
-        this.pguser = user;
+        this.pgpassword = dbPassword;
+        this.pguser = dbUser;
 
-        this.connection = DriverManager.getConnection(jdbcUrl, user, password);
+        this.publisher = new GeoServerRESTPublisher(GEOSERVER_URL, geoserverUser, geoserverPassword);
+        this.connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
         this.searchGeomInsertPointStatement = this.connection.prepareStatement(searchGeomInsertPointTpl);
         this.searchGeomInsertPolygonStatement = this.connection.prepareStatement(searchGeomInsertPolygonTpl);
         this.searchGeomInsertLineStatement = this.connection.prepareStatement(searchGeomInsertLineTpl);
@@ -427,7 +467,10 @@ public class SpatialIndexTools {
      * @throws  Exception              DOCUMENT ME!
      * @throws  FileNotFoundException  DOCUMENT ME!
      */
-    public int updateSpatialIndex(final URL fileURL, final FileType fileType, final int resourceId) throws Exception {
+    public int updateSpatialIndex(
+            final URL fileURL,
+            final FileType fileType,
+            final int resourceId) throws Exception {
         final long currentTime = System.currentTimeMillis();
 
         if (LOGGER.isDebugEnabled()) {
@@ -457,7 +500,7 @@ public class SpatialIndexTools {
         }
 
         int i = 0;
-        int updateCount = 0;
+        int searchGeomUpdateCount = 0;
         for (final File file : files) {
             i++;
             if (LOGGER.isDebugEnabled()) {
@@ -475,14 +518,25 @@ public class SpatialIndexTools {
                 this.pguser,
                 files[0].getName());
 
-            updateCount += this.insertSearchGeometries(geometryType, resourceId);
+            searchGeomUpdateCount += this.insertSearchGeometries(geometryType, resourceId);
+
+            if (this.publisher != null) {
+                this.publishToGeoserver(geometryType, resourceId);
+                this.insertTMSRepresentation(resourceId);
+            }
         }
 
-        LOGGER.info("downloaded '" + fileURL + "' and inserted " + updateCount + " search geometries from *."
-                    + fileType.toString() + " files for resource with id " + resourceId
+        int geomUpdateCount = 0;
+        if (searchGeomUpdateCount > 0) {
+            geomUpdateCount = this.updateResourceSpatialcoverage(resourceId);
+        }
+
+        LOGGER.info("downloaded '" + fileURL + "', inserted " + searchGeomUpdateCount + " search geometries from *."
+                    + fileType.toString() + " file and updated " + geomUpdateCount
+                    + " spatial coverage for resource with id " + resourceId
                     + " in " + ((System.currentTimeMillis() - currentTime) / 1000) + " seconds.");
 
-        return updateCount;
+        return searchGeomUpdateCount;
     }
 
     /**
@@ -877,6 +931,134 @@ public class SpatialIndexTools {
     }
 
     /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  SQLException  DOCUMENT ME!
+     */
+    protected int updateResourceSpatialcoverage(final int resourceId) throws SQLException {
+        LOGGER.info("updating the spatial coverage of resource with id '"
+                    + resourceId + "'");
+
+        final String updateResourceSpatialcoverage = updateResourceSpatialcoverageTpl.replaceAll(
+                "%RESOURCE_ID%",
+                String.valueOf(resourceId));
+
+        final Statement updateResourceSpatialcoverageStatement = this.connection.createStatement();
+        final int updateCount = updateResourceSpatialcoverageStatement.executeUpdate(updateResourceSpatialcoverage);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(updateCount + " spatial coverages for resource with id '"
+                        + resourceId + "' updated");
+        }
+
+        return updateCount;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   resourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  SQLException            DOCUMENT ME!
+     * @throws  NoSuchElementException  DOCUMENT ME!
+     */
+    protected String getGeometryTypeForResource(final int resourceId) throws SQLException {
+        LOGGER.info("retrieving geometry type for  '" + resourceId + "' from PostGIS database");
+
+        final String selectGeometryType = selectGeometryTypeTpl.replaceAll(
+                "%RESOURCE_ID%",
+                String.valueOf(resourceId));
+
+        final Statement selectGeometryTypeStatement = this.connection.createStatement();
+        final ResultSet resultSet = selectGeometryTypeStatement.executeQuery(selectGeometryType);
+
+        if (resultSet.next()) {
+            final String geometryType = resultSet.getString(1);
+            return geometryType;
+        } else {
+            throw new NoSuchElementException("search geometry for  '" + resourceId
+                        + "' could not be found PostGIS database");
+        }
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param   geometryType  DOCUMENT ME!
+     * @param   resourceId    DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     * @throws  NullPointerException          DOCUMENT ME!
+     */
+    protected boolean publishToGeoserver(final GeometryType geometryType, final int resourceId)
+            throws UnsupportedDataTypeException, SQLException {
+        if (this.publisher == null) {
+            throw new NullPointerException("cannot pusblish layer for resource "
+                        + resourceId + " of type '" + geometryType + "': GeoServerPublisher not initialized!");
+        }
+
+        final GSLayerEncoder layer = new GSLayerEncoder();
+        if (geometryType == GeometryType.POLYGON) {
+            layer.setDefaultStyle(GEOSERVER_POLYGON_STYLE);
+        } else if (geometryType == GeometryType.POINT) {
+            layer.setDefaultStyle(GEOSERVER_POINT_STYLE);
+        } else if (geometryType == GeometryType.LINE) {
+            layer.setDefaultStyle(GEOSERVER_LINE_STYLE);
+        } else {
+            throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
+                        + "' for resource " + resourceId + " is not supported by this operation");
+        }
+
+        final String geometryTypeForResource = this.getGeometryTypeForResource(resourceId);
+
+        LOGGER.info("publishing new layer '" + resourceId + "' of type '" + geometryTypeForResource
+                    + "' (" + geometryType + ") to " + GEOSERVER_URL);
+
+        final VTGeometryEncoder vtGeom = new VTGeometryEncoder();
+        vtGeom.setName("geo_field");
+        vtGeom.setType(geometryTypeForResource);
+        vtGeom.setSrid("4326");
+
+        final String selectVirtualLayerStatement = selectVirtualLayerTpl.replaceAll(
+                "%RESOURCE_ID%",
+                String.valueOf(resourceId));
+
+        // Set-up the virtual table
+        final GSVirtualTableEncoder vte = new GSVirtualTableEncoder();
+        vte.setName(String.valueOf(resourceId));
+        vte.setSql(selectVirtualLayerStatement);
+        vte.addKeyColumn("id");
+        vte.addVirtualTableGeometry(vtGeom);
+
+        final GSFeatureTypeEncoder featureType = new GSFeatureTypeEncoder();
+        featureType.setName(String.valueOf(resourceId));
+        featureType.setTitle(String.valueOf(resourceId));
+        featureType.setAbstract("Feature Layer for SWITCH-ON Resource " + resourceId);
+        featureType.setDescription("Feature Layer for SWITCH-ON Resource " + resourceId);
+        featureType.setSRS(SRS);
+        featureType.setNativeCRS(SRS);
+        featureType.addKeyword("SWITCHON");
+        featureType.setProjectionPolicy(GSResourceEncoder.ProjectionPolicy.FORCE_DECLARED);
+
+        featureType.setMetadataVirtualTable(vte);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("FeatureType '" + featureType.toString() + " created");
+        }
+        return publisher.publishDBLayer(GEOSERVER_WORKSPACE, GEOSERVER_DATASOURCE,
+                featureType, layer);
+    }
+
+    /**
      * Helper method to sanitize File names for OGR2OGR.
      *
      * @param   workingDir  DOCUMENT ME!
@@ -958,28 +1140,30 @@ public class SpatialIndexTools {
         }
 
         final int resourceId = Integer.parseInt(args[0]);
-        final String password = args[1];
-        final String download = (args.length > 2) ? args[2] : ("http://localhost:3030/" + resourceId + ".zip");
-        final String user = (args.length > 3) ? args[3] : "switchon";
+        final String dbPassword = args[1];
+        final String geoserverPassword = (args.length > 2) ? args[2] : null;
+        final String download = (args.length > 3) ? args[3] : ("http://localhost:3030/" + resourceId + ".zip");
         final String database = (args.length > 4) ? args[4] : "jdbc:postgresql://127.0.0.1:5432/switchon_dev";
+        final String dbUser = (args.length > 5) ? args[5] : "switchon";
+        final String geoserverUser = (args.length > 6) ? args[6] : "admin";
 
         SpatialIndexTools.LOGGER.info("Starting Spatial Index Import with \n "
                     + "resource: '" + resourceId + "'\n "
                     + "file: '" + download + "'\n "
                     + "database: '" + database + "'\n "
-                    + "user: '" + user + "'");
+                    + "user: '" + dbUser + "'");
 
         try {
             final SpatialIndexTools spatialIndexTools = new SpatialIndexTools(
                     database,
-                    user,
-                    password);
+                    dbUser,
+                    dbPassword,
+                    geoserverUser,
+                    geoserverPassword);
 
             spatialIndexTools.updateSpatialIndex(
                 new URL(download),
                 resourceId);
-
-            spatialIndexTools.insertTMSRepresentation(resourceId);
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
             System.exit(1);

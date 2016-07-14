@@ -201,6 +201,11 @@
             <version>1.5.8</version>
             <classifier>tests</classifier>
         </dependency>
+        <dependency>
+            <groupId>it.geosolutions</groupId>
+            <artifactId>geoserver-manager</artifactId>
+            <version>1.7.0</version>
+        </dependency>
     </dependencies>
 
     <build>

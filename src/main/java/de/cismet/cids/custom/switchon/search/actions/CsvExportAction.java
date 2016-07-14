@@ -14,10 +14,15 @@ import org.apache.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 
+import java.nio.file.attribute.FileTime;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -39,14 +44,17 @@ public class CsvExportAction implements ServerAction {
 
     //~ Instance fields --------------------------------------------------------
 
-    private final transient String exportQuery = "SELECT title as name,\n"
+    private final transient String exportQuery = "SELECT title_alternate as id,\n"
+                + "       title as name,\n"
                 + "       abstract as description,\n"
+                + "       date,\n"
                 + "       topiccategory,\n"
-                + "       keywords,\n"
+                + "       keywords as x_cuahsi_keywords,\n"
                 + "       wkt_geometry as spatialextent,\n"
-                + "       conditionapplyingtoaccessanduse AS license,\n"
+                + "       conditionapplyingtoaccessanduse AS access_conditions,\n"
+                + "       otherconstraints AS license_statement,\n"
                 + "       substring(links FROM '.*,+(.*$)') AS link\n"
-                + "FROM pycsw.data_table order by title ASC;";
+                + "FROM pycsw.pycsw_view order by title_alternate::int DESC;";
 
     //~ Constructors -----------------------------------------------------------
 
@@ -120,9 +128,19 @@ public class CsvExportAction implements ServerAction {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("zipping output");
                 }
+
+                final long currentTime = System.currentTimeMillis();
+                final String dateString = new SimpleDateFormat("yyyy-MM-dd").format(new Date(currentTime));
+
                 final ByteArrayOutputStream output = new ByteArrayOutputStream();
                 final ZipOutputStream zipStream = new ZipOutputStream(output);
-                zipStream.putNextEntry(new ZipEntry("switchon-meta-data-repository.csv"));
+                final ZipEntry zipEntry = new ZipEntry("switchon-meta-data-repository-" + dateString + ".csv");
+                zipEntry.setCreationTime(FileTime.fromMillis(currentTime));
+                zipEntry.setLastModifiedTime(FileTime.fromMillis(currentTime));
+                zipEntry.setLastAccessTime(FileTime.fromMillis(currentTime));
+                zipEntry.setComment(dateString);
+                zipEntry.setTime(System.currentTimeMillis());
+                zipStream.putNextEntry(zipEntry);
                 zipStream.write(csvBuilder.toString().getBytes("UTF-8"));
                 zipStream.closeEntry();
                 zipStream.close();
