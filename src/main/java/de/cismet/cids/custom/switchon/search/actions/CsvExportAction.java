@@ -135,9 +135,9 @@ public class CsvExportAction implements ServerAction {
                 final ByteArrayOutputStream output = new ByteArrayOutputStream();
                 final ZipOutputStream zipStream = new ZipOutputStream(output);
                 final ZipEntry zipEntry = new ZipEntry("switchon-meta-data-repository-" + dateString + ".csv");
-                zipEntry.setCreationTime(FileTime.fromMillis(currentTime));
-                zipEntry.setLastModifiedTime(FileTime.fromMillis(currentTime));
-                zipEntry.setLastAccessTime(FileTime.fromMillis(currentTime));
+                // zipEntry.setCreationTime(FileTime.fromMillis(currentTime));
+                // zipEntry.setLastModifiedTime(FileTime.fromMillis(currentTime));
+                // zipEntry.setLastAccessTime(FileTime.fromMillis(currentTime));
                 zipEntry.setComment(dateString);
                 zipEntry.setTime(System.currentTimeMillis());
                 zipStream.putNextEntry(zipEntry);
