@@ -17,8 +17,8 @@ import it.geosolutions.geoserver.rest.encoder.metadata.virtualtable.GSVirtualTab
 import it.geosolutions.geoserver.rest.encoder.metadata.virtualtable.VTGeometryEncoder;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -46,6 +46,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
@@ -64,15 +65,15 @@ public class SpatialIndexTools {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    protected static final String GEOSERVER_URL = "http://data.water-switch-on.eu/geoserver";
-    protected static final String GEOSERVER_WORKSPACE = "switchon";
-    protected static final String GEOSERVER_DATASOURCE = "switchon_dev";
-    protected static final String GEOSERVER_LINE_STYLE = "switchon_line";
-    protected static final String GEOSERVER_POLYGON_STYLE = "switchon_polygon";
-    protected static final String GEOSERVER_POINT_STYLE = "switchon_point";
+    static final String GEOSERVER_URL = "http://data.water-switch-on.eu/geoserver";
+    static final String GEOSERVER_WORKSPACE = "switchon";
+    static final String GEOSERVER_DATASOURCE = "switchon_dev";
+    static final String GEOSERVER_LINE_STYLE = "switchon_line";
+    static final String GEOSERVER_POLYGON_STYLE = "switchon_polygon";
+    static final String GEOSERVER_POINT_STYLE = "switchon_point";
 
-    protected static final String SRS = "EPSG:4326";
-    protected static final String DOWNLOAD_FILENAME = "download.zip";
+    static final String SRS = "EPSG:4326";
+    static final String DOWNLOAD_FILENAME = "download.zip";
     public static final String SPATIAL_PROCESSING_INSTRUCTION = "deriveSpatialIndex:";
 
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
@@ -190,7 +191,7 @@ public class SpatialIndexTools {
 
         //~ Enum constants -----------------------------------------------------
 
-        SHAPE("shp");
+        SHAPE("shp"), ZIP("zip");
 
         //~ Instance fields ----------------------------------------------------
 
@@ -410,7 +411,7 @@ public class SpatialIndexTools {
      * @throws  ClassNotFoundException  DOCUMENT ME!
      * @throws  SQLException            DOCUMENT ME!
      */
-    private SpatialIndexTools(final String jdbcUrl,
+    SpatialIndexTools(final String jdbcUrl,
             final String dbUser,
             final String dbPassword,
             final String geoserverUser,
@@ -1129,7 +1130,13 @@ public class SpatialIndexTools {
      * @param  args  DOCUMENT ME!
      */
     public static void main(final String[] args) {
-        BasicConfigurator.configure();
+        final Properties log4jProperties = new Properties();
+        log4jProperties.put("log4j.appender.Remote", "org.apache.log4j.net.SocketAppender");
+        log4jProperties.put("log4j.appender.Remote.remoteHost", "localhost");
+        log4jProperties.put("log4j.appender.Remote.port", "4445");
+        log4jProperties.put("log4j.appender.Remote.locationInfo", "true");
+        log4jProperties.put("log4j.rootLogger", "ALL,Remote");
+        PropertyConfigurator.configure(log4jProperties);
 
         if (args.length == 0) {
             LOGGER.fatal("first required argument resurce id is missing, bailing out!");
