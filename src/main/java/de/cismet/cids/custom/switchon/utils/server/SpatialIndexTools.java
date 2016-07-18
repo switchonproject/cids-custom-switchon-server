@@ -22,6 +22,7 @@ import org.apache.log4j.PropertyConfigurator;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class SpatialIndexTools {
 
     static final String GEOSERVER_URL = "http://data.water-switch-on.eu/geoserver";
     static final String GEOSERVER_WORKSPACE = "switchon";
-    static final String GEOSERVER_DATASOURCE = "switchon_dev";
+    static final String GEOSERVER_DATASOURCE = "switchon";
     static final String GEOSERVER_LINE_STYLE = "switchon_line";
     static final String GEOSERVER_POLYGON_STYLE = "switchon_polygon";
     static final String GEOSERVER_POINT_STYLE = "switchon_point";
@@ -118,6 +119,8 @@ public class SpatialIndexTools {
                 + "FROM resource\n"
                 + "JOIN geom ON resource.spatialcoverage = geom.id\n"
                 + "WHERE resource.id = ? LIMIT 1;";
+
+    protected static final String clearGeomSearchTpl = "DELETE FROM geom_search WHERE resource = ?";
 
     protected static final String insertTMSRepresentationTlp = "WITH rep as \n"
                 + "(INSERT INTO \"public\".representation \n"
@@ -265,6 +268,7 @@ public class SpatialIndexTools {
     protected final PreparedStatement searchGeomInsertPointStatement;
     protected final PreparedStatement searchGeomInsertPolygonStatement;
     protected final PreparedStatement searchGeomInsertLineStatement;
+    protected final PreparedStatement clearGeomSearchStatement;
     protected final PreparedStatement searchGeomCopyStatement;
     protected final PreparedStatement updateRepresentationStatusStatement;
 
@@ -396,6 +400,7 @@ public class SpatialIndexTools {
         this.searchGeomInsertLineStatement = this.connection.prepareStatement(searchGeomInsertLineTpl);
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
+        this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
         this.publisher = null;
     }
 
@@ -435,6 +440,7 @@ public class SpatialIndexTools {
         this.searchGeomInsertLineStatement = this.connection.prepareStatement(searchGeomInsertLineTpl);
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
+        this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -479,7 +485,10 @@ public class SpatialIndexTools {
                         + fileType.toString() + " files for resource with id " + resourceId);
         }
 
-        final Path workingPath = this.tempPath.resolve(String.valueOf(System.currentTimeMillis()));
+        final Path workingPath = this.tempPath.resolve(
+                String.valueOf(resourceId)
+                        + "_"
+                        + String.valueOf(System.currentTimeMillis()));
 
         final File workingDir = workingPath.toFile();
         workingDir.mkdirs();
@@ -788,8 +797,18 @@ public class SpatialIndexTools {
         // wait 30 minutes for import
         final int timeout = 30;
 
+        final File outputFile = new File(workingDir, "output.txt");
+        outputFile.createNewFile();
+
+        final File errorFile = new File(workingDir, "error.txt");
+        errorFile.createNewFile();
+
         final ProcessBuilder processBuilder = new ProcessBuilder(ogr2ogrCmd);
         processBuilder.directory(workingDir);
+        processBuilder.redirectOutput(outputFile);
+        processBuilder.redirectError(errorFile);
+        // processBuilder.redirectErrorStream(true);
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(Arrays.toString(ogr2ogrCmd));
         }
@@ -802,7 +821,7 @@ public class SpatialIndexTools {
 
         final int exitValue = process.waitFor();
         if (exitValue != 0) {
-            final String message = outputError(process.getInputStream(), process.getErrorStream());
+            final String message = outputError(new FileInputStream(outputFile), new FileInputStream(errorFile));
             LOGGER.error(message);
             final Exception processException = new Exception(message);
             throw new ExecutionException("importing spatial file '" + file
@@ -811,7 +830,7 @@ public class SpatialIndexTools {
                 processException);
         }
 
-        final String[] output = output(process.getInputStream());
+        final String[] output = output(new FileInputStream(outputFile));
         if (output.length == 0) {
             throw new IOException("importing spatial file '" + file
                         + "' into database '" + pghost + ":" + pgport + "/" + pgdbname
@@ -838,6 +857,11 @@ public class SpatialIndexTools {
             throws UnsupportedDataTypeException, SQLException {
         LOGGER.info("inserting imported '" + geometryType + "' geometries for resource with id '"
                     + resourceId + "' into the search geometries table");
+
+        synchronized (clearGeomSearchStatement) {
+            clearGeomSearchStatement.setInt(1, resourceId);
+            clearGeomSearchStatement.executeUpdate();
+        }
 
         final PreparedStatement searchGeomInsertStatement;
         if (geometryType == GeometryType.POLYGON) {
@@ -1092,9 +1116,11 @@ public class SpatialIndexTools {
                     if (invalidFilename) {
                         final Path oldPath = file.toPath();
                         final Path newPath = oldPath.resolveSibling(FileType.SHAPE.toString() + "_" + file.getName());
-                        LOGGER.warn("'" + oldPath.toString() + "' is an invalid "
-                                    + FileType.SHAPE.toString() + " filename, renaming to '"
-                                    + newPath.toString() + "'.");
+                        if (LOGGER.isDebugEnabled()) {
+                            LOGGER.warn("'" + oldPath.toString() + "' is an invalid "
+                                        + FileType.SHAPE.toString() + " filename, renaming to '"
+                                        + newPath.toString() + "'.");
+                        }
 
                         Files.move(oldPath, newPath, ATOMIC_MOVE);
                     }
@@ -1122,6 +1148,7 @@ public class SpatialIndexTools {
                     }
                 });
 
+        Arrays.sort(files);
         return files;
     }
     /**
@@ -1150,7 +1177,7 @@ public class SpatialIndexTools {
         final String dbPassword = args[1];
         final String geoserverPassword = (args.length > 2) ? args[2] : null;
         final String download = (args.length > 3) ? args[3] : ("http://localhost:3030/" + resourceId + ".zip");
-        final String database = (args.length > 4) ? args[4] : "jdbc:postgresql://127.0.0.1:5432/switchon_dev";
+        final String database = (args.length > 4) ? args[4] : "jdbc:postgresql://127.0.0.1:5432/switchon";
         final String dbUser = (args.length > 5) ? args[5] : "switchon";
         final String geoserverUser = (args.length > 6) ? args[6] : "admin";
 

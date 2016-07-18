@@ -71,16 +71,25 @@ public class ShpImport {
                     geoserverUser,
                     geoserverPassword);
 
+            int i = 0;
             final File[] zipFiles = spatialIndexTools.listSupportedFiles(zipDir, SpatialIndexTools.FileType.ZIP);
             for (final File zipFile : zipFiles) {
-                final String filename = zipFile.getName();
-                final int resourceId = Integer.parseInt(FilenameUtils.removeExtension(filename));
-                final URL downloadUrl = new URL(host + filename);
-                spatialIndexTools.updateSpatialIndex(
-                    downloadUrl,
-                    resourceId);
-                System.out.println(filename + " imported into " + database + " and published to "
-                            + SpatialIndexTools.GEOSERVER_URL);
+                i++;
+                try {
+                    final String filename = zipFile.getName();
+                    final int resourceId = Integer.parseInt(FilenameUtils.removeExtension(filename));
+                    final URL downloadUrl = new URL(host + filename);
+                    spatialIndexTools.updateSpatialIndex(
+                        downloadUrl,
+                        resourceId);
+                    System.out.println("file " + i + "/" + zipFiles.length + "'"
+                                + filename + "' imported into " + database + " and published to "
+                                + SpatialIndexTools.GEOSERVER_URL);
+                } catch (Throwable t) {
+                    SpatialIndexTools.LOGGER.error("Processing file " + i + "/" + zipFiles.length
+                                + "'" + zipFile + "' failed:" + t.getMessage(),
+                        t);
+                }
             }
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
