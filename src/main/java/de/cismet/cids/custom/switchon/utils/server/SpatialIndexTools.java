@@ -85,11 +85,11 @@ public class SpatialIndexTools {
         "SELECT GeometryType(geo_field) from public.geom_search WHERE resource = %RESOURCE_ID% ORDER BY id DESC LIMIT 1";
 
     protected static final String searchGeomInsertPolygonTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_MakeValid(geom) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_CollectionExtract(ST_MakeValid(geom),3) FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertPointTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(ST_MakeValid(geom)) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(ST_CollectionExtract(ST_MakeValid(geom)),1) FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertLineTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(ST_MakeValid(geom)) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(ST_CollectionExtract(ST_MakeValid(geom),2)) FROM import_tables.geosearch_import";
 
     protected static final String updateResourceSpatialcoverageTpl = "WITH geom_coverage AS\n"
                 + "  (INSERT INTO \"public\".geom (geo_field) SELECT ST_Envelope(ST_ConvexHull(ST_Collect(geo_field))) AS geo_field\n"
@@ -433,7 +433,8 @@ public class SpatialIndexTools {
         this.pgpassword = dbPassword;
         this.pguser = dbUser;
 
-        this.publisher = new GeoServerRESTPublisher(GEOSERVER_URL, geoserverUser, geoserverPassword);
+        this.publisher = ((geoserverUser != null) && (geoserverPassword != null))
+            ? new GeoServerRESTPublisher(GEOSERVER_URL, geoserverUser, geoserverPassword) : null;
         this.connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
         this.searchGeomInsertPointStatement = this.connection.prepareStatement(searchGeomInsertPointTpl);
         this.searchGeomInsertPolygonStatement = this.connection.prepareStatement(searchGeomInsertPolygonTpl);
@@ -860,7 +861,11 @@ public class SpatialIndexTools {
 
         synchronized (clearGeomSearchStatement) {
             clearGeomSearchStatement.setInt(1, resourceId);
-            clearGeomSearchStatement.executeUpdate();
+            final int deleteCount = clearGeomSearchStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(deleteCount + " old '" + geometryType + "' geometries for resource with id '"
+                            + resourceId + "' removed from search geometries table");
+            }
         }
 
         final PreparedStatement searchGeomInsertStatement;
