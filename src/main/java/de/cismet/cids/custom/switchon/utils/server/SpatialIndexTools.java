@@ -87,7 +87,7 @@ public class SpatialIndexTools {
     protected static final String searchGeomInsertPolygonTpl =
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_CollectionExtract(ST_MakeValid(geom),3) FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertPointTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(ST_CollectionExtract(ST_MakeValid(geom)),1) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(ST_CollectionExtract(ST_MakeValid(geom),1)) FROM import_tables.geosearch_import";
     protected static final String searchGeomInsertLineTpl =
         "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(ST_CollectionExtract(ST_MakeValid(geom),2)) FROM import_tables.geosearch_import";
 
