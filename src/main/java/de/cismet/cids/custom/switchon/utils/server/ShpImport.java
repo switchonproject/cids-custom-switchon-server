@@ -55,7 +55,7 @@ public class ShpImport {
             final String dbPassword = args[1];
             final String geoserverPassword = (args.length > 2) ? args[2] : null;
             final String host = (args.length > 4) ? args[4] : "http://localhost:3030/";
-            final String database = (args.length > 4) ? args[4] : "jdbc:postgresql://127.0.0.1:5432/switchon_dev";
+            final String database = (args.length > 4) ? args[4] : "jdbc:postgresql://127.0.0.1:5432/switchon";
             final String dbUser = (args.length > 5) ? args[5] : "switchon";
             final String geoserverUser = (args.length > 6) ? args[6] : "admin";
 
