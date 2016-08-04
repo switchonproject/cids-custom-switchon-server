@@ -8,10 +8,18 @@
 package de.cismet.cids.custom.switchon.utils.server;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import org.openide.util.Exceptions;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+
+import java.util.Properties;
 
 /**
  * DOCUMENT ME!
@@ -706,5 +714,71 @@ public class CleanupTools {
         }
 
         return result;
+    }
+
+    /**
+     * DOCUMENT ME!
+     *
+     * @param  args  DOCUMENT ME!
+     */
+    public static void main(final String[] args) {
+        try {
+            final Properties log4jProperties = new Properties();
+            log4jProperties.put("log4j.appender.Remote", "org.apache.log4j.net.SocketAppender");
+            log4jProperties.put("log4j.appender.Remote.remoteHost", "localhost");
+            log4jProperties.put("log4j.appender.Remote.port", "4445");
+            log4jProperties.put("log4j.appender.Remote.locationInfo", "true");
+            log4jProperties.put("log4j.rootLogger", "ALL,Remote");
+            PropertyConfigurator.configure(log4jProperties);
+
+            if (args.length == 0) {
+                LOGGER.fatal("first required pg password argument is missing, bailing out!");
+                System.exit(1);
+            }
+
+            final String dbPassword = args[0];
+            final String jdbcUrl = (args.length > 1) ? args[1] : "jdbc:postgresql://127.0.0.1:5432/switchon_dev";
+            final String dbUser = (args.length > 2) ? args[2] : "switchon";
+
+            final String selectResourcesTpl = "SELECT resource.id, resource.name\n"
+                        + "    FROM \n"
+                        + "    resource\n"
+                        + "    WHERE collection = (SELECT DISTINCT tag.id      \n"
+                        + "            FROM tag      \n"
+                        + "            WHERE tag.name ILIKE 'NTSG - AE_Land3'           \n"
+                        + "                AND tag.taggroup IN \n"
+                        + "                (SELECT id FROM taggroup WHERE name ILIKE 'collection' ) limit 1)\n"
+                        + "  GROUP BY\n"
+                        + "    resource.id, resource.name\n"
+                        + "    ORDER BY resource.id ASC";
+
+            final String deleteResourceTpl = "DELETE from resource where id = ?";
+
+            final Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPassword);
+            final CleanupTools cleanupTools = new CleanupTools(connection);
+
+            final PreparedStatement deleteResourcesStatement = connection.prepareStatement(deleteResourceTpl);
+            final Statement selectResourcesStatement = connection.createStatement();
+            final ResultSet resultSet = selectResourcesStatement.executeQuery(selectResourcesTpl);
+
+            int i = 0;
+            while (resultSet.next()) {
+                final int resourceId = resultSet.getInt(1);
+                cleanupTools.cleanupResource(resourceId);
+                deleteResourcesStatement.setInt(1, resourceId);
+                deleteResourcesStatement.executeUpdate();
+                i++;
+            }
+
+            LOGGER.info("resources and orphanded entities of " + i + " resources successfully removed from db '"
+                        + jdbcUrl + "'");
+            resultSet.close();
+            selectResourcesStatement.close();
+
+            connection.close();
+        } catch (Exception ex) {
+            LOGGER.fatal(ex.getMessage(), ex);
+            System.exit(1);
+        }
     }
 }
