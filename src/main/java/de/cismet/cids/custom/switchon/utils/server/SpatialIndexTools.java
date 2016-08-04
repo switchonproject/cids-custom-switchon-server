@@ -1171,7 +1171,7 @@ public class SpatialIndexTools {
         PropertyConfigurator.configure(log4jProperties);
 
         if (args.length == 0) {
-            LOGGER.fatal("first required argument resurce id is missing, bailing out!");
+            LOGGER.fatal("first required argument resource id is missing, bailing out!");
             System.exit(1);
         } else if (args.length < 2) {
             LOGGER.fatal("2nd required pg password argument is missing, bailing out!");
