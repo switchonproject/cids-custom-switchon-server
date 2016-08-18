@@ -494,7 +494,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                 query.append("!");
             }
 
-            query.append("''").append(parameter).append("''");
+            query.append("''").append(parameter).append("'':*");
             if (title.equals(description)) {
                 query.append("')");
             } else {
@@ -503,7 +503,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
                 if (checkForNot(parameter)) {
                     query.append("!");
                 }
-                query.append("''").append(parameter).append("''')");
+                query.append("''").append(parameter).append("'':*')");
             }
         } else if (title != null) {
             parameter = new StringBuilder(title);
@@ -511,14 +511,14 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
             if (checkForNot(parameter)) {
                 query.append("!");
             }
-            query.append("''").append(parameter).append("''')");
+            query.append("''").append(parameter).append("'':*')");
         } else {
             parameter = new StringBuilder(description);
             query.append(" r.description) @@ to_tsquery('simple', '");
             if (checkForNot(parameter)) {
                 query.append("!");
             }
-            query.append("''").append(parameter).append("''')");
+            query.append("''").append(parameter).append("'':*')");
         }
     }
 
