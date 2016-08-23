@@ -82,9 +82,13 @@ public class ShpImport {
                     spatialIndexTools.updateSpatialIndex(
                         downloadUrl,
                         resourceId);
-                    System.out.println("file " + i + "/" + zipFiles.length + "'"
-                                + filename + "' imported into " + database + " and published to "
-                                + SpatialIndexTools.GEOSERVER_URL);
+
+                    final String message = "file " + i + "/" + zipFiles.length + "'"
+                                + filename + "' successfully imported into " + database + " and published to "
+                                + SpatialIndexTools.GEOSERVER_URL;
+
+                    SpatialIndexTools.LOGGER.info(message);
+                    System.out.println(message);
                 } catch (Throwable t) {
                     SpatialIndexTools.LOGGER.error("Processing file " + i + "/" + zipFiles.length
                                 + "'" + zipFile + "' failed:" + t.getMessage(),
