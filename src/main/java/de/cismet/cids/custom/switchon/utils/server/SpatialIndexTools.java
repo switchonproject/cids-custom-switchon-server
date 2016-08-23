@@ -122,7 +122,27 @@ public class SpatialIndexTools {
 
     protected static final String clearGeomSearchTpl = "DELETE FROM geom_search WHERE resource = ?";
 
-    protected static final String insertTMSRepresentationTlp = "WITH rep as \n"
+    protected static final String clearRepresentationTpl = "    DELETE\n"
+                + "    FROM\n"
+                + "        representation\n"
+                + "    WHERE\n"
+                + "        id IN (\n"
+                + "            SELECT\n"
+                + "                representation.id\n"
+                + "            FROM\n"
+                + "                representation\n"
+                + "            JOIN\n"
+                + "                jt_resource_representation\n"
+                + "                    ON jt_resource_representation.resource_reference = ?\n"
+                + "                    AND jt_resource_representation.representationid = representation.id\n"
+                + "            WHERE\n"
+                + "                representation.type = 213\n"
+                + "                AND representation.function = 72\n"
+                + "                AND representation.protocol IN (186, 205)\n"
+                + "                AND representation.contenttype IN (51,59)\n"
+                + "        )";
+
+    protected static final String insertTMSRepresentationTpl = "WITH rep as \n"
                 + "(INSERT INTO \"public\".representation \n"
                 + "(\"type\", spatialresolution, \"name\", description, applicationprofile, tags, \n"
                 + "\"function\", contentlocation, temporalresolution, protocol, content, \n"
@@ -134,7 +154,7 @@ public class SpatialIndexTools {
                 + "RETURNING id) INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference) \n"
                 + "SELECT id, %RESOURCE_ID% from rep;";
 
-    protected static final String insertWMSRepresentationTlp = "WITH rep as \n"
+    protected static final String insertWMSRepresentationTpl = "WITH rep as \n"
                 + "(INSERT INTO \"public\".representation \n"
                 + "(\"type\", spatialresolution, \"name\", description, applicationprofile, tags, \n"
                 + "\"function\", contentlocation, temporalresolution, protocol, content, \n"
@@ -269,6 +289,7 @@ public class SpatialIndexTools {
     protected final PreparedStatement searchGeomInsertPolygonStatement;
     protected final PreparedStatement searchGeomInsertLineStatement;
     protected final PreparedStatement clearGeomSearchStatement;
+    protected final PreparedStatement clearRepresentationStatement;
     protected final PreparedStatement searchGeomCopyStatement;
     protected final PreparedStatement updateRepresentationStatusStatement;
 
@@ -401,6 +422,7 @@ public class SpatialIndexTools {
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
+        this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
         this.publisher = null;
     }
 
@@ -442,6 +464,7 @@ public class SpatialIndexTools {
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
+        this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -937,14 +960,24 @@ public class SpatialIndexTools {
         LOGGER.info("inserting new representation for resource with id '"
                     + resourceId + "'");
 
+        synchronized (clearRepresentationStatement) {
+            clearRepresentationStatement.setInt(1, resourceId);
+            final int deleteCount = clearRepresentationStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(deleteCount + " old " + (isTMS ? "TMS" : "WMS")
+                            + " representations for resource with id '"
+                            + resourceId + "' removed");
+            }
+        }
+
         final String insertRepresentation;
 
         if (isTMS) {
-            insertRepresentation = insertTMSRepresentationTlp.replaceAll(
+            insertRepresentation = insertTMSRepresentationTpl.replaceAll(
                     "%RESOURCE_ID%",
                     String.valueOf(resourceId));
         } else {
-            insertRepresentation = insertWMSRepresentationTlp.replaceAll(
+            insertRepresentation = insertWMSRepresentationTpl.replaceAll(
                     "%RESOURCE_ID%",
                     String.valueOf(resourceId));
         }
