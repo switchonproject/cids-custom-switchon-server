@@ -174,6 +174,52 @@ public class SpatialIndexTools {
                 + "RETURNING id) INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference) \n"
                 + "SELECT id, %RESOURCE_ID% from rep;";
 
+    protected static final String copyRepresentationTpl = "WITH rep as (INSERT INTO\n"
+                + "    \"public\".representation (\n"
+                + "        \"type\", spatialresolution, \"name\", description, applicationprofile, tags, \"function\", contentlocation, temporalresolution, protocol, content, spatialscale, contenttype, uploadmessage, uploadstatus)      \n"
+                + "    (SELECT\n"
+                + "        \"type\",\n"
+                + "        spatialresolution,\n"
+                + "        \"name\",\n"
+                + "        description,\n"
+                + "        applicationprofile,\n"
+                + "        tags,\n"
+                + "        \"function\",\n"
+                + "        contentlocation,\n"
+                + "        temporalresolution,\n"
+                + "        protocol,\n"
+                + "        content,\n"
+                + "        spatialscale,\n"
+                + "        contenttype,\n"
+                + "        uploadmessage,\n"
+                + "        uploadstatus       \n"
+                + "    FROM\n"
+                + "        \"public\".representation       \n"
+                + "    WHERE\n"
+                + "        id = %REPRESENTATION_ID%) RETURNING id) \n"
+                + "INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference)\n"
+                + "    SELECT id, %RESOURCE_ID% from rep;";
+
+    protected static final String findRepresentationTpl = "SELECT\n"
+                + "    representation.id     \n"
+                + "FROM\n"
+                + "    representation                                                       \n"
+                + "JOIN\n"
+                + "    jt_resource_representation                                                                                                                                              \n"
+                + "        ON jt_resource_representation.representationid = representation.id               -- \n"
+                + "        AND jt_resource_representation.resource_reference = ?                  \n"
+                + "WHERE\n"
+                + "    representation.type = 213                                                                                              \n"
+                + "    AND representation.function = 72                                                                                      \n"
+                + "    AND representation.protocol IN (\n"
+                + "        186, 205                                                                                    \n"
+                + "    )                                                                                     \n"
+                + "    AND representation.contenttype IN (\n"
+                + "        51,59                                                                                             \n"
+                + "    )            \n"
+                + "ORDER BY representation.id DESC\n"
+                + "LIMIT 1";
+
     //~ Enums ------------------------------------------------------------------
 
     /**
@@ -300,6 +346,7 @@ public class SpatialIndexTools {
     protected final PreparedStatement clearRepresentationStatement;
     protected final PreparedStatement searchGeomCopyStatement;
     protected final PreparedStatement updateRepresentationStatusStatement;
+    protected final PreparedStatement findRepresentationStatement;
 
     protected final String pghost;
     protected final String pgport;
@@ -431,6 +478,7 @@ public class SpatialIndexTools {
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
         this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
+        this.findRepresentationStatement = this.connection.prepareStatement(findRepresentationTpl);
         this.publisher = null;
     }
 
@@ -473,6 +521,7 @@ public class SpatialIndexTools {
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
         this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
+        this.findRepresentationStatement = this.connection.prepareStatement(findRepresentationTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -1014,6 +1063,67 @@ public class SpatialIndexTools {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(updateCount + " representations for resource with id '"
                         + resourceId + "' inserted");
+        }
+
+        return updateCount;
+    }
+
+    /**
+     * Copies a WMS/TMS map layer representation from a source to a target resource.
+     *
+     * @param   sourceResourceId  DOCUMENT ME!
+     * @param   targetResourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     * @throws  FileNotFoundException         DOCUMENT ME!
+     */
+    public int copyRepresentation(
+            final int sourceResourceId,
+            final int targetResourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
+        LOGGER.info("copying representation from source resource with id '"
+                    + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+
+        int representationId = -1;
+        synchronized (findRepresentationStatement) {
+            findRepresentationStatement.setInt(1, sourceResourceId);
+            final ResultSet resultSet = findRepresentationStatement.executeQuery();
+            if (resultSet.next()) {
+                representationId = resultSet.getInt(1);
+            }
+            resultSet.close();
+        }
+
+        if (representationId == -1) {
+            final String message = "could no copy representation from source resource with id '"
+                        + sourceResourceId + "' to target resource with id '" + targetResourceId
+                        + "': no suitable representation found for source resource";
+            LOGGER.error(message);
+            throw new FileNotFoundException(message);
+        }
+
+        synchronized (clearRepresentationStatement) {
+            clearRepresentationStatement.setInt(1, targetResourceId);
+            final int deleteCount = clearRepresentationStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(deleteCount + " old representations for resource with id '"
+                            + targetResourceId + "' removed");
+            }
+        }
+
+        final String copyRepresentation = copyRepresentationTpl.replaceAll(
+                    "%RESOURCE_ID%",
+                    String.valueOf(targetResourceId))
+                    .replaceAll("%REPRESENTATION_ID%", String.valueOf(targetResourceId));
+
+        final Statement copyRepresentationStatement = this.connection.createStatement();
+        final int updateCount = copyRepresentationStatement.executeUpdate(copyRepresentation);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(updateCount + " representations from source resource with id '"
+                        + sourceResourceId + "' to target resource with id '" + targetResourceId + "' copied");
         }
 
         return updateCount;
