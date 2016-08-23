@@ -220,6 +220,17 @@ public class SpatialIndexTools {
                 + "ORDER BY representation.id DESC\n"
                 + "LIMIT 1";
 
+    protected static final String copyGeomSearchTpl =
+        "INSERT INTO \"public\".geom_search (resource, geo_field, geom)  \n"
+                + "    SELECT\n"
+                + "        ? as resource,\n"
+                + "        geo_field,\n"
+                + "        null as geom \n"
+                + "    FROM\n"
+                + "        \"public\".geom_search \n"
+                + "    WHERE\n"
+                + "        resource = ?";
+
     //~ Enums ------------------------------------------------------------------
 
     /**
@@ -343,6 +354,7 @@ public class SpatialIndexTools {
     protected final PreparedStatement searchGeomInsertPolygonStatement;
     protected final PreparedStatement searchGeomInsertLineStatement;
     protected final PreparedStatement clearGeomSearchStatement;
+    protected final PreparedStatement copyGeomSearchStatement;
     protected final PreparedStatement clearRepresentationStatement;
     protected final PreparedStatement searchGeomCopyStatement;
     protected final PreparedStatement updateRepresentationStatusStatement;
@@ -479,6 +491,7 @@ public class SpatialIndexTools {
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
         this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
         this.findRepresentationStatement = this.connection.prepareStatement(findRepresentationTpl);
+        this.copyGeomSearchStatement = this.connection.prepareStatement(copyGeomSearchTpl);
         this.publisher = null;
     }
 
@@ -522,6 +535,7 @@ public class SpatialIndexTools {
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
         this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
         this.findRepresentationStatement = this.connection.prepareStatement(findRepresentationTpl);
+        this.copyGeomSearchStatement = this.connection.prepareStatement(copyGeomSearchTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -616,7 +630,9 @@ public class SpatialIndexTools {
                 if (this.publishToGeoserver(zipFile, geometryType, resourceId)) {
                     this.insertTMSRepresentation(resourceId);
                 } else {
-                    final String message = "could not publish resource " + resourceId + " to geoserver.";
+                    final String message = "could not publish resource "
+                                + resourceId
+                                + " to geoserver.";
                     LOGGER.error(message);
                     throw new IOException(message);
                 }
@@ -657,7 +673,8 @@ public class SpatialIndexTools {
                     + workingDir.getAbsolutePath() + "'");
 
         final String[] curlCmd = curlCmdTpl.toArray(new String[curlCmdTpl.size() + 1]);
-        curlCmd[curlCmd.length - 1] = fileURL.toString();
+        curlCmd[curlCmd.length
+                    - 1] = fileURL.toString();
 
         final int timeout = 15;
         final ProcessBuilder processBuilder = new ProcessBuilder(curlCmd);
@@ -685,7 +702,8 @@ public class SpatialIndexTools {
         if (zipFile.exists() && zipFile.canRead()) {
             return zipFile;
         } else {
-            final String message = "downloaded file '" + zipFile.getAbsolutePath()
+            final String message = "downloaded file '"
+                        + zipFile.getAbsolutePath()
                         + "' does not exist or is not readable!";
             LOGGER.error(message);
             throw new FileNotFoundException(message);
@@ -753,7 +771,8 @@ public class SpatialIndexTools {
                     + workingDir.getAbsolutePath() + "'");
 
         final String[] ogrinfoCmd = ogrinfoCmdTpl.toArray(new String[ogrinfoCmdTpl.size() + 1]);
-        ogrinfoCmd[ogrinfoCmd.length - 1] = file;
+        ogrinfoCmd[ogrinfoCmd.length
+                    - 1] = file;
         final int timeout = 30;
 
         final ProcessBuilder processBuilder = new ProcessBuilder(ogrinfoCmd);
@@ -1080,7 +1099,7 @@ public class SpatialIndexTools {
      * @throws  SQLException                  DOCUMENT ME!
      * @throws  FileNotFoundException         DOCUMENT ME!
      */
-    public int copyRepresentation(
+    public int copyResourceRepresentation(
             final int sourceResourceId,
             final int targetResourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
         LOGGER.info("copying representation from source resource with id '"
@@ -1098,7 +1117,9 @@ public class SpatialIndexTools {
 
         if (representationId == -1) {
             final String message = "could no copy representation from source resource with id '"
-                        + sourceResourceId + "' to target resource with id '" + targetResourceId
+                        + sourceResourceId
+                        + "' to target resource with id '"
+                        + targetResourceId
                         + "': no suitable representation found for source resource";
             LOGGER.error(message);
             throw new FileNotFoundException(message);
@@ -1125,6 +1146,50 @@ public class SpatialIndexTools {
             LOGGER.debug(updateCount + " representations from source resource with id '"
                         + sourceResourceId + "' to target resource with id '" + targetResourceId + "' copied");
         }
+
+        return updateCount;
+    }
+
+    /**
+     * Copies search geometries from one resource to another.
+     *
+     * @param   sourceResourceId  DOCUMENT ME!
+     * @param   targetResourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     * @throws  FileNotFoundException         DOCUMENT ME!
+     */
+    public int copyResourceGeometry(
+            final int sourceResourceId,
+            final int targetResourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
+        LOGGER.info("copying geometries from source resource with id '"
+                    + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+
+        synchronized (clearGeomSearchStatement) {
+            clearGeomSearchStatement.setInt(1, targetResourceId);
+            final int deleteCount = clearGeomSearchStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(deleteCount + " old geometries for target resource with id '"
+                            + targetResourceId + "' removed from search geometries table");
+            }
+        }
+
+        final int updateCount;
+        synchronized (searchGeomCopyStatement) {
+            searchGeomCopyStatement.setInt(1, targetResourceId);
+            searchGeomCopyStatement.setInt(2, sourceResourceId);
+            updateCount = searchGeomCopyStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(updateCount + " search geometries copied from source resource with id '"
+                            + sourceResourceId + "' to target resource with id '"
+                            + targetResourceId + "' ");
+            }
+        }
+
+        this.updateResourceSpatialcoverage(targetResourceId);
 
         return updateCount;
     }
