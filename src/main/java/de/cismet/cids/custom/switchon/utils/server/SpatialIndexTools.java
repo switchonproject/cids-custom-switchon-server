@@ -72,10 +72,18 @@ public class SpatialIndexTools {
     static final String GEOSERVER_LINE_STYLE = "switchon_line";
     static final String GEOSERVER_POLYGON_STYLE = "switchon_polygon";
     static final String GEOSERVER_POINT_STYLE = "switchon_point";
+    static final String GEOSERVER_NAMED_POINT_STYLE = "switchon_named_point";
 
     static final String SRS = "EPSG:4326";
     static final String DOWNLOAD_FILENAME = "download.zip";
     public static final String SPATIAL_PROCESSING_INSTRUCTION = "deriveSpatialIndex:";
+
+    /**
+     * Decides if geoserver publisher publishes point shape files by uploading the actual shape file and creating a
+     * shapefile layer (true) or by creating a database layer on basis of the geom_search table (false). Advantage of
+     * the shape layer: the name property of the shape data can be used in the SLD to show names of points!
+     */
+    static final boolean PUBLISH_POINT_LAYER_AS_SHAPE = true;
 
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
 
@@ -497,6 +505,7 @@ public class SpatialIndexTools {
      *
      * @throws  Exception              DOCUMENT ME!
      * @throws  FileNotFoundException  DOCUMENT ME!
+     * @throws  IOException            DOCUMENT ME!
      */
     public int updateSpatialIndex(
             final URL fileURL,
@@ -517,7 +526,7 @@ public class SpatialIndexTools {
         final File workingDir = workingPath.toFile();
         workingDir.mkdirs();
 
-        this.downloadFile(workingDir, fileURL);
+        final File zipFile = this.downloadFile(workingDir, fileURL);
 
         this.unzipFile(workingDir);
 
@@ -555,8 +564,13 @@ public class SpatialIndexTools {
             searchGeomUpdateCount += this.insertSearchGeometries(geometryType, resourceId);
 
             if (this.publisher != null) {
-                this.publishToGeoserver(geometryType, resourceId);
-                this.insertTMSRepresentation(resourceId);
+                if (this.publishToGeoserver(zipFile, geometryType, resourceId)) {
+                    this.insertTMSRepresentation(resourceId);
+                } else {
+                    final String message = "could not publish resource " + resourceId + " to geoserver.";
+                    LOGGER.error(message);
+                    throw new IOException(message);
+                }
             }
         }
 
@@ -579,12 +593,14 @@ public class SpatialIndexTools {
      * @param   workingDir  DOCUMENT ME!
      * @param   fileURL     DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     *
      * @throws  IOException           DOCUMENT ME!
      * @throws  InterruptedException  DOCUMENT ME!
      * @throws  TimeoutException      DOCUMENT ME!
      * @throws  ExecutionException    DOCUMENT ME!
      */
-    protected void downloadFile(final File workingDir, final URL fileURL) throws IOException,
+    protected File downloadFile(final File workingDir, final URL fileURL) throws IOException,
         InterruptedException,
         TimeoutException,
         ExecutionException {
@@ -614,6 +630,16 @@ public class SpatialIndexTools {
             throw new ExecutionException("downloading " + fileURL
                         + " failed with exit value " + exitValue,
                 processException);
+        }
+
+        final File zipFile = new File(workingDir, DOWNLOAD_FILENAME);
+        if (zipFile.exists() && zipFile.canRead()) {
+            return zipFile;
+        } else {
+            final String message = "downloaded file '" + zipFile.getAbsolutePath()
+                        + "' does not exist or is not readable!";
+            LOGGER.error(message);
+            throw new FileNotFoundException(message);
         }
     }
 
@@ -1053,72 +1079,90 @@ public class SpatialIndexTools {
     /**
      * DOCUMENT ME!
      *
+     * @param   zipFile       DOCUMENT ME!
      * @param   geometryType  DOCUMENT ME!
      * @param   resourceId    DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return  true if the operation completed successfully
      *
      * @throws  UnsupportedDataTypeException  DOCUMENT ME!
      * @throws  SQLException                  DOCUMENT ME!
+     * @throws  FileNotFoundException         DOCUMENT ME!
      * @throws  NullPointerException          DOCUMENT ME!
      */
-    protected boolean publishToGeoserver(final GeometryType geometryType, final int resourceId)
-            throws UnsupportedDataTypeException, SQLException {
+    protected boolean publishToGeoserver(
+            final File zipFile,
+            final GeometryType geometryType,
+            final int resourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
         if (this.publisher == null) {
             throw new NullPointerException("cannot pusblish layer for resource "
                         + resourceId + " of type '" + geometryType + "': GeoServerPublisher not initialized!");
         }
 
-        final GSLayerEncoder layer = new GSLayerEncoder();
-        if (geometryType == GeometryType.POLYGON) {
-            layer.setDefaultStyle(GEOSERVER_POLYGON_STYLE);
-        } else if (geometryType == GeometryType.POINT) {
-            layer.setDefaultStyle(GEOSERVER_POINT_STYLE);
-        } else if (geometryType == GeometryType.LINE) {
-            layer.setDefaultStyle(GEOSERVER_LINE_STYLE);
-        } else {
-            throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
-                        + "' for resource " + resourceId + " is not supported by this operation");
-        }
-
         final String geometryTypeForResource = this.getGeometryTypeForResource(resourceId);
 
-        LOGGER.info("publishing new layer '" + resourceId + "' of type '" + geometryTypeForResource
-                    + "' (" + geometryType + ") to " + GEOSERVER_URL);
+        if (PUBLISH_POINT_LAYER_AS_SHAPE && (geometryType == GeometryType.POINT)) {
+            LOGGER.info("publishing new SHAPEFILE layer '" + resourceId + "' of type '" + geometryTypeForResource
+                        + "' (" + geometryType + ") to " + GEOSERVER_URL);
 
-        final VTGeometryEncoder vtGeom = new VTGeometryEncoder();
-        vtGeom.setName("geo_field");
-        vtGeom.setType(geometryTypeForResource);
-        vtGeom.setSrid("4326");
+            return publisher.publishShp(
+                    GEOSERVER_WORKSPACE,
+                    String.valueOf(resourceId),
+                    String.valueOf(resourceId),
+                    zipFile,
+                    SRS,
+                    GEOSERVER_NAMED_POINT_STYLE);
+        } else {
+            final GSLayerEncoder layer = new GSLayerEncoder();
+            if (geometryType == GeometryType.POLYGON) {
+                layer.setDefaultStyle(GEOSERVER_POLYGON_STYLE);
+            } else if (geometryType == GeometryType.POINT) {
+                layer.setDefaultStyle(GEOSERVER_POINT_STYLE);
+            } else if (geometryType == GeometryType.LINE) {
+                layer.setDefaultStyle(GEOSERVER_LINE_STYLE);
+            } else {
+                throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
+                            + "' for resource " + resourceId + " is not supported by this operation");
+            }
 
-        final String selectVirtualLayerStatement = selectVirtualLayerTpl.replaceAll(
-                "%RESOURCE_ID%",
-                String.valueOf(resourceId));
+            LOGGER.info("publishing new DATABASE layer '" + resourceId + "' of type '" + geometryTypeForResource
+                        + "' (" + geometryType + ") to " + GEOSERVER_URL);
 
-        // Set-up the virtual table
-        final GSVirtualTableEncoder vte = new GSVirtualTableEncoder();
-        vte.setName(String.valueOf(resourceId));
-        vte.setSql(selectVirtualLayerStatement);
-        vte.addKeyColumn("id");
-        vte.addVirtualTableGeometry(vtGeom);
+            final VTGeometryEncoder vtGeom = new VTGeometryEncoder();
+            vtGeom.setName("geo_field");
+            vtGeom.setType(geometryTypeForResource);
+            vtGeom.setSrid("4326");
 
-        final GSFeatureTypeEncoder featureType = new GSFeatureTypeEncoder();
-        featureType.setName(String.valueOf(resourceId));
-        featureType.setTitle(String.valueOf(resourceId));
-        featureType.setAbstract("Feature Layer for SWITCH-ON Resource " + resourceId);
-        featureType.setDescription("Feature Layer for SWITCH-ON Resource " + resourceId);
-        featureType.setSRS(SRS);
-        featureType.setNativeCRS(SRS);
-        featureType.addKeyword("SWITCHON");
-        featureType.setProjectionPolicy(GSResourceEncoder.ProjectionPolicy.FORCE_DECLARED);
+            final String selectVirtualLayerStatement = selectVirtualLayerTpl.replaceAll(
+                    "%RESOURCE_ID%",
+                    String.valueOf(resourceId));
 
-        featureType.setMetadataVirtualTable(vte);
+            // Set-up the virtual table
+            final GSVirtualTableEncoder vte = new GSVirtualTableEncoder();
+            vte.setName(String.valueOf(resourceId));
+            vte.setSql(selectVirtualLayerStatement);
+            vte.addKeyColumn("id");
+            vte.addVirtualTableGeometry(vtGeom);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("FeatureType '" + featureType.toString() + " created");
+            final GSFeatureTypeEncoder featureType = new GSFeatureTypeEncoder();
+            featureType.setName(String.valueOf(resourceId));
+            featureType.setTitle(String.valueOf(resourceId));
+            featureType.setAbstract("Feature Layer for SWITCH-ON Resource " + resourceId);
+            featureType.setDescription("Feature Layer for SWITCH-ON Resource " + resourceId);
+            featureType.setSRS(SRS);
+            featureType.setNativeCRS(SRS);
+            featureType.addKeyword("SWITCHON");
+            featureType.setProjectionPolicy(GSResourceEncoder.ProjectionPolicy.FORCE_DECLARED);
+
+            featureType.setMetadataVirtualTable(vte);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("FeatureType '" + featureType.toString() + " created");
+            }
+
+            return publisher.publishDBLayer(GEOSERVER_WORKSPACE, GEOSERVER_DATASOURCE,
+                    featureType, layer);
         }
-        return publisher.publishDBLayer(GEOSERVER_WORKSPACE, GEOSERVER_DATASOURCE,
-                featureType, layer);
     }
 
     /**
@@ -1190,7 +1234,7 @@ public class SpatialIndexTools {
         return files;
     }
     /**
-     * DOCUMENT ME!
+     * Start with resourceId, postgres password, geoserver password.
      *
      * @param  args  DOCUMENT ME!
      */
