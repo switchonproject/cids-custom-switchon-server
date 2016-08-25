@@ -39,7 +39,19 @@ public class ShpImport {
         log4jProperties.put("log4j.appender.Remote.remoteHost", "localhost");
         log4jProperties.put("log4j.appender.Remote.port", "4445");
         log4jProperties.put("log4j.appender.Remote.locationInfo", "true");
-        log4jProperties.put("log4j.rootLogger", "ALL,Remote");
+
+        log4jProperties.put("log4j.appender.File", "org.apache.log4j.FileAppender");
+        log4jProperties.put("log4j.appender.File.file", "shpImport.log");
+        log4jProperties.put("log4j.appender.File.layout", "org.apache.log4j.PatternLayout");
+        log4jProperties.put(
+            "log4j.appender.File.layout.ConversionPattern",
+            "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n");
+        log4jProperties.put("log4j.appender.File.append", "false");
+
+        log4jProperties.put(
+            "log4j.logger.de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools",
+            "ALL,Remote,File");
+
         PropertyConfigurator.configure(log4jProperties);
 
         if (args.length == 0) {

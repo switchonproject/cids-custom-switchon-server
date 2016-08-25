@@ -7,7 +7,6 @@
 ****************************************************/
 package de.cismet.cids.custom.switchon.utils.server;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -16,16 +15,12 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.File;
 
-import java.net.URL;
-
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
-
-import static Sirius.util.NamingServerMonitor.NamingServerMonitor.host;
 
 import static de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools.LOGGER;
 
@@ -50,7 +45,19 @@ public class ResourceCopy {
         log4jProperties.put("log4j.appender.Remote.remoteHost", "localhost");
         log4jProperties.put("log4j.appender.Remote.port", "4445");
         log4jProperties.put("log4j.appender.Remote.locationInfo", "true");
-        log4jProperties.put("log4j.rootLogger", "ALL,Remote");
+
+        log4jProperties.put("log4j.appender.File", "org.apache.log4j.FileAppender");
+        log4jProperties.put("log4j.appender.File.file", "resourceCopy.log");
+        log4jProperties.put("log4j.appender.File.layout", "org.apache.log4j.PatternLayout");
+        log4jProperties.put(
+            "log4j.appender.File.layout.ConversionPattern",
+            "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n");
+        log4jProperties.put("log4j.appender.File.append", "false");
+
+        log4jProperties.put(
+            "log4j.logger.de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools",
+            "ALL,Remote,File");
+
         PropertyConfigurator.configure(log4jProperties);
 
         if (args.length == 0) {
