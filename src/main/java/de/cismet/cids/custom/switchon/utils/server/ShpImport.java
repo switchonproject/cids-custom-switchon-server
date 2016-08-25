@@ -39,11 +39,23 @@ public class ShpImport {
         log4jProperties.put("log4j.appender.Remote.remoteHost", "localhost");
         log4jProperties.put("log4j.appender.Remote.port", "4445");
         log4jProperties.put("log4j.appender.Remote.locationInfo", "true");
-        log4jProperties.put("log4j.rootLogger", "ALL,Remote");
+
+        log4jProperties.put("log4j.appender.File", "org.apache.log4j.FileAppender");
+        log4jProperties.put("log4j.appender.File.file", "shpImport.log");
+        log4jProperties.put("log4j.appender.File.layout", "org.apache.log4j.PatternLayout");
+        log4jProperties.put(
+            "log4j.appender.File.layout.ConversionPattern",
+            "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n");
+        log4jProperties.put("log4j.appender.File.append", "false");
+
+        log4jProperties.put(
+            "log4j.logger.de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools",
+            "ALL,Remote,File");
+
         PropertyConfigurator.configure(log4jProperties);
 
         if (args.length == 0) {
-            LOGGER.fatal("first required argument resurce id is missing, bailing out!");
+            LOGGER.fatal("first required argument zip file directory is missing, bailing out!");
             System.exit(1);
         } else if (args.length < 2) {
             LOGGER.fatal("2nd required pg password argument is missing, bailing out!");
@@ -82,9 +94,13 @@ public class ShpImport {
                     spatialIndexTools.updateSpatialIndex(
                         downloadUrl,
                         resourceId);
-                    System.out.println("file " + i + "/" + zipFiles.length + "'"
-                                + filename + "' imported into " + database + " and published to "
-                                + SpatialIndexTools.GEOSERVER_URL);
+
+                    final String message = "file " + i + "/" + zipFiles.length + "'"
+                                + filename + "' successfully imported into " + database + " and published to "
+                                + SpatialIndexTools.GEOSERVER_URL;
+
+                    SpatialIndexTools.LOGGER.info(message);
+                    System.out.println(message);
                 } catch (Throwable t) {
                     SpatialIndexTools.LOGGER.error("Processing file " + i + "/" + zipFiles.length
                                 + "'" + zipFile + "' failed:" + t.getMessage(),

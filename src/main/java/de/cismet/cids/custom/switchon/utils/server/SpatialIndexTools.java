@@ -72,10 +72,18 @@ public class SpatialIndexTools {
     static final String GEOSERVER_LINE_STYLE = "switchon_line";
     static final String GEOSERVER_POLYGON_STYLE = "switchon_polygon";
     static final String GEOSERVER_POINT_STYLE = "switchon_point";
+    static final String GEOSERVER_NAMED_POINT_STYLE = "switchon_named_point";
 
     static final String SRS = "EPSG:4326";
     static final String DOWNLOAD_FILENAME = "download.zip";
     public static final String SPATIAL_PROCESSING_INSTRUCTION = "deriveSpatialIndex:";
+
+    /**
+     * Decides if geoserver publisher publishes point shape files by uploading the actual shape file and creating a
+     * shapefile layer (true) or by creating a database layer on basis of the geom_search table (false). Advantage of
+     * the shape layer: the name property of the shape data can be used in the SLD to show names of points!
+     */
+    static final boolean PUBLISH_POINT_LAYER_AS_SHAPE = true;
 
     protected static final Logger LOGGER = Logger.getLogger(SpatialIndexTools.class);
 
@@ -122,7 +130,27 @@ public class SpatialIndexTools {
 
     protected static final String clearGeomSearchTpl = "DELETE FROM geom_search WHERE resource = ?";
 
-    protected static final String insertTMSRepresentationTlp = "WITH rep as \n"
+    protected static final String clearRepresentationTpl = "    DELETE\n"
+                + "    FROM\n"
+                + "        representation\n"
+                + "    WHERE\n"
+                + "        id IN (\n"
+                + "            SELECT\n"
+                + "                representation.id\n"
+                + "            FROM\n"
+                + "                representation\n"
+                + "            JOIN\n"
+                + "                jt_resource_representation\n"
+                + "                    ON jt_resource_representation.resource_reference = ?\n"
+                + "                    AND jt_resource_representation.representationid = representation.id\n"
+                + "            WHERE\n"
+                + "                representation.type = 213\n"
+                + "                AND representation.function = 72\n"
+                + "                AND representation.protocol IN (186, 205)\n"
+                + "                AND representation.contenttype IN (51,59)\n"
+                + "        )";
+
+    protected static final String insertTMSRepresentationTpl = "WITH rep as \n"
                 + "(INSERT INTO \"public\".representation \n"
                 + "(\"type\", spatialresolution, \"name\", description, applicationprofile, tags, \n"
                 + "\"function\", contentlocation, temporalresolution, protocol, content, \n"
@@ -134,7 +162,7 @@ public class SpatialIndexTools {
                 + "RETURNING id) INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference) \n"
                 + "SELECT id, %RESOURCE_ID% from rep;";
 
-    protected static final String insertWMSRepresentationTlp = "WITH rep as \n"
+    protected static final String insertWMSRepresentationTpl = "WITH rep as \n"
                 + "(INSERT INTO \"public\".representation \n"
                 + "(\"type\", spatialresolution, \"name\", description, applicationprofile, tags, \n"
                 + "\"function\", contentlocation, temporalresolution, protocol, content, \n"
@@ -145,6 +173,63 @@ public class SpatialIndexTools {
                 + "NULL, 186, NULL, NULL, 51, 'switchon:%RESOURCE_ID%', NULL, NULL) \n"
                 + "RETURNING id) INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference) \n"
                 + "SELECT id, %RESOURCE_ID% from rep;";
+
+    protected static final String copyRepresentationTpl = "WITH rep as (INSERT INTO\n"
+                + "    \"public\".representation (\n"
+                + "        \"type\", spatialresolution, \"name\", description, applicationprofile, tags, \"function\", contentlocation, temporalresolution, protocol, content, spatialscale, contenttype, uploadmessage, uploadstatus)      \n"
+                + "    (SELECT\n"
+                + "        \"type\",\n"
+                + "        spatialresolution,\n"
+                + "        \"name\",\n"
+                + "        description,\n"
+                + "        applicationprofile,\n"
+                + "        tags,\n"
+                + "        \"function\",\n"
+                + "        contentlocation,\n"
+                + "        temporalresolution,\n"
+                + "        protocol,\n"
+                + "        content,\n"
+                + "        spatialscale,\n"
+                + "        contenttype,\n"
+                + "        uploadmessage,\n"
+                + "        uploadstatus       \n"
+                + "    FROM\n"
+                + "        \"public\".representation       \n"
+                + "    WHERE\n"
+                + "        id = %REPRESENTATION_ID%) RETURNING id) \n"
+                + "INSERT INTO \"public\".jt_resource_representation (representationid, resource_reference)\n"
+                + "    SELECT id, %RESOURCE_ID% from rep;";
+
+    protected static final String findRepresentationTpl = "SELECT\n"
+                + "    representation.id     \n"
+                + "FROM\n"
+                + "    representation                                                       \n"
+                + "JOIN\n"
+                + "    jt_resource_representation                                                                                                                                              \n"
+                + "        ON jt_resource_representation.representationid = representation.id               -- \n"
+                + "        AND jt_resource_representation.resource_reference = ?                  \n"
+                + "WHERE\n"
+                + "    representation.type = 213                                                                                              \n"
+                + "    AND representation.function = 72                                                                                      \n"
+                + "    AND representation.protocol IN (\n"
+                + "        186, 205                                                                                    \n"
+                + "    )                                                                                     \n"
+                + "    AND representation.contenttype IN (\n"
+                + "        51,59                                                                                             \n"
+                + "    )            \n"
+                + "ORDER BY representation.id DESC\n"
+                + "LIMIT 1";
+
+    protected static final String copyGeomSearchTpl =
+        "INSERT INTO \"public\".geom_search (resource, geo_field, geom)  \n"
+                + "    SELECT\n"
+                + "        ? as resource,\n"
+                + "        geo_field,\n"
+                + "        null as geom \n"
+                + "    FROM\n"
+                + "        \"public\".geom_search \n"
+                + "    WHERE\n"
+                + "        resource = ?";
 
     //~ Enums ------------------------------------------------------------------
 
@@ -269,8 +354,11 @@ public class SpatialIndexTools {
     protected final PreparedStatement searchGeomInsertPolygonStatement;
     protected final PreparedStatement searchGeomInsertLineStatement;
     protected final PreparedStatement clearGeomSearchStatement;
+    protected final PreparedStatement copyGeomSearchStatement;
+    protected final PreparedStatement clearRepresentationStatement;
     protected final PreparedStatement searchGeomCopyStatement;
     protected final PreparedStatement updateRepresentationStatusStatement;
+    protected final PreparedStatement findRepresentationStatement;
 
     protected final String pghost;
     protected final String pgport;
@@ -401,6 +489,9 @@ public class SpatialIndexTools {
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
+        this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
+        this.findRepresentationStatement = this.connection.prepareStatement(findRepresentationTpl);
+        this.copyGeomSearchStatement = this.connection.prepareStatement(copyGeomSearchTpl);
         this.publisher = null;
     }
 
@@ -442,6 +533,9 @@ public class SpatialIndexTools {
         this.searchGeomCopyStatement = this.connection.prepareStatement(searchGeomCopyTpl);
         this.updateRepresentationStatusStatement = this.connection.prepareStatement(updateRepresentationStatusTpl);
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
+        this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
+        this.findRepresentationStatement = this.connection.prepareStatement(findRepresentationTpl);
+        this.copyGeomSearchStatement = this.connection.prepareStatement(copyGeomSearchTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -474,6 +568,7 @@ public class SpatialIndexTools {
      *
      * @throws  Exception              DOCUMENT ME!
      * @throws  FileNotFoundException  DOCUMENT ME!
+     * @throws  IOException            DOCUMENT ME!
      */
     public int updateSpatialIndex(
             final URL fileURL,
@@ -494,7 +589,7 @@ public class SpatialIndexTools {
         final File workingDir = workingPath.toFile();
         workingDir.mkdirs();
 
-        this.downloadFile(workingDir, fileURL);
+        final File zipFile = this.downloadFile(workingDir, fileURL);
 
         this.unzipFile(workingDir);
 
@@ -532,8 +627,15 @@ public class SpatialIndexTools {
             searchGeomUpdateCount += this.insertSearchGeometries(geometryType, resourceId);
 
             if (this.publisher != null) {
-                this.publishToGeoserver(geometryType, resourceId);
-                this.insertTMSRepresentation(resourceId);
+                if (this.publishToGeoserver(zipFile, geometryType, resourceId)) {
+                    this.insertTMSRepresentation(resourceId);
+                } else {
+                    final String message = "could not publish resource "
+                                + resourceId
+                                + " to geoserver.";
+                    LOGGER.error(message);
+                    throw new IOException(message);
+                }
             }
         }
 
@@ -556,12 +658,14 @@ public class SpatialIndexTools {
      * @param   workingDir  DOCUMENT ME!
      * @param   fileURL     DOCUMENT ME!
      *
+     * @return  DOCUMENT ME!
+     *
      * @throws  IOException           DOCUMENT ME!
      * @throws  InterruptedException  DOCUMENT ME!
      * @throws  TimeoutException      DOCUMENT ME!
      * @throws  ExecutionException    DOCUMENT ME!
      */
-    protected void downloadFile(final File workingDir, final URL fileURL) throws IOException,
+    protected File downloadFile(final File workingDir, final URL fileURL) throws IOException,
         InterruptedException,
         TimeoutException,
         ExecutionException {
@@ -569,7 +673,8 @@ public class SpatialIndexTools {
                     + workingDir.getAbsolutePath() + "'");
 
         final String[] curlCmd = curlCmdTpl.toArray(new String[curlCmdTpl.size() + 1]);
-        curlCmd[curlCmd.length - 1] = fileURL.toString();
+        curlCmd[curlCmd.length
+                    - 1] = fileURL.toString();
 
         final int timeout = 15;
         final ProcessBuilder processBuilder = new ProcessBuilder(curlCmd);
@@ -591,6 +696,17 @@ public class SpatialIndexTools {
             throw new ExecutionException("downloading " + fileURL
                         + " failed with exit value " + exitValue,
                 processException);
+        }
+
+        final File zipFile = new File(workingDir, DOWNLOAD_FILENAME);
+        if (zipFile.exists() && zipFile.canRead()) {
+            return zipFile;
+        } else {
+            final String message = "downloaded file '"
+                        + zipFile.getAbsolutePath()
+                        + "' does not exist or is not readable!";
+            LOGGER.error(message);
+            throw new FileNotFoundException(message);
         }
     }
 
@@ -655,7 +771,8 @@ public class SpatialIndexTools {
                     + workingDir.getAbsolutePath() + "'");
 
         final String[] ogrinfoCmd = ogrinfoCmdTpl.toArray(new String[ogrinfoCmdTpl.size() + 1]);
-        ogrinfoCmd[ogrinfoCmd.length - 1] = file;
+        ogrinfoCmd[ogrinfoCmd.length
+                    - 1] = file;
         final int timeout = 30;
 
         final ProcessBuilder processBuilder = new ProcessBuilder(ogrinfoCmd);
@@ -937,14 +1054,24 @@ public class SpatialIndexTools {
         LOGGER.info("inserting new representation for resource with id '"
                     + resourceId + "'");
 
+        synchronized (clearRepresentationStatement) {
+            clearRepresentationStatement.setInt(1, resourceId);
+            final int deleteCount = clearRepresentationStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(deleteCount + " old " + (isTMS ? "TMS" : "WMS")
+                            + " representations for resource with id '"
+                            + resourceId + "' removed");
+            }
+        }
+
         final String insertRepresentation;
 
         if (isTMS) {
-            insertRepresentation = insertTMSRepresentationTlp.replaceAll(
+            insertRepresentation = insertTMSRepresentationTpl.replaceAll(
                     "%RESOURCE_ID%",
                     String.valueOf(resourceId));
         } else {
-            insertRepresentation = insertWMSRepresentationTlp.replaceAll(
+            insertRepresentation = insertWMSRepresentationTpl.replaceAll(
                     "%RESOURCE_ID%",
                     String.valueOf(resourceId));
         }
@@ -956,6 +1083,113 @@ public class SpatialIndexTools {
             LOGGER.debug(updateCount + " representations for resource with id '"
                         + resourceId + "' inserted");
         }
+
+        return updateCount;
+    }
+
+    /**
+     * Copies a WMS/TMS map layer representation from a source to a target resource.
+     *
+     * @param   sourceResourceId  DOCUMENT ME!
+     * @param   targetResourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     * @throws  FileNotFoundException         DOCUMENT ME!
+     */
+    public int copyResourceRepresentation(
+            final int sourceResourceId,
+            final int targetResourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
+        LOGGER.info("copying representation from source resource with id '"
+                    + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+
+        int representationId = -1;
+        synchronized (findRepresentationStatement) {
+            findRepresentationStatement.setInt(1, sourceResourceId);
+            final ResultSet resultSet = findRepresentationStatement.executeQuery();
+            if (resultSet.next()) {
+                representationId = resultSet.getInt(1);
+            }
+            resultSet.close();
+        }
+
+        if (representationId == -1) {
+            final String message = "could no copy representation from source resource with id '"
+                        + sourceResourceId
+                        + "' to target resource with id '"
+                        + targetResourceId
+                        + "': no suitable representation found for source resource";
+            LOGGER.error(message);
+            throw new FileNotFoundException(message);
+        }
+
+        synchronized (clearRepresentationStatement) {
+            clearRepresentationStatement.setInt(1, targetResourceId);
+            final int deleteCount = clearRepresentationStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(deleteCount + " old representations for resource with id '"
+                            + targetResourceId + "' removed");
+            }
+        }
+
+        final String copyRepresentation = copyRepresentationTpl.replaceAll(
+                    "%RESOURCE_ID%",
+                    String.valueOf(targetResourceId))
+                    .replaceAll("%REPRESENTATION_ID%", String.valueOf(targetResourceId));
+
+        final Statement copyRepresentationStatement = this.connection.createStatement();
+        final int updateCount = copyRepresentationStatement.executeUpdate(copyRepresentation);
+
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug(updateCount + " representations from source resource with id '"
+                        + sourceResourceId + "' to target resource with id '" + targetResourceId + "' copied");
+        }
+
+        return updateCount;
+    }
+
+    /**
+     * Copies search geometries from one resource to another.
+     *
+     * @param   sourceResourceId  DOCUMENT ME!
+     * @param   targetResourceId  DOCUMENT ME!
+     *
+     * @return  DOCUMENT ME!
+     *
+     * @throws  UnsupportedDataTypeException  DOCUMENT ME!
+     * @throws  SQLException                  DOCUMENT ME!
+     * @throws  FileNotFoundException         DOCUMENT ME!
+     */
+    public int copyResourceGeometry(
+            final int sourceResourceId,
+            final int targetResourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
+        LOGGER.info("copying geometries from source resource with id '"
+                    + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+
+        synchronized (clearGeomSearchStatement) {
+            clearGeomSearchStatement.setInt(1, targetResourceId);
+            final int deleteCount = clearGeomSearchStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(deleteCount + " old geometries for target resource with id '"
+                            + targetResourceId + "' removed from search geometries table");
+            }
+        }
+
+        final int updateCount;
+        synchronized (searchGeomCopyStatement) {
+            searchGeomCopyStatement.setInt(1, targetResourceId);
+            searchGeomCopyStatement.setInt(2, sourceResourceId);
+            updateCount = searchGeomCopyStatement.executeUpdate();
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug(updateCount + " search geometries copied from source resource with id '"
+                            + sourceResourceId + "' to target resource with id '"
+                            + targetResourceId + "' ");
+            }
+        }
+
+        this.updateResourceSpatialcoverage(targetResourceId);
 
         return updateCount;
     }
@@ -1020,72 +1254,90 @@ public class SpatialIndexTools {
     /**
      * DOCUMENT ME!
      *
+     * @param   zipFile       DOCUMENT ME!
      * @param   geometryType  DOCUMENT ME!
      * @param   resourceId    DOCUMENT ME!
      *
-     * @return  DOCUMENT ME!
+     * @return  true if the operation completed successfully
      *
      * @throws  UnsupportedDataTypeException  DOCUMENT ME!
      * @throws  SQLException                  DOCUMENT ME!
+     * @throws  FileNotFoundException         DOCUMENT ME!
      * @throws  NullPointerException          DOCUMENT ME!
      */
-    protected boolean publishToGeoserver(final GeometryType geometryType, final int resourceId)
-            throws UnsupportedDataTypeException, SQLException {
+    protected boolean publishToGeoserver(
+            final File zipFile,
+            final GeometryType geometryType,
+            final int resourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
         if (this.publisher == null) {
             throw new NullPointerException("cannot pusblish layer for resource "
                         + resourceId + " of type '" + geometryType + "': GeoServerPublisher not initialized!");
         }
 
-        final GSLayerEncoder layer = new GSLayerEncoder();
-        if (geometryType == GeometryType.POLYGON) {
-            layer.setDefaultStyle(GEOSERVER_POLYGON_STYLE);
-        } else if (geometryType == GeometryType.POINT) {
-            layer.setDefaultStyle(GEOSERVER_POINT_STYLE);
-        } else if (geometryType == GeometryType.LINE) {
-            layer.setDefaultStyle(GEOSERVER_LINE_STYLE);
-        } else {
-            throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
-                        + "' for resource " + resourceId + " is not supported by this operation");
-        }
-
         final String geometryTypeForResource = this.getGeometryTypeForResource(resourceId);
 
-        LOGGER.info("publishing new layer '" + resourceId + "' of type '" + geometryTypeForResource
-                    + "' (" + geometryType + ") to " + GEOSERVER_URL);
+        if (PUBLISH_POINT_LAYER_AS_SHAPE && (geometryType == GeometryType.POINT)) {
+            LOGGER.info("publishing new SHAPEFILE layer '" + resourceId + "' of type '" + geometryTypeForResource
+                        + "' (" + geometryType + ") to " + GEOSERVER_URL);
 
-        final VTGeometryEncoder vtGeom = new VTGeometryEncoder();
-        vtGeom.setName("geo_field");
-        vtGeom.setType(geometryTypeForResource);
-        vtGeom.setSrid("4326");
+            return publisher.publishShp(
+                    GEOSERVER_WORKSPACE,
+                    String.valueOf(resourceId),
+                    String.valueOf(resourceId),
+                    zipFile,
+                    SRS,
+                    GEOSERVER_NAMED_POINT_STYLE);
+        } else {
+            final GSLayerEncoder layer = new GSLayerEncoder();
+            if (geometryType == GeometryType.POLYGON) {
+                layer.setDefaultStyle(GEOSERVER_POLYGON_STYLE);
+            } else if (geometryType == GeometryType.POINT) {
+                layer.setDefaultStyle(GEOSERVER_POINT_STYLE);
+            } else if (geometryType == GeometryType.LINE) {
+                layer.setDefaultStyle(GEOSERVER_LINE_STYLE);
+            } else {
+                throw new UnsupportedDataTypeException("Geometry Type '" + geometryType
+                            + "' for resource " + resourceId + " is not supported by this operation");
+            }
 
-        final String selectVirtualLayerStatement = selectVirtualLayerTpl.replaceAll(
-                "%RESOURCE_ID%",
-                String.valueOf(resourceId));
+            LOGGER.info("publishing new DATABASE layer '" + resourceId + "' of type '" + geometryTypeForResource
+                        + "' (" + geometryType + ") to " + GEOSERVER_URL);
 
-        // Set-up the virtual table
-        final GSVirtualTableEncoder vte = new GSVirtualTableEncoder();
-        vte.setName(String.valueOf(resourceId));
-        vte.setSql(selectVirtualLayerStatement);
-        vte.addKeyColumn("id");
-        vte.addVirtualTableGeometry(vtGeom);
+            final VTGeometryEncoder vtGeom = new VTGeometryEncoder();
+            vtGeom.setName("geo_field");
+            vtGeom.setType(geometryTypeForResource);
+            vtGeom.setSrid("4326");
 
-        final GSFeatureTypeEncoder featureType = new GSFeatureTypeEncoder();
-        featureType.setName(String.valueOf(resourceId));
-        featureType.setTitle(String.valueOf(resourceId));
-        featureType.setAbstract("Feature Layer for SWITCH-ON Resource " + resourceId);
-        featureType.setDescription("Feature Layer for SWITCH-ON Resource " + resourceId);
-        featureType.setSRS(SRS);
-        featureType.setNativeCRS(SRS);
-        featureType.addKeyword("SWITCHON");
-        featureType.setProjectionPolicy(GSResourceEncoder.ProjectionPolicy.FORCE_DECLARED);
+            final String selectVirtualLayerStatement = selectVirtualLayerTpl.replaceAll(
+                    "%RESOURCE_ID%",
+                    String.valueOf(resourceId));
 
-        featureType.setMetadataVirtualTable(vte);
+            // Set-up the virtual table
+            final GSVirtualTableEncoder vte = new GSVirtualTableEncoder();
+            vte.setName(String.valueOf(resourceId));
+            vte.setSql(selectVirtualLayerStatement);
+            vte.addKeyColumn("id");
+            vte.addVirtualTableGeometry(vtGeom);
 
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("FeatureType '" + featureType.toString() + " created");
+            final GSFeatureTypeEncoder featureType = new GSFeatureTypeEncoder();
+            featureType.setName(String.valueOf(resourceId));
+            featureType.setTitle(String.valueOf(resourceId));
+            featureType.setAbstract("Feature Layer for SWITCH-ON Resource " + resourceId);
+            featureType.setDescription("Feature Layer for SWITCH-ON Resource " + resourceId);
+            featureType.setSRS(SRS);
+            featureType.setNativeCRS(SRS);
+            featureType.addKeyword("SWITCHON");
+            featureType.setProjectionPolicy(GSResourceEncoder.ProjectionPolicy.FORCE_DECLARED);
+
+            featureType.setMetadataVirtualTable(vte);
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("FeatureType '" + featureType.toString() + " created");
+            }
+
+            return publisher.publishDBLayer(GEOSERVER_WORKSPACE, GEOSERVER_DATASOURCE,
+                    featureType, layer);
         }
-        return publisher.publishDBLayer(GEOSERVER_WORKSPACE, GEOSERVER_DATASOURCE,
-                featureType, layer);
     }
 
     /**
@@ -1157,7 +1409,7 @@ public class SpatialIndexTools {
         return files;
     }
     /**
-     * DOCUMENT ME!
+     * Start with resourceId, postgres password, geoserver password.
      *
      * @param  args  DOCUMENT ME!
      */
