@@ -120,6 +120,7 @@ public class SpatialIndexTools {
                 + "        WHERE name = 'upload status' LIMIT 1) LIMIT 1), uploadmessage = ?\n"
                 + "WHERE uuid = ?;";
 
+    /** Copy geometry to search geometry (fallback if creation of search geometry from SHP file failed. */
     protected static final String searchGeomCopyTpl = "INSERT INTO geom_search(resource, geo_field, geom)\n"
                 + "SELECT resource.id,\n"
                 + "       geom.geo_field,\n"
@@ -220,7 +221,8 @@ public class SpatialIndexTools {
                 + "ORDER BY representation.id DESC\n"
                 + "LIMIT 1";
 
-    protected static final String copyGeomSearchTpl =
+    /** Duplicate the search geometries (copy from one resource to another. */
+    protected static final String duplicateGeomSearchTpl =
         "INSERT INTO \"public\".geom_search (resource, geo_field, geom)  \n"
                 + "    SELECT\n"
                 + "        ? as resource,\n"
@@ -354,7 +356,7 @@ public class SpatialIndexTools {
     protected final PreparedStatement searchGeomInsertPolygonStatement;
     protected final PreparedStatement searchGeomInsertLineStatement;
     protected final PreparedStatement clearGeomSearchStatement;
-    protected final PreparedStatement copyGeomSearchStatement;
+    protected final PreparedStatement duplicateGeomSearchStatement;
     protected final PreparedStatement clearRepresentationStatement;
     protected final PreparedStatement searchGeomCopyStatement;
     protected final PreparedStatement updateRepresentationStatusStatement;
@@ -491,7 +493,7 @@ public class SpatialIndexTools {
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
         this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
         this.findRepresentationStatement = this.connection.prepareStatement(findRepresentationTpl);
-        this.copyGeomSearchStatement = this.connection.prepareStatement(copyGeomSearchTpl);
+        this.duplicateGeomSearchStatement = this.connection.prepareStatement(duplicateGeomSearchTpl);
         this.publisher = null;
     }
 
@@ -535,7 +537,7 @@ public class SpatialIndexTools {
         this.clearGeomSearchStatement = this.connection.prepareStatement(clearGeomSearchTpl);
         this.clearRepresentationStatement = this.connection.prepareStatement(clearRepresentationTpl);
         this.findRepresentationStatement = this.connection.prepareStatement(findRepresentationTpl);
-        this.copyGeomSearchStatement = this.connection.prepareStatement(copyGeomSearchTpl);
+        this.duplicateGeomSearchStatement = this.connection.prepareStatement(duplicateGeomSearchTpl);
     }
 
     //~ Methods ----------------------------------------------------------------
@@ -1102,9 +1104,6 @@ public class SpatialIndexTools {
     public int copyResourceRepresentation(
             final int sourceResourceId,
             final int targetResourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
-        LOGGER.info("copying representation from source resource with id '"
-                    + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
-
         int representationId = -1;
         synchronized (findRepresentationStatement) {
             findRepresentationStatement.setInt(1, sourceResourceId);
@@ -1125,6 +1124,9 @@ public class SpatialIndexTools {
             throw new FileNotFoundException(message);
         }
 
+        LOGGER.info("copying representation '" + representationId + "' from source resource with id '"
+                    + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+
         synchronized (clearRepresentationStatement) {
             clearRepresentationStatement.setInt(1, targetResourceId);
             final int deleteCount = clearRepresentationStatement.executeUpdate();
@@ -1137,7 +1139,7 @@ public class SpatialIndexTools {
         final String copyRepresentation = copyRepresentationTpl.replaceAll(
                     "%RESOURCE_ID%",
                     String.valueOf(targetResourceId))
-                    .replaceAll("%REPRESENTATION_ID%", String.valueOf(targetResourceId));
+                    .replaceAll("%REPRESENTATION_ID%", String.valueOf(representationId));
 
         final Statement copyRepresentationStatement = this.connection.createStatement();
         final int updateCount = copyRepresentationStatement.executeUpdate(copyRepresentation);
@@ -1178,10 +1180,10 @@ public class SpatialIndexTools {
         }
 
         final int updateCount;
-        synchronized (searchGeomCopyStatement) {
-            searchGeomCopyStatement.setInt(1, targetResourceId);
-            searchGeomCopyStatement.setInt(2, sourceResourceId);
-            updateCount = searchGeomCopyStatement.executeUpdate();
+        synchronized (duplicateGeomSearchStatement) {
+            duplicateGeomSearchStatement.setInt(1, targetResourceId);
+            duplicateGeomSearchStatement.setInt(2, sourceResourceId);
+            updateCount = duplicateGeomSearchStatement.executeUpdate();
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(updateCount + " search geometries copied from source resource with id '"
                             + sourceResourceId + "' to target resource with id '"

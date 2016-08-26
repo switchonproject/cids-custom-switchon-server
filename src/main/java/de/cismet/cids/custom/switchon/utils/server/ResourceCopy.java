@@ -32,6 +32,11 @@ import static de.cismet.cids.custom.switchon.utils.server.SpatialIndexTools.LOGG
  */
 public class ResourceCopy {
 
+    //~ Static fields/initializers ---------------------------------------------
+
+    private static final int SOURCE_RESOURCE_CELL = 3;
+    private static final int TARGET_RESOURCE_CELL = 2;
+
     //~ Methods ----------------------------------------------------------------
 
     /**
@@ -108,8 +113,10 @@ public class ResourceCopy {
 
                     if (rowIdx > 1) {
                         final String resourceName = row.getCell(1).getStringCellValue();
-                        final int targetResourceId = ((Double)row.getCell(2).getNumericCellValue()).intValue();
-                        final int sourceResourceId = ((Double)row.getCell(4).getNumericCellValue()).intValue();
+                        final int targetResourceId = ((Double)row.getCell(TARGET_RESOURCE_CELL).getNumericCellValue())
+                                    .intValue();
+                        final int sourceResourceId = ((Double)row.getCell(SOURCE_RESOURCE_CELL).getNumericCellValue())
+                                    .intValue();
 
                         if ((targetResourceId > 0) && (sourceResourceId > 0)) {
                             final List<Integer> targetResourceIds;
@@ -140,7 +147,7 @@ public class ResourceCopy {
             for (final Entry<Integer, List<Integer>> entry : resourcesMap.entrySet()) {
                 final int sourceResourceId = entry.getKey();
                 final List<Integer> targetResourceIds = entry.getValue();
-                targetResourceIds.remove(sourceResourceId);
+                targetResourceIds.remove(targetResourceIds.indexOf(sourceResourceId));
                 if (!targetResourceIds.isEmpty()) {
                     for (final int targetResourceId : targetResourceIds) {
                         try {
