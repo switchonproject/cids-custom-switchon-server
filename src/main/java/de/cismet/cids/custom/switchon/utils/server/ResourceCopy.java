@@ -34,8 +34,9 @@ public class ResourceCopy {
 
     //~ Static fields/initializers ---------------------------------------------
 
-    private static final int SOURCE_RESOURCE_CELL = 3;
+    private static final int NAME_RESOURCE_CELL = 1;
     private static final int TARGET_RESOURCE_CELL = 2;
+    private static final int SOURCE_RESOURCE_CELL = 3;
 
     //~ Methods ----------------------------------------------------------------
 
@@ -112,7 +113,7 @@ public class ResourceCopy {
                     ++rowIdx;
 
                     if (rowIdx > 1) {
-                        final String resourceName = row.getCell(1).getStringCellValue();
+                        final String targetResourceName = row.getCell(NAME_RESOURCE_CELL).getStringCellValue();
                         final int targetResourceId = ((Double)row.getCell(TARGET_RESOURCE_CELL).getNumericCellValue())
                                     .intValue();
                         final int sourceResourceId = ((Double)row.getCell(SOURCE_RESOURCE_CELL).getNumericCellValue())
@@ -129,9 +130,9 @@ public class ResourceCopy {
 
                             targetResourceIds.add(targetResourceId);
                             if (LOGGER.isDebugEnabled()) {
-                                LOGGER.debug("resource '" + resourceName
-                                            + "' (" + sourceResourceId + ") maps to resource with id "
-                                            + targetResourceId);
+                                LOGGER.debug("target resource #" + rowIdx + " with id '" + targetResourceId
+                                            + "' (" + targetResourceName + ") maps to source resource with id '"
+                                            + sourceResourceId + "'");
                             }
                         } else {
                             LOGGER.warn("ignoring empty row #" + rowIdx + " in " + xslxFile.getName());
@@ -147,19 +148,41 @@ public class ResourceCopy {
             for (final Entry<Integer, List<Integer>> entry : resourcesMap.entrySet()) {
                 final int sourceResourceId = entry.getKey();
                 final List<Integer> targetResourceIds = entry.getValue();
-                targetResourceIds.remove(targetResourceIds.indexOf(sourceResourceId));
+
+                // remove self reference
+                final int index = targetResourceIds.indexOf(sourceResourceId);
+                if (index != -1) {
+                    targetResourceIds.remove(index);
+                }
+
                 if (!targetResourceIds.isEmpty()) {
                     for (final int targetResourceId : targetResourceIds) {
                         try {
-                            spatialIndexTools.copyResourceRepresentation(sourceResourceId, targetResourceId);
+                            final int sourceRepresentationId = spatialIndexTools.copyResourceRepresentation(
+                                    sourceResourceId,
+                                    targetResourceId);
+
                             spatialIndexTools.copyResourceGeometry(sourceResourceId, targetResourceId);
+
                             copyCount++;
+
+                            final String message = "target resource with id '" + targetResourceId
+                                        + "' successfully updated with source representation with id '"
+                                        + sourceRepresentationId
+                                        + "' from source resource with id '" + sourceResourceId + "'";
+                            LOGGER.info(message);
+                            System.out.println(message);
                         } catch (Throwable t) {
-                            SpatialIndexTools.LOGGER.fatal("could not copy source resource "
-                                        + sourceResourceId + " to target resource " + targetResourceId
-                                        + ": " + t.getMessage(),
+                            SpatialIndexTools.LOGGER.fatal("could not copy source resource with id '"
+                                        + sourceResourceId + "' to target resource with id '" + targetResourceId
+                                        + "': " + t.getMessage(),
                                 t);
                         }
+                    }
+                } else {
+                    if (LOGGER.isDebugEnabled()) {
+                        LOGGER.warn("ignoring equal target / source resource with id '"
+                                    + sourceResourceId + "'");
                     }
                 }
             }
@@ -168,7 +191,7 @@ public class ResourceCopy {
                         + xslxFile.getName() + "'";
 
             SpatialIndexTools.LOGGER.info(message);
-            System.out.println(message);
+            // System.out.println(message);
         } catch (Throwable t) {
             SpatialIndexTools.LOGGER.fatal(t.getMessage(), t);
             System.exit(1);

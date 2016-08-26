@@ -1123,15 +1123,16 @@ public class SpatialIndexTools {
             LOGGER.error(message);
             throw new FileNotFoundException(message);
         }
-
-        LOGGER.info("copying representation '" + representationId + "' from source resource with id '"
-                    + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("copying representation '" + representationId + "' from source resource with id '"
+                        + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+        }
 
         synchronized (clearRepresentationStatement) {
             clearRepresentationStatement.setInt(1, targetResourceId);
             final int deleteCount = clearRepresentationStatement.executeUpdate();
             if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(deleteCount + " old representations for resource with id '"
+                LOGGER.debug(deleteCount + " old representations for target resource with id '"
                             + targetResourceId + "' removed");
             }
         }
@@ -1149,7 +1150,7 @@ public class SpatialIndexTools {
                         + sourceResourceId + "' to target resource with id '" + targetResourceId + "' copied");
         }
 
-        return updateCount;
+        return representationId;
     }
 
     /**
@@ -1167,8 +1168,10 @@ public class SpatialIndexTools {
     public int copyResourceGeometry(
             final int sourceResourceId,
             final int targetResourceId) throws UnsupportedDataTypeException, SQLException, FileNotFoundException {
-        LOGGER.info("copying geometries from source resource with id '"
-                    + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("copying geometries from source resource with id '"
+                        + sourceResourceId + "' to target resource with id '" + targetResourceId + "'");
+        }
 
         synchronized (clearGeomSearchStatement) {
             clearGeomSearchStatement.setInt(1, targetResourceId);
