@@ -308,7 +308,7 @@ public class MetaObjectNodeResourceSearchStatement extends AbstractCidsServerSea
     protected void appendGeometry() {
         if (geometryToSearchFor != null) {
             final String geostring = PostGisGeometryFactory.getPostGisCompliantDbString(geometryToSearchFor);
-            query.append("AND g.geo_field && st_GeomFromEWKT('").append(geostring).append("')");
+            query.append("AND g.geo_field && ST_MakeValid(ST_GeomFromEWKT('").append(geostring).append("'))");
 
             if (((geoBuffer > 0) && (geometryToSearchFor instanceof Polygon))
                         || (geometryToSearchFor instanceof MultiPolygon)) {
