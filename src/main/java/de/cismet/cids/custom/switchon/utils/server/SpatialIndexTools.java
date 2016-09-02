@@ -93,11 +93,11 @@ public class SpatialIndexTools {
         "SELECT GeometryType(geo_field) from public.geom_search WHERE resource = %RESOURCE_ID% ORDER BY id DESC LIMIT 1";
 
     protected static final String searchGeomInsertPolygonTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_CollectionExtract(ST_MakeValid(geom),3) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_CollectionExtract(ST_MakeValid(geom),3) FROM import_tables.geosearch_import WHERE geom IS NOT NULL";
     protected static final String searchGeomInsertPointTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(ST_CollectionExtract(ST_MakeValid(geom),1)) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Collect(ST_CollectionExtract(ST_MakeValid(geom),1)) FROM import_tables.geosearch_import WHERE geom IS NOT NULL";
     protected static final String searchGeomInsertLineTpl =
-        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(ST_CollectionExtract(ST_MakeValid(geom),2)) FROM import_tables.geosearch_import";
+        "INSERT INTO public.geom_search(resource, geo_field) SELECT ?, ST_Union(ST_CollectionExtract(ST_MakeValid(geom),2)) FROM import_tables.geosearch_import WHERE geom IS NOT NULL";
 
     protected static final String updateResourceSpatialcoverageTpl = "WITH geom_coverage AS\n"
                 + "  (INSERT INTO \"public\".geom (geo_field) SELECT ST_Envelope(ST_ConvexHull(ST_Collect(geo_field))) AS geo_field\n"

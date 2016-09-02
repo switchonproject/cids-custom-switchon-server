@@ -158,10 +158,13 @@ public class ResourceCopy {
                 if (!targetResourceIds.isEmpty()) {
                     for (final int targetResourceId : targetResourceIds) {
                         try {
+                            // copy representatrion
                             final int sourceRepresentationId = spatialIndexTools.copyResourceRepresentation(
                                     sourceResourceId,
                                     targetResourceId);
+                            // final int sourceRepresentationId = -1;
 
+                            // copy geometry
                             spatialIndexTools.copyResourceGeometry(sourceResourceId, targetResourceId);
 
                             copyCount++;
