@@ -3,8 +3,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>de.cismet.cids</groupId>
-        <artifactId>cids-parent</artifactId>
+        <groupId>de.cismet</groupId>
+        <artifactId>cismet-parent</artifactId>
         <version>5.0-SNAPSHOT</version>
     </parent>
 
@@ -106,11 +106,28 @@
             </dependency>
 
             <!-- END: managed cids-dependencies -->    
+            <!--
+                Require upper bound dependencies error for commons-codec:commons-codec:1.6
+            -->
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.9</version>
+            </dependency>
+             
+            <!--
             <dependency>
                 <groupId>org.apache.xmlbeans</groupId>
                 <artifactId>xmlbeans</artifactId>
                 <version>2.5.0</version>
-            </dependency> 
+                <exclusions>
+                    <exclusion>
+                        <groupId>stax</groupId>
+                        <artifactId>stax-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            --> 
         </dependencies>
     </dependencyManagement>
 
@@ -136,12 +153,7 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-xml</artifactId>
-            <type>jar</type>
-        </dependency>
+        </dependency>  
         <dependency>
             <groupId>com.vividsolutions</groupId>
             <artifactId>jts</artifactId>
@@ -150,20 +162,30 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
+        <!--
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.xmlbeans</groupId>
-            <artifactId>xmlbeans</artifactId>
-        </dependency>
+        -->
         <!-- END: managed dependencies -->
         
         <!-- BEGIN: runtime dependencies -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-xml</artifactId>
+            <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>javax.xml.stream</groupId>
+                    <artifactId>stax-api</artifactId>
+                </exclusion>
+            </exclusions>
             <scope>runtime</scope>
         </dependency>
         <!-- END: runtime dependencies -->
@@ -177,19 +199,15 @@
         <!-- END: Provided dependencies -->
         
         <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util-lookup</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
             <groupId>it.geosolutions</groupId>
             <artifactId>geoserver-manager</artifactId>
             <version>1.7.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jdom</groupId>
+                    <artifactId>jdom</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.poi</groupId>
@@ -197,8 +215,8 @@
             <version>3.12</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.apache.xmlbeans</groupId>
-                    <artifactId>xmlbeans</artifactId>
+                    <groupId>stax</groupId>
+                    <artifactId>stax-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -206,12 +224,6 @@
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>3.12</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.xmlbeans</groupId>
-                    <artifactId>xmlbeans</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 
