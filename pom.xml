@@ -43,7 +43,6 @@
     </developers>
     
     <properties>
-        <de.cismet.libDir>lib/localSwitchon</de.cismet.libDir>
         <netbeans.version>RELEASE701</netbeans.version>
     </properties>
     
