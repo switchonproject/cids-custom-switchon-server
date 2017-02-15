@@ -111,7 +111,7 @@
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.9</version>
+                <version>1.10</version>
             </dependency>
              
             <!--
@@ -144,6 +144,19 @@
         <dependency>
             <groupId>de.cismet.cids</groupId>
             <artifactId>cids-server</artifactId>
+            <exclusions>
+                <!--
+                    Wrong jfreechart dependency in jasper!
+                -->
+                <exclusion>
+                    <groupId>jfree</groupId>
+                    <artifactId>jfreechart</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jfree</groupId>
+                    <artifactId>jcommon</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- END: cids-dependencies -->
         
