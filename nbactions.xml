@@ -155,7 +155,6 @@
         </properties>
         <activatedProfiles>
             <activatedProfile>netbeans-fastbuild</activatedProfile>
-            <activatedProfile>cismet-dev-exec</activatedProfile>
             <activatedProfile>switch-on</activatedProfile>
         </activatedProfiles>
     </action>
@@ -176,7 +175,6 @@
         </properties>
         <activatedProfiles>
             <activatedProfile>netbeans-fastbuild</activatedProfile>
-            <activatedProfile>cismet-dev-exec</activatedProfile>
             <activatedProfile>switch-on</activatedProfile>
         </activatedProfiles>
     </action>
@@ -196,7 +194,6 @@
         </properties>
         <activatedProfiles>
             <activatedProfile>netbeans-fastbuild</activatedProfile>
-            <activatedProfile>cismet-dev-exec</activatedProfile>
             <activatedProfile>switch-on</activatedProfile>
         </activatedProfiles>
     </action>
