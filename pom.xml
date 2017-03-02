@@ -42,10 +42,6 @@
         </developer>
     </developers>
     
-    <properties>
-        <netbeans.version>RELEASE701</netbeans.version>
-    </properties>
-    
     <dependencyManagement>  
         <!-- IMPORT of cismet-ext-bom -->
         <dependencies>
@@ -113,20 +109,6 @@
                 <artifactId>commons-codec</artifactId>
                 <version>1.10</version>
             </dependency>
-             
-            <!--
-            <dependency>
-                <groupId>org.apache.xmlbeans</groupId>
-                <artifactId>xmlbeans</artifactId>
-                <version>2.5.0</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>stax</groupId>
-                        <artifactId>stax-api</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-            --> 
         </dependencies>
     </dependencyManagement>
 
@@ -159,8 +141,7 @@
             </exclusions>
         </dependency>
         <!-- END: cids-dependencies -->
-        
-        
+
         <!-- BEGIN: managed dependencies -->
         <dependency>
             <groupId>log4j</groupId>
@@ -174,12 +155,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>
-        -->
         <!-- END: managed dependencies -->
         
         <!-- BEGIN: runtime dependencies -->
