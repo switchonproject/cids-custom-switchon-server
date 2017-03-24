@@ -14,8 +14,6 @@ import org.apache.log4j.Logger;
 
 import java.io.ByteArrayOutputStream;
 
-import java.nio.file.attribute.FileTime;
-
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Statement;
