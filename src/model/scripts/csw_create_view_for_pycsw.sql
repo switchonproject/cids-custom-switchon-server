@@ -2,8 +2,6 @@
 
 -- DROP VIEW pycsw.pycsw_view;
 
-CREATE SCHEMA IF NOT EXISTS pycsw;
-
 CREATE OR REPLACE VIEW pycsw.pycsw_view AS 
  WITH tag_to_group_resource AS (
          SELECT jt_resource_tag.resource_reference AS resid,
@@ -34,7 +32,7 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
         ), accumulatedlinks AS (
          SELECT resource.id,
             resource.name,
-            concat(translate(rep.description, ',',''), ',', type.name, ',', rep.contentlocation) AS link
+            concat(translate(rep.name, ','::text, ''::text), ',', translate(rep.description, ','::text, ''::text), ',', type.name, ',', rep.contentlocation) AS link
            FROM resource
              LEFT JOIN jt_resource_representation jt_rep ON jt_rep.resource_reference = resource.id
              LEFT JOIN representation rep ON rep.id = jt_rep.representationid
@@ -85,7 +83,7 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
           WHERE accumulatedtags_resource.taggroup = taggroup.id AND taggroup.name::text = 'constraints'::text AND resource.id = accumulatedtags_resource.resid
         ), temptable_links AS (
          SELECT accumulatedlinks.id,
-            concat('none', ',', array_to_string(array_accum(accumulatedlinks.link), ', '::text)) AS links
+            concat(array_to_string(array_accum(accumulatedlinks.link), '^'::text)) AS links
            FROM accumulatedlinks
           GROUP BY accumulatedlinks.id
         ), temptable_accessstuff AS (
@@ -98,8 +96,7 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
             tag limitations
           WHERE resource.accessconditions = conditions.id AND resource.accesslimitations = limitations.id
         ), pycsw_view AS (
-         SELECT DISTINCT 
-            resource.id AS resource_id,
+         SELECT DISTINCT resource.id AS resource_id,
             resource.uuid::text AS identifier,
             'eu.water-switch-on.data'::text AS parentidentifier,
             resource.name AS title,
@@ -157,7 +154,7 @@ CREATE OR REPLACE VIEW pycsw.pycsw_view AS
           WHERE metadata.type = (( SELECT tag.id
                    FROM tag
                   WHERE tag.name::text ~~* 'basic meta-data'::text))
-          ORDER BY resource.id ASC
+          ORDER BY resource.id
         )
  SELECT DISTINCT pycsw_view.identifier,
     pycsw_view.parentidentifier,
